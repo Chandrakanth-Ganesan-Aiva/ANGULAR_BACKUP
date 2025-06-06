@@ -1,0 +1,137 @@
+<h1 class="h4">Supplier Registration Approval - Technical</h1>
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-12 col-sm-6 col-md-4">
+                <label for="">Approved By</label>
+                <select class="form-select w-100" *ngFor="let load of loadArray">
+                    <option [value]="load.empid">{{load.empname}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="table-responsive w-100">
+            <table class="table table-bordered text-nowrap">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 300px;">Approve</th>
+                        <th style="width: 300px;">Party Code</th>
+                        <th style="width: 300px;">Party Name</th>
+                        <th style="width: 300px;">Address</th>
+                        <th style="width: 300px;">City</th>
+                        <th style="width: 300px;">State</th>
+                        <th style="width: 300px;">Country</th>
+                        <th style="width: 300px;">PinCode</th>
+                        <th style="width: 300px;">GST No</th>
+                        <th style="width: 300px;">Cr Days</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let table of tableArray">
+                        <td><input type="checkbox" class="form-check-input" (change)="select($event,table)" /></td>
+                        <td>{{table.code}}</td>
+                        <td class="text-break" style="text-align: left;">{{table.name}}</td>
+                        <td class="text-break" style="text-align: left;">{{table.address}}</td>
+                        <td style="text-align: left;">{{table.AreaName}}</td>
+                        <td style="text-align: left;">{{table.StateName}}</td>
+                        <td style="text-align: left;">{{table.CountryName}}</td>
+                        <td style="text-align: left;">{{table.pincode}}</td>
+                        <td class="text-break">{{table.gstno}}</td>
+                        <td>{{table.Creditperiod}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row mt-4">
+            <div class="col-12 col-md-4 mb-3">
+                <label>Party Id</label>
+                <input type="text" class="form-control" [(ngModel)]="partyid" readonly>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-4 mb-2">
+                <label>Machinery Details</label>
+                <input type="text" class="form-control" [(ngModel)]="MachineryDetails" readonly>
+            </div>
+            <div class="col-md-4 mb-2">
+                <label>Measuring Inst. Details</label>
+                <input type="text" class="form-control" [(ngModel)]="Measuring" readonly>
+            </div>
+            <div class="col-md-4 mb-2">
+                <label>Quality System</label>
+                <input type="text" class="form-control" [(ngModel)]="Qs" readonly>
+            </div>
+        </div>
+        <h5 class="mt-4" class="form-label"
+            style="font-size: 25px;font-family: 'Times New Roman', Times, serif;color: brown;text-align: center;">
+            Organisational Chart</h5>
+        <div class="card" style="background-color: #F5F5F5;">
+            <div class="card-body">
+                <h6
+                    style="font-size: 20px;font-family: 'Times New Roman', Times, serif;color: brown;text-align: center;">
+                    Man Power Details</h6>
+                <div class="row mb-3">
+                    <div class="col-md-6 mb-2">
+                        <label>Production</label>
+                        <input type="text" class="form-control" [(ngModel)]="production" readonly>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label>Quality</label>
+                        <input type="text" class="form-control" [(ngModel)]="quality" readonly>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6 mb-2">
+                        <label>Others</label>
+                        <input type="text" class="form-control" [(ngModel)]="others" readonly>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label>Total</label>
+                        <input type="text" class="form-control" [(ngModel)]="total" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3 mb-3">
+            <div class="col-md-6 mb-2">
+                <label>Weekly Holiday</label>
+                <input type="text" class="form-control" [(ngModel)]="weeklyHoliday" readonly>
+            </div>
+            <div class="col-md-6 mb-2">
+                <label>Working hours</label>
+                <input type="text" class="form-control" [(ngModel)]="workingHours" readonly>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6 mb-2">
+                <label>Shift Details</label>
+                <input type="text" class="form-control" [(ngModel)]="shiftDetails" readonly>
+            </div>
+            <div class="col-md-6 mb-2">
+                <label>Shift Timings</label>
+                <input type="text" class="form-control" [(ngModel)]="shiftTimings" readonly>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col-md-4 mb-2">
+                <label>Expansion Plan</label>
+                <input type="text" class="form-control" [(ngModel)]="exp_plan" readonly>
+            </div>
+            <div class="col-md-4 mb-2">
+                <label>Sanctioned Power Avl</label>
+                <input type="text" class="form-control" [(ngModel)]="sanctioned_pow_Avl" readonly>
+            </div>
+            <div class="col-md-4 mb-2">
+                <label>Standby Power</label>
+                <input type="text" class="form-control" [(ngModel)]="standBy_Power" readonly>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-end">
+                <button mat-raised-button style="background-color: green;color: white;"
+                    (click)="approve()">Approve</button>
+                <button mat-raised-button style="background-color: red;color: white;margin-left: 3px;"
+                    (click)="clear()">Clear</button>
+            </div>
+        </div>
+    </div>
+</div>

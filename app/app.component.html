@@ -1,0 +1,101 @@
+<ng-container *ngIf="UserName">
+    <ngx-spinner size="medium" type="ball-scale-multiples">
+        <mat-spinner color="accent"></mat-spinner>
+    </ngx-spinner>
+    <mat-toolbar class="navbar" [hidden]="Toolbar">
+        <mat-icon class="mr-3 fs-2 animate__flip" (click)="toggleSidenav()">menu</mat-icon>
+        <h3 class=" ml-1 text-white ">AIVA VENTURES</h3>
+        <span class="example-spacer"></span>
+        <div class="search-container mr-4">
+            <input type="search" class="form-control search" placeholder="Search MenuId"
+                matTooltip="After Type MenuId Press Enter Button To Open That Menu" (keydown)="InputEvent($event)">
+        </div>
+        <div class="nav-icons d-none d-md-flex -mb-3">
+            <a class="text-color-secondary " href="http://dataserver:1436/Reports/Pages/Folder.aspx"> <mat-icon
+                    class="mr-4 fs-3 " matTooltip="REPORT">bar_chart</mat-icon></a>
+            <mat-icon class="mr-4 fs-3 " [matTooltip]="UserName">person</mat-icon>
+            <mat-icon class="mr-4 fs-3 " matTooltip="LOGOUT" (click)="Logout()">exit_to_app</mat-icon>
+        </div>
+        <mat-icon class="more-options d-md-none" (click)="toggleMoreOptions()"
+            [matMenuTriggerFor]="moreMenu">more_vert</mat-icon>
+        <mat-menu #moreMenu="matMenu">
+            <button mat-menu-item (click)="openReports()">
+                <mat-icon>bar_chart</mat-icon> Report
+            </button>
+            <button mat-menu-item>
+                <mat-icon>person</mat-icon> {{ UserName }}
+            </button>
+            <button mat-menu-item (click)="Logout()">
+                <mat-icon>exit_to_app</mat-icon> Logout
+            </button>
+        </mat-menu>
+    </mat-toolbar>
+    <div class="sidenav-container">
+        <mat-sidenav-container class="sidenav-container overflow-hidden">
+            <mat-sidenav [class]="sidenavClass" [@sidenavState]="isSidenavOpen ? 'open' : 'closed'" [mode]="'over'"
+                position="start" [opened]="isSidenavOpen">
+                <mat-nav-list class="nav-list overflow-hidden">
+                    <div id="main-container">
+                        <div *ngFor="let menu of menus" class="sidenavRow border-bottom"
+                            (click)="toggleSubTitles(menu)">
+                            <div class="menu-title-container">
+                                <div class="menu-item">
+                                    <div class="icon-container">
+                                        <mat-icon>{{ menu.icon }}</mat-icon>
+                                    </div>
+                                    <span class="menu-title">{{ menu.Name }}</span>
+                                </div>
+                                <mat-icon class="mat-18" style="font-size: x-large; color: #8e9090;"
+                                    *ngIf="menu.MainId!=6 && menu.MainId!=7">
+                                    {{ getArrowIcon(menu) }}
+                                </mat-icon>
+                            </div>
+                            <div class="sidenavSubtitle"
+                                *ngIf="selectedMainMenuTitle === menu.Name && (menu.MainId!=6 && menu.MainId!=7)">
+                                <ul class="main">
+                                    <li *ngFor="let subtitle of subTitle" (click)="navigateToSubContainer(subtitle)">
+                                        <label>
+                                            {{ subtitle.MainMenuName }}
+                                        </label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="sub-container" style="display: none;">
+                        <div id="mainMenu">
+                            <mat-icon class="mat-18 text-black" style="font-size: x-large; color: #ffffff;"
+                                (click)="navigateToMainContainer()">
+                                keyboard_arrow_left
+                            </mat-icon>
+                            <div class="sidenavContentHeader  fs-4">
+                                {{ Subtitle }}
+                            </div>
+                        </div>
+                        <div>
+                            <div class="m-lg-2">
+                                <input type="search" class="form-control" placeholder="Search"
+                                    (input)="SearchEvent($event)">
+                            </div>
+                            <div *ngFor="let subMenu of SubMenuArr" [routerLink]="['/', subMenu.route]"
+                                class="sidenavContent" (click)="toggleSidenav()">
+                                <a [routerLink]="['/', subMenu.route]">
+                                    {{ subMenu.SubMenuName }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </mat-nav-list>
+            </mat-sidenav>
+            <mat-sidenav-content>
+                <router-outlet>
+                </router-outlet>
+            </mat-sidenav-content>
+        </mat-sidenav-container>
+    </div>
+</ng-container>
+<ng-container *ngIf="!UserName">
+    <router-outlet></router-outlet>
+</ng-container>
+<!-- </router-outlet>  -->
+<!-- </mat-sidenav-content> -->

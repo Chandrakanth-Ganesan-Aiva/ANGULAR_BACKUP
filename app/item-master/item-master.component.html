@@ -1,0 +1,165 @@
+
+<mat-card class="p-2 ">
+    <mat-card-header class="justify-content-center p-1 ">
+        <mat-card-title class="">Item Master</mat-card-title>
+    </mat-card-header>
+    <mat-divider></mat-divider>
+    <mat-card-content>
+        <div class="row">
+            <div class="col-12 col-sm-12 col-m- col-lg-6 mat-elevation-z8">
+                <form [formGroup]="form">
+                    <div class="row">
+                        <div class="col-12 col-sm-12 col-md-6  col-lg-6">
+                            <mat-form-field>
+                                <mat-label>Category</mat-label>
+                                <mat-select formControlName="category"(selectionChange)="CategoryEvent()">
+                                    <mat-option><ngx-mat-select-search [formControl]="catFilterControl"
+                                            [clearSearchInput]="true" placeholderLabel="---Search---"
+                                            noEntriesFoundLabel="No Records Found">
+                                        </ngx-mat-select-search></mat-option>
+                                    <mat-option *ngFor="let item of this.filterCategory"
+                                        [value]="item.grntypeid">{{item.grntype}}</mat-option>
+                                </mat-select>
+                                <mat-error >Field must be required</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-6  col-lg-6">
+                            <mat-form-field>
+                                <mat-label>Department</mat-label>
+                                <mat-select formControlName="Dept">
+                                    <mat-option><ngx-mat-select-search [formControl]="deptFilterArr"
+                                            placeholderLabel="---Search---"
+                                            noEntriesFoundLabel="No Records Found"></ngx-mat-select-search></mat-option>
+                                    <mat-option *ngFor="let item of filterDept" [value]="item.deptid">{{item.deptname}}</mat-option>
+                                </mat-select>
+                                <mat-error>Field must be required</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-6  col-lg-6">
+                            <mat-form-field>
+                                <mat-label>Item Code</mat-label>
+                                <input type="text" matInput formControlName="itemCode">
+                                <mat-error>Field must be required</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-6  col-lg-6">
+                            <mat-form-field>
+                                <mat-label>Drawing No</mat-label>
+                                <input type="text" matInput formControlName="drgo">
+                                <mat-error>Field must be required</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12  col-lg-12">
+                            <mat-form-field>
+                                <mat-label>Item Name</mat-label>
+                                <input type="text" matInput formControlName="itemName" (input)="itemEvent()">
+                                <mat-error>Field must be required</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                            <mat-form-field>
+                                <mat-label>Specification</mat-label>
+                                <textarea matInput placeholder="" formControlName="Spec"></textarea>
+                                <mat-error>Field must be required</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-6 col-lg-3">
+                            <mat-form-field>
+                                <mat-label>UOM</mat-label>
+                                <mat-select formControlName="Uom">
+                                    <mat-option><ngx-mat-select-search [formControl]="UomFilterArr"
+                                            placeholderLabel="---Search---"
+                                            noEntriesFoundLabel="No Records Found"></ngx-mat-select-search></mat-option>
+                                    <mat-option *ngFor="let item of filterUom" [value]="item.uomid">{{item.uomname}}</mat-option>
+                                </mat-select>
+                                <mat-error>Field must be required</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-6 col-lg-3">
+                            <mat-form-field>
+                                <mat-label>Make</mat-label>
+                                <input type="text" matInput formControlName="make">
+                                <mat-error>Field must be required</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-6 col-lg-3">
+                            <mat-form-field>
+                                <mat-label>Location</mat-label>
+                                <mat-select>
+                                    <mat-option><ngx-mat-select-search placeholderLabel="---Search---"
+                                            noEntriesFoundLabel="No Records Found"
+                                            [formControl]="RawMatLocFilterArr"></ngx-mat-select-search></mat-option>
+                                    <mat-option *ngFor="let item of filterRawMatLoc" [value]="item.id">{{item.locid}}</mat-option>
+                                </mat-select>
+                                <mat-error>Field must be required</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-6 col-lg-3">
+                            <mat-form-field>
+                                <mat-label>Weight</mat-label>
+                                <input type="text" matInput formControlName="weight">
+                                <mat-error>Field must be required</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-6 col-sm-12 col-md-6 col-lg-3">
+                            <mat-form-field>
+                                <mat-label>Grade</mat-label>
+                                <mat-select formControlName="grade">
+                                    <mat-option><ngx-mat-select-search placeholderLabel="---Search---"
+                                            noEntriesFoundLabel="No Records Found"
+                                            [formControl]="GradeFiterArr"></ngx-mat-select-search></mat-option>
+                                    <mat-option *ngFor="let item of filterGrade" [value]="item.gradeid">{{item.gradename}}</mat-option>
+                                </mat-select>
+                                <mat-error>Field must be required</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-6 col-sm-6 col-md-4 col-lg-3 ">
+                            <mat-checkbox  color="primary"  formControlName="saleable" (change)="saleableEvent($event)">Salable</mat-checkbox>
+                        </div>
+                        <div class="col-6 col-sm-6 col-md-4 col-lg-3 ">
+                            <mat-checkbox  color="primary"  formControlName="shelflife">Shelflife</mat-checkbox>
+                        </div>
+                        <div class="col-6 col-sm-6 col-md-4 col-lg-3 ">
+                            <mat-checkbox  color="primary"  formControlName="qcReq">Qc Req</mat-checkbox>
+                        </div>
+                        <div class="modal-footer p-2">
+                          <button mat-raised-button type="button" style="background-color: green;color: white;" (click)="saveVaild()">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-12 col-sm-12 col-m- col-lg-6">
+                <div class="mat-elevation-z8 table-wrapper">
+                    <h4 class="m-2">Rawmaterial Master</h4>
+                    <table mat-table #table [dataSource]="dataSource">
+                        <ng-container matColumnDef="SNo">
+                            <th mat-header-cell *matHeaderCellDef> S.No </th>
+                            <td mat-cell *matCellDef="let row;let i=index">{{i+1}} </td>
+                        </ng-container>
+                        <ng-container matColumnDef="Material">
+                            <th mat-header-cell *matHeaderCellDef> Material </th>
+                            <td mat-cell *matCellDef="let row"> {{row.rawmatname}} </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="['SNo','Material']"></tr>
+                        <tr mat-row *matRowDef="let row; columns: ['SNo','Material'];"></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </mat-card-content>
+</mat-card>
+<mat-card>
+    <mat-card-content>
+        <div class="mat-elevation-z8 table-wrapper  Item">
+            <h4 class="m-2"> Pending Rawmaterial Master</h4>
+            <table mat-table #table [dataSource]="dataSource1">
+                <ng-container matColumnDef="Material">
+                    <th mat-header-cell *matHeaderCellDef> Material </th>
+                    <td mat-cell *matCellDef="let row"> {{row.itemname}} </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="['Material']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['Material'];"></tr>
+            </table>
+        </div>
+    </mat-card-content>
+</mat-card>

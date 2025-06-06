@@ -1,0 +1,119 @@
+<div class="container-fluid p-3">
+    <h1 class="mb-3 text-center">Supplier Registration Approval - Finance</h1>
+    <div class="card">
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-4 col-sm-6 col-12">
+                    <label>Approved By</label>
+                    <input type="text" class="form-control" [(ngModel)]="empname" />
+                </div>
+            </div>
+            <div class="table-responsive mb-4">
+                <table class="table table-bordered table-hover w-100" style="table-layout: fixed;">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 300px;">Approve</th>
+                            <th style="width: 300px;">Party_Code</th>
+                            <th style="width: 300px;">Party_Name</th>
+                            <th style="width: 600px;">Address</th>
+                            <th style="width: 300px;">City</th>
+                            <th style="width: 300px;">State</th>
+                            <th style="width: 300px;">Country</th>
+                            <th style="width: 300px;">Pin_Code</th>
+                            <th style="width: 300px;">GST.No</th>
+                            <th style="width: 300px;">CrDays</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let table of tableArray">
+                            <td><input type="checkbox" class="form-check-input" (change)="select($event, table)" /></td>
+                            <td>{{table.code}}</td>
+                            <td style="text-align: left;">{{table.name}}</td>
+                            <td style="text-align: left;">{{table.address}}</td>
+                            <td style="text-align: left;">{{table.AreaName}}</td>
+                            <td style="text-align: left;">{{table.StateName}}</td>
+                            <td style="text-align: left;">{{table.CountryName}}</td>
+                            <td>{{table.pincode}}</td>
+                            <td>{{table.gstno}}</td>
+                            <td>{{table.Creditperiod}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 col-sm-6 col-12">
+                    <label>Party Id</label>
+                    <input type="text" class="form-control" [(ngModel)]="partyid" readonly />
+                </div>
+                <div class="col-md-4 col-sm-6 col-12">
+                    <label>Total Capital Investment</label>
+                    <input type="text" class="form-control" [(ngModel)]="capital" readonly />
+                </div>
+                <div class="col-md-3 col-sm-6 col-12">
+                    <label>Bankers name/ Address</label>
+                    <input type="text" class="form-control" [(ngModel)]="banker" readonly />
+                </div>
+                <div class="col-md-1 col-sm-6 col-12" style="margin-top: 23px;">
+                    <button mat-raised-button color="primary" (click)="viewBankDetails()">View</button>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 col-sm-6 col-12">
+                    <label>SSI Reg. No. & Others</label>
+                    <input type="text" class="form-control" [(ngModel)]="ssi" readonly />
+                </div>
+                <div class="col-md-4 col-sm-6 col-12 d-flex align-items-center mt-3 mt-md-0">
+                    <input type="checkbox" class="form-check-input me-2" [(ngModel)]="vendor"
+                        (click)="$event.preventDefault()" />
+                    <label>Registered Vendor</label>
+                </div>
+                <div class="col-md-3 col-sm-6 col-12">
+                    <label>GST No.</label>
+                    <input type="text" class="form-control" [(ngModel)]="gst" readonly />
+                </div>
+                <div class="col-md-1 col-sm-6 col-12" style="margin-top: 23px;">
+                    <button mat-raised-button color="primary" (click)="viewgst()">View</button>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 col-sm-6 col-12">
+                    <label>ECC No.</label>
+                    <input type="text" class="form-control" [(ngModel)]="ecc_no" readonly />
+                </div>
+                <div class="col-md-4 col-sm-6 col-12">
+                    <label>Current Type</label>
+                    <input type="text" class="form-control" [(ngModel)]="currency" readonly />
+                </div>
+                <div class="col-md-3 col-sm-6 col-12">
+                    <label for="">SME no.</label>
+                    <input type="text" class="form-control" [(ngModel)]="this.smeno">
+                </div>
+                <div class="col-md-1 col-sm-6 col-12" style="margin-top: 23px;">
+                    <button mat-raised-button color="primary" (click)="viewsme()">View</button>
+                </div>
+            </div>
+            <div class=" row mb-4">
+                <div class="col-md-4 col-sm-6 col-12">
+                    <label>Party Type</label>
+                    <input type="text" class="form-control" [(ngModel)]="partyType" readonly>
+                </div>
+                <div class="col-md-4 col-sm-6 col-12">
+                    <label>Ledger Group</label>
+                    <input type="text" [(ngModel)]="ledgergrp" class="form-control" readonly>
+                </div>
+                <div class="col-md-4 col-sm-6 col-12">
+                    <label>Ledger Name</label>
+                    <input type="text" class="form-control" [(ngModel)]="Ledgername" readonly />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col text-end">
+                    <button mat-raised-button style="background-color: green;color: white;"
+                        (click)="approve()">Approve</button>
+                    <button mat-raised-button style="background-color: red;color: white;margin-left: 3px;"
+                        (click)="clear()">Clear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

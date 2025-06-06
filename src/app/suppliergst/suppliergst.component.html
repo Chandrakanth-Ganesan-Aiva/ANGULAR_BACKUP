@@ -1,0 +1,96 @@
+<h1 class="mt-3 mb-4 text-center">Supplier GST No Update</h1>
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <input type="radio" class="form-check-input" id="supplier" value="Supplier" [(ngModel)]="supplierType"
+                    (change)="type()">
+                <label for="supplier" class="form-check-label">Supplier</label>
+            </div>
+            <div class="col-md-4">
+                <input type="radio" class="form-check-input" id="subcontractor" value="Subcontractor"
+                    [(ngModel)]="supplierType" (change)="type()">
+                <label for="subcontractor" class="form-check-label">Subcontractor</label>
+            </div>
+            <div class="col-md-4">
+                <input type="radio" class="form-check-input" id="customer" value="Customer" [(ngModel)]="supplierType"
+                    (change)="type()">
+                <label for="customer" class="form-check-label">Customer</label>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Supplier Name</label>
+                <ng-select [items]="supplierArray" bindLabel="supname" bindValue="supid" [(ngModel)]="supplierId"
+                    (change)="supplier($event)">
+                </ng-select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">GST No</label>
+                <input type="text" class="form-control" [(ngModel)]="gstNo" />
+            </div>
+        </div>
+
+        <!-- PAN and Contact -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">PAN No</label>
+                <input type="text" class="form-control" [(ngModel)]="PanNo" />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Contact Name</label>
+                <input type="text" class="form-control" [(ngModel)]="ContactNo" />
+            </div>
+        </div>
+
+        <!-- Email and Mobile -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <label class="form-label">Email ID</label>
+                <input type="text" class="form-control" [(ngModel)]="EmailId" />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Mobile No</label>
+                <input type="text" class="form-control" [(ngModel)]="MobileNo" />
+            </div>
+        </div>
+
+        <!-- Save Button -->
+        <div class="row mb-4">
+            <div class="col-md-12 text-end">
+                <button mat-raised-button style="background-color: #5161b6;color: white; font-size: 18px;"
+                    (click)="save()">Save</button>
+                <button mat-raised-button style="background-color: red;color: white;margin-left: 3px;"
+                    (click)="clear()">Clear</button>
+            </div>
+        </div>
+
+        <!-- Table for Displaying Data -->
+        <div class="table-responsive mt-4" style="max-height: 400px; overflow-y: auto;">
+            <table class="table table-bordered" style="table-layout: fixed; width: 1800px;">
+                <thead class="table-light sticky-top" style="top: 0; background-color: #fff; z-index: 1;">
+                    <tr>
+                        <th style="width: 300px;">Supplier Name</th>
+                        <th style="width: 300px;">GST No</th>
+                        <th style="width: 300px;">PAN No</th>
+                        <th style="width: 300px;">Contact Person</th>
+                        <th style="width: 300px;">Mobile No</th>
+                        <th style="width: 300px;">Email Id</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let table of TableArray">
+                        <td style="text-align: left; word-wrap: break-word; padding-left: 15px;">{{ table.supname }}
+                        </td>
+                        <td style="word-wrap: break-word;">{{ table.gstno }}</td>
+                        <td style="word-wrap: break-word;">{{ table.pannumber }}</td>
+                        <td style="word-wrap: break-word;">{{ table.gst_contact }}</td>
+                        <td style="word-wrap: break-word;">{{ table.gst_mobileno }}</td>
+                        <td style="text-align: left; word-wrap: break-word; padding-left: 15px;">{{ table.gst_emailid }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

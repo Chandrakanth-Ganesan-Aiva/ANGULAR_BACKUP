@@ -1,0 +1,151 @@
+<mat-card>
+    <mat-card-header class="justify-content-center">
+        <mat-card-title style="color: brown;font-family: 'Times New Roman', Times, serif;font-weight: bold;"
+            class="fs-3">Stock Report</mat-card-title>
+    </mat-card-header>
+    <mat-divider></mat-divider>
+    <mat-card-content class="p-2">
+    <form [formGroup]="form">
+        <div class="row">
+            <div class="col-6 col-sm-6 col-md-6 col-lg-3">
+                <mat-form-field>
+                    <mat-label>FromDate</mat-label>
+                    <input matInput [matDatepicker]="picker" formControlName="frmdate"
+                        (dateChange)="dateChageEvent($event)">
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+
+            </div>
+            <div class="col-6 col-sm-6 col-md-6 col-lg-3">
+                <mat-form-field>
+                    <mat-label>ToDate</mat-label>
+                    <input matInput [matDatepicker]="picker1" formControlName="todate">
+                    <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                    <mat-datepicker #picker1></mat-datepicker>
+                </mat-form-field>
+            </div>
+            <div class="col-6 col-sm-6 col-md-6 col-lg-3">
+                <mat-form-field>
+                    <mat-label>Category</mat-label>
+                    <mat-select formControlName="Category" (selectionChange)="catgChangeEvent()">
+                        <mat-option><ngx-mat-select-search [formControl]="CatgFilter" [clearSearchInput]="true"
+                                placeholderLabel="Search..."
+                                noEntriesFoundLabel="No Records Found"></ngx-mat-select-search></mat-option>
+                        <mat-option *ngFor="let item of catgArrFilter"
+                            [value]="item.grntypeid">{{item.grntype}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="col-6 col-sm-6 col-md-6 col-lg-3">
+                <mat-form-field>
+                    <mat-label>Location</mat-label>
+                    <mat-select formControlName="unit">
+                        <mat-option><ngx-mat-select-search [formControl]="LocFilter" [clearSearchInput]="true"
+                                placeholderLabel="Search..."
+                                noEntriesFoundLabel="No Records Found"></ngx-mat-select-search></mat-option>
+                        <mat-option *ngFor="let item of LocArrFilter"
+                            [value]="item.companyid">{{item.location}}</mat-option>
+                    </mat-select>
+                    <mat-error>Field Required</mat-error>
+                </mat-form-field>
+
+            </div>
+            <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+                <mat-form-field>
+                    <mat-label>Item</mat-label>
+                    <mat-select formControlName="Item">
+                        <mat-option><ngx-mat-select-search [formControl]="ItemFilter" [clearSearchInput]="true"
+                                placeholderLabel="Search..."
+                                noEntriesFoundLabel="No Records Found"></ngx-mat-select-search></mat-option>
+                        <mat-option *ngFor="let item of ItemArrFilt"
+                            [value]="item.rawmatid">{{item.rawmatname}}</mat-option>
+                    </mat-select>
+                    <mat-error>Field Required</mat-error>
+                </mat-form-field>
+            </div>
+
+            <div class="col-6 col-sm-6 col-md-6 col-lg-2 mt-1">
+                <button mat-raised-button type="button" color="primary" (click)="View()">View</button>
+                <!-- <button mat-raised-button type="button" color="warn" class="ml-4"  (click)="clear()">Clear</button> -->
+            </div>
+        </div>
+    </form>
+    </mat-card-content>
+    <mat-card-content>
+        <div class="mat-elevation-z8" >
+          <mat-form-field>
+            <mat-label>Search</mat-label>
+            <input type="text" matInput (input)="search($event)">
+          </mat-form-field>
+          <table mat-table #table [dataSource]="dataSource">
+            <ng-container matColumnDef="RawmatName" >
+              <th mat-header-cell *matHeaderCellDef> RawmatName </th>
+              <td mat-cell *matCellDef="let row"> {{row.rawmatname}} </td>
+            </ng-container>
+            <ng-container matColumnDef="Uom">
+              <th mat-header-cell *matHeaderCellDef> Uom </th>
+              <td mat-cell *matCellDef="let row"> {{row.uom}} </td>
+            </ng-container>
+            <ng-container matColumnDef="Opening">
+              <th mat-header-cell *matHeaderCellDef> Opening </th>
+              <td mat-cell *matCellDef="let row"> {{row.OP}} </td>
+            </ng-container>
+            <ng-container matColumnDef="Receipt" >
+                <th mat-header-cell *matHeaderCellDef> Receipt </th>
+                <td mat-cell *matCellDef="let row"> {{row.rec}} </td>
+              </ng-container>
+              <ng-container matColumnDef="issues">
+                <th mat-header-cell *matHeaderCellDef> Issues </th>
+                <td mat-cell *matCellDef="let row"> {{row.iss}} </td>
+              </ng-container>
+              <ng-container matColumnDef="Rej">
+                <th mat-header-cell *matHeaderCellDef> Rejection </th>
+                <td mat-cell *matCellDef="let row"> {{row.rejection}} </td>
+              </ng-container>
+              <ng-container matColumnDef="Closing" >
+                <th mat-header-cell *matHeaderCellDef> Closing </th>
+                <td mat-cell *matCellDef="let row"> {{row.closing}} </td>
+              </ng-container>
+              <ng-container matColumnDef="Rate">
+                <th mat-header-cell *matHeaderCellDef> Rate </th>
+                <td mat-cell *matCellDef="let row"> {{row.grate}} </td>
+              </ng-container>
+              <ng-container matColumnDef="Value">
+                <th mat-header-cell *matHeaderCellDef> Value </th>
+                <td mat-cell *matCellDef="let row"> {{row.value}} </td>
+              </ng-container>
+              <ng-container matColumnDef="Min" >
+                <th mat-header-cell *matHeaderCellDef> Minimum </th>
+                <td mat-cell *matCellDef="let row"> {{row.min_level}} </td>
+              </ng-container>
+              <ng-container matColumnDef="Max">
+                <th mat-header-cell *matHeaderCellDef> Maximum </th>
+                <td mat-cell *matCellDef="let row"> {{row.max_level}} </td>
+              </ng-container>
+              <ng-container matColumnDef="ReOrder">
+                <th mat-header-cell *matHeaderCellDef> ReOrder </th>
+                <td mat-cell *matCellDef="let row"> {{row.reorder_level}} </td>
+              </ng-container>
+              <ng-container matColumnDef="LeadDays" >
+                <th mat-header-cell *matHeaderCellDef> LeadDays </th>
+                <td mat-cell *matCellDef="let row"> {{row.leadtime}} </td>
+              </ng-container>
+              <ng-container matColumnDef="GrnType">
+                <th mat-header-cell *matHeaderCellDef> GrnType </th>
+                <td mat-cell *matCellDef="let row"> {{row.grntype}} </td>
+              </ng-container>
+              <ng-container matColumnDef="Location">
+                <th mat-header-cell *matHeaderCellDef> Location </th>
+                <td mat-cell *matCellDef="let row"> {{row.Stock}} </td>
+              </ng-container>
+            <td mat-footer-cell *matFooterCellDef> Total </td>
+            <tr mat-header-row *matHeaderRowDef="['RawmatName','Uom','Opening','Receipt','issues','Rej','Closing','Rate','Value','Min','Max','ReOrder','LeadDays','GrnType','Location'];sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['RawmatName','Uom','Opening','Receipt','issues','Rej','Closing','Rate','Value','Min','Max','ReOrder','LeadDays','GrnType','Location' ];"></tr>
+            <!-- <tr mat-footer-row *matFooterRowDef="['RawmatName','Uom','Opening','Receipt']; sticky: true"></tr> -->
+          </table>
+          <mat-paginator #paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons aria-label="Select page of periodic elements">
+          </mat-paginator>
+        </div>
+      </mat-card-content>
+</mat-card>

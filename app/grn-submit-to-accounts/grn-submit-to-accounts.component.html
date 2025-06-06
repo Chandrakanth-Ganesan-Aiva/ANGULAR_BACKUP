@@ -1,0 +1,105 @@
+<mat-card>
+    <mat-card-header class="justify-content-center">
+        <mat-card-title style="color: brown;font-family: 'Times New Roman', Times, serif;font-weight: bold;"
+            class="fs-3">Grn Submit To Accounts</mat-card-title>
+    </mat-card-header>
+    <mat-divider></mat-divider>
+    <form [formGroup]="form">
+    <div class="row">
+            <div class="col-6">
+                <mat-form-field>
+                    <mat-label>Location</mat-label>
+                    <input type="text" matInput formControlName="unit">
+                    <mat-error>Field Required</mat-error>
+                </mat-form-field>
+
+            </div>
+            <div class="col-6">
+
+                <mat-form-field>
+                    <mat-label>PrintId</mat-label>
+                    <input type="text" matInput formControlName="id">
+                    <mat-error>Field Required</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+    </form>
+    <div class="row ">
+        <div class="col-12 col-sm-12 col-md-12 col-lg-6">
+            <mat-form-field>
+                <mat-label>Search</mat-label>
+                <input type="text" matInput (input)="Search($event)">
+            </mat-form-field>
+            <div class="mat-elevation-z8">
+                <table mat-table #table [dataSource]="dataSource">
+                    <ng-container matColumnDef="select">
+                        <th mat-header-cell *matHeaderCellDef> Action </th>
+                        <td mat-cell *matCellDef="let row"><mat-checkbox [(ngModel)]="row.select"
+                                color="primary"></mat-checkbox></td>
+                    </ng-container>
+                    <ng-container matColumnDef="grnRefno">
+                        <th mat-header-cell *matHeaderCellDef> GrnRefNo </th>
+                        <td class="w-14rem" mat-cell *matCellDef="let row"> {{row.Grn_Ref_no}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="grnDate">
+                        <th mat-header-cell *matHeaderCellDef> Date </th>
+                        <td class="w-8rem" mat-cell *matCellDef="let row"> {{row.grndate}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="Supplier">
+                        <th mat-header-cell *matHeaderCellDef> Supplier </th>
+                        <td mat-cell *matCellDef="let row"> {{row.supname}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="Value">
+                        <th mat-header-cell *matHeaderCellDef> Value </th>
+                        <td mat-cell *matCellDef="let row"> {{row.value}} </td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="['select','grnRefno','grnDate','Supplier','Value']"></tr>
+                    <tr mat-row *matRowDef="let row; columns: ['select','grnRefno','grnDate','Supplier','Value'];"
+                        [class.highlight]="row.select"></tr>
+                </table>
+                <mat-paginator #paginator [pageSizeOptions]="[ 6, 25, 100]"
+                    aria-label="Select page of users"></mat-paginator>
+                <button mat-raised-button type="button" class="m-2 float-end" color="primary"
+                    (click)="View()">View</button>
+            </div>
+        </div>
+        <div class="col-12 col-sm-12 col-md-12 col-lg-6 mat-elevation-z8">
+            <div class="row " id="printableDiv">
+                <h2><strong>SANDFITS FOUNDRIES PVT LTD-UNIT-1</strong> </h2>
+                <h3><strong> GRN GATE PASS DETAILS FOR THE DATE <label style="color: blueviolet;">{{
+                            this.CurrDate}}</label></strong> </h3>
+
+                <table mat-table #table [dataSource]="dataSource1">
+                    <ng-container matColumnDef="SNo">
+                        <th class="text-black fw-bolder" mat-header-cell *matHeaderCellDef> SNo </th>
+                        <td mat-cell *matCellDef="let row;let i=index"> {{i+1}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="grnRefno">
+                        <th class="text-black fw-bolder" mat-header-cell *matHeaderCellDef> GrnRefNo </th>
+                        <td class="w-14rem" mat-cell *matCellDef="let row"> {{row.Grn_Ref_no}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="grnDate">
+                        <th class="text-black fw-bolder" mat-header-cell *matHeaderCellDef> Date </th>
+                        <td class="w-8rem" mat-cell *matCellDef="let row"> {{row.grndate}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="Supplier">
+                        <th class="text-black fw-bolder" mat-header-cell *matHeaderCellDef> Supplier </th>
+                        <td mat-cell *matCellDef="let row"> {{row.supname}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="Value">
+                        <th class="text-black fw-bolder" mat-header-cell *matHeaderCellDef> Value </th>
+                        <td mat-cell *matCellDef="let row"> {{row.value}} </td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="['SNo','grnRefno','grnDate','Supplier','Value']"></tr>
+                    <tr mat-row *matRowDef="let row; columns: ['SNo','grnRefno','grnDate','Supplier','Value'];"></tr>
+                </table>
+            </div>
+            <button mat-raised-button type="button" class="m-2 float-end" style="background-color: green;color: white;"
+                (click)="Print()">Print</button>
+        </div>
+    </div>
+
+    <mat-card-content>
+    </mat-card-content>
+
+</mat-card>

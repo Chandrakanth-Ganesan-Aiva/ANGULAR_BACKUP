@@ -1,0 +1,112 @@
+mat-form-field {
+  width: 100%;
+}
+
+table {
+  th {
+    margin: 0%;
+    background-color: #3f51b5;
+    color: white;
+    border: 1px solid silver;
+    text-align: center;
+  }
+
+  td {
+    border: 1px solid silver;
+  }
+}
+
+.highlight {
+  background-color: #ffff99;
+}
+
+// .pono{
+//     background-color: rgb(255, 251, 236);
+//     border: 1px solid black;
+// }
+tr:last-child {
+  border: 1px solid silver !important;
+}
+
+button {
+  border-radius: 50px;
+}
+
+mat-elevation-z2 {
+  overflow-x: auto;
+}
+
+.checkbox {
+  border: solid silver 1px
+}
+
+.received {
+  width: 10rem;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.custom-tooltip {
+  font-size: xx-large;
+  --bs-tooltip-bg: var(--bd-violet-bg) !important;
+  --bs-tooltip-color: var(--bs-white) !important;
+}
+
+@media screen and (min-width: 350px) and (max-width: 575px) {
+  mat-select {
+    font-size: small;
+  }
+
+  mat-option {
+    font-size: small;
+  }
+
+  mat-label {
+    font-size: smaller;
+  }
+
+  input {
+    font-size: smaller;
+  }
+
+  .form-control {
+    font-size: x-small;
+  }
+
+  table {
+    th {
+      font-size: smaller;
+    }
+
+    td {
+      font-size: smaller;
+    }
+
+  }
+
+  button {
+    font-size: small;
+    width: fit-content;
+  }
+
+}
+
+
+.disabled-column td:nth-child(6),
+/* Assuming 'Edit' is the 6th column */
+.disabled-column th:nth-child(6) {
+  pointer-events: none;
+  /* Prevent clicks */
+  opacity: 0.5;
+  /* Make it look visually disabled */
+}
+
+.disabled-icon {
+  pointer-events: none;
+  /* Disable only the icon */
+  opacity: 0.5;
+}

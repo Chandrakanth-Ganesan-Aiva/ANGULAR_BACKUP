@@ -1,0 +1,124 @@
+mat-form-field {
+  width: 100%;
+}
+
+table {
+
+  th {
+    margin: 0%;
+    color: gray;
+  }
+
+}
+
+.wallet-card {
+  padding: 20px;
+  width: 320px;
+}
+
+.wallet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.progress-bar {
+  margin-top: 10px;
+  height: 6px;
+  border-radius: 5px;
+}
+
+.wallet-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+.wallet-icon {
+  font-size: 12px;
+  margin-right: 5px;
+}
+
+.wallet-value {
+  font-weight: bold;
+}
+
+mat-icon:hover {
+  transform: scale(1);
+}
+p-tag {
+  display: inline-block !important;
+  font-size: 14px !important;
+}
+
+
+// ------------------------Warhouse
+.warehouse-container {
+  overflow: hidden;
+  padding: 2%;
+  display: grid;
+  flex-wrap: wrap; /* Allows items to wrap to the next row */
+  gap: 20px; /* Space between items */
+  justify-content: flex-start; /* Aligns items to the left */
+  grid-template-columns: repeat(4, 1fr); /* 4 columns */
+}
+
+.warehouse {
+  overflow: hidden;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: inline-block; /* Makes it take only necessary width */
+  white-space: nowrap; /* Prevents text from breaking */
+  transition: all 0.3s ease-in-out;
+}
+
+.warehouse:hover {
+
+  background-color: #f5f5f5;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+.rstock {
+  
+  font-size: 18px;
+  font-weight: bold;
+  // color: #d32f2f; /* Highlight stock value */
+  // label{
+  //   padding-right: 10%;
+  // }
+}
+
+.location-name {
+  font-weight: bold;
+  font-size: 14px;
+  color: #555;
+  // label{
+  //   padding-right: 2%;
+  // }
+}
+
+@media (max-width: 1024px) {
+  .warehouse-container {
+    grid-template-columns: repeat(3, 1fr); /* 3 columns for tablets */
+  }
+}
+
+@media (max-width: 768px) {
+  .warehouse-container {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns for smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .warehouse-container {
+    grid-template-columns: repeat(1, 1fr); /* 1 column for mobile */
+  }
+}
+

@@ -1,0 +1,407 @@
+<h1>Supplier Registration</h1>
+<div class="card" style="margin-left: 30px;margin-right: 30px;">
+    <div class="card-body p-3">
+        <div class="row">
+            <div class="col-lg-4 col-12 mb-2">
+                <input type="checkbox" class="form-check-input" [checked]="type === 'supplier'"
+                    [disabled]="type && type !== 'supplier'" (change)="Selectedtype($event, 'supplier')" />
+                <label class="form-check-label">Supplier</label>
+            </div>
+            <div class="col-lg-4 col-12 mb-2">
+                <input type="checkbox" class="form-check-input" [checked]="type === 'subcontractor'"
+                    [disabled]="type && type !== 'subcontractor'" (change)="Selectedtype($event, 'subcontractor')" />
+                <label class="form-check-label">Subcontractor</label>
+            </div>
+            <div class="col-lg-4 col-12 mb-2">
+                <input type="checkbox" class="form-check-input" [checked]="type === 'customer'"
+                    [disabled]="type && type!=='customer'" (change)="Selectedtype($event, 'customer')" />
+                <label class="form-check-label">Customer</label>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card mt-3" style="margin-left: 30px;margin-right: 30px;padding: 30px;" *ngIf="show">
+    <div class="card-body p-3">
+        <div class="row" style="padding:10px; border: 1px solid rgb(231, 231, 231); background-color:#f5f5f5;">
+            <div class="col-12 col-lg-4 mb-2">
+                <input type="radio" class="form-check-input" [checked]="supplier === 'General'"
+                    (change)="SelectedSupplier($event, 'General')" />
+                <label class="form-check-label">General Supplier</label>
+            </div>
+            <div class="col-12 col-lg-4">
+                <input type="radio" class="form-check-input" [checked]="supplier === 'Production'"
+                    (change)="SelectedSupplier($event, 'Production')" />
+                <label class="form-check-label">Production Supplier</label>
+            </div>
+        </div>
+    </div>
+    <h1>Entry</h1>
+    <table class="table table-bordered" style="width: 100%; border: 1px solid #ddd;" *ngIf="table">
+        <thead style="display: table; width: 100%; table-layout: fixed; background-color: #3f51b5; color: white;">
+            <tr>
+                <th style="width: 30%;">Code</th>
+                <th style="width: 70%;">Party Name</th>
+            </tr>
+        </thead>
+        <tbody style="display: block; max-height: 280px; overflow-y: auto; width: 100%;">
+            <tr *ngFor="let party of partyArray" style="display: table; table-layout: fixed; width: 100%;">
+                <td style="width: 30%;">{{ party.code }}</td>
+                <td style="width: 70%;">{{ party.name }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="mt-3">
+        <ul class="nav nav-tabs" id="supplierTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="general-tab" data-bs-toggle="tab" href="#general" role="tab"
+                    aria-controls="general" aria-selected="true" style="font-size: 20px;">General</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="commercial-tab" data-bs-toggle="tab" href="#commercial" role="tab"
+                    aria-controls="commercial" aria-selected="false" style="font-size: 20px;">Commercial</a>
+            </li>
+            <li class="nav-item" role="presentation" *ngIf="tabhide">
+                <a class="nav-link" id="technical-tab" data-bs-toggle="tab" href="#technical" role="tab"
+                    aria-controls="technical" aria-selected="false" style="font-size: 20px;">Technical</a>
+            </li>
+        </ul>
+        <div class="tab-content" id="supplierTabsContent">
+            <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab"
+                style="padding: 30px;">
+                <div class="row">
+                    <div class="col-12 col-md-4 mb-2">
+                        <label class="form-check-label">Supplier Code <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" [(ngModel)]="suppliercode" readonly />
+                    </div>
+                    <div class="col-12 col-md-4 mb-2">
+                        <label class="form-check-label">Supplier Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" [(ngModel)]="suppname" (input)="suppnamefun()" />
+                    </div>
+                    <div class="col-12 col-md-4 mb-2">
+                        <label class="form-check-label">Contact Person <span class="text-danger">*</span> </label>
+                        <input type="text" class="form-control" [(ngModel)]="contactperson" />
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12 col-md-4 mb-2">
+                        <label class="form-check-label">Contact No <span class="text-danger">*</span></label>
+                        <input type="number" (keydown)="blockInvalidKeys($event)" min="10" max="10" class="form-control"
+                            [(ngModel)]="contactno" />
+                    </div>
+                    <div class="col-12 col-md-4 mb-2">
+                        <label class="form-check-label">E-Mail <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" [(ngModel)]="email" />
+                    </div>
+                    <!-- <div class="col-12 col-md-4 mb-2">
+                        <label class="form-check-label">Fax No</label>
+                        <input type="text" class="form-control" [(ngModel)]="faxno" />
+                    </div> -->
+                    <div class="col-12 col-md-4 mb-2">
+                        <label class="form-check-label">Website</label>
+                        <input type="text" class="form-control" [(ngModel)]="website" />
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12 col-md-4 mb-2">
+                        <label class="form-check-label">Pan No</label>
+                        <input type="text" class="form-control" [(ngModel)]="panno" />
+                    </div>
+                    <div class="col-12 col-md-3 mb-2">
+                        <label class="form-check-label">Pan Card</label>
+                        <input type="file" class="form-control" (change)="onFileSelected($event, 'panCard')" />
+                    </div>
+                    <div class="col-12 col-md-1 mt-4 mb-2">
+                        <button mat-raised-button color="primary" (click)="viewFile('panCard')">View</button>
+                    </div>
+                    <div class="col-12 col-md-3 mb-2">
+                        <label class="form-check-label">Organization_Type <span class="text-danger">*</span></label>
+                        <select class="form-select" [(ngModel)]="selectorgname" (change)="selectorgnamefunc()">
+                            <option *ngFor="let org of OrganArray" [value]="org.id">{{ org.orgname }}</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-1 mt-4 mb-2">
+                        <button mat-raised-button style="background-color: #5161b6;color: white;"
+                            (click)="add()">Add</button>
+                    </div>
+                </div>
+                <div class="row align-items-end">
+                    <!-- Organization Type -->
+                    <div class="col-md-3 mb-2" *ngIf="orghide">
+                        <label class="form-check-label">New Organisation Type</label>
+                        <input type="text" class="form-control" [(ngModel)]="newOrganisation" />
+                    </div>
+                    <div class="col-md-2 mb-2" *ngIf="orghide">
+                        <button mat-raised-button style="background-color: green;color: white;"
+                            (click)="orgSave()">Save</button>
+                    </div>
+                    <div class="col-md-2 mb-2" *ngIf="orghide">
+                        <button mat-raised-button style="background-color: red;color: white;margin-left: 5px;"
+                            (click)="close()">Close</button>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12 col-md-4 mb-2">
+                        <label class="form-check-label">Establishment Year</label>
+                        <input type="number" class="form-control" [(ngModel)]="Establishyear"
+                            (keydown)="blockInvalidKeys($event)" />
+                    </div>
+                    <div class="col-12 col-md-4 mb-2">
+                        <label class="form-check-label">Executive Name</label>
+                        <input type="text" class="form-control" [(ngModel)]="executive" />
+                    </div>
+                    <div class="col-12 col-md-4 mb-2">
+                        <label class="form-check-label">Major Customer</label>
+                        <input type="text" class="form-control" [(ngModel)]="majorCust" />
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12 col-md-4 mb-2">
+                        <label class="form-check-label">Company Address <span class="text-danger">*</span></label>
+                        <textarea class="form-control" style="resize: none;" draggable="false"
+                            [(ngModel)]="companyaddr"></textarea>
+                    </div>
+                    <div class="col-12 col-md-4 mb-2">
+                        <label class="form-check-label">Address Proof Type <span class="text-danger">*</span></label>
+                        <input type="text" [(ngModel)]="Addressprooftype" class="form-control" name="" id="">
+                    </div>
+                    <div class="col-12 col-md-3 mb-2">
+                        <label class="form-check-label">Company Address Proof <span class="text-danger">*</span></label>
+                        <input type="file" class="form-control" (change)="onFileSelected($event, 'addressProof')" />
+                    </div>
+                    <div class="col-12 col-md-1 mt-4 mb-2">
+                        <button mat-raised-button color="primary" (click)="viewFile('addressProof')">View</button>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12 col-md-4 mb-2">
+                        <label class="form-check-label">Country <span class="text-danger">*</span></label>
+                        <select class="form-select" [(ngModel)]="selectedCountryID" name="country" (change)="Country()">
+                            <option *ngFor="let country of countryArray" [value]="country.countryid">
+                                {{country.countryname}}</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-4 mb-2">
+                        <label class="form-check-label">State <span class="text-danger">*</span></label>
+                        <select class="form-select" [(ngModel)]="selectedStateID" name="state" (change)="state()">
+                            <option *ngFor="let state of stateArray" [value]="state.stateid">
+                                {{ state.statename }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-4 mb-2">
+                        <label class="form-check-label">Area/City <span class="text-danger">*</span></label>
+                        <select class="form-select" [(ngModel)]="area" name="" (change)="selectedArea()">
+                            <option *ngFor="let area of areaArray" [value]="area.areaid">{{area.areaname}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12 col-md-4 mb-2">
+                        <label class="form-check-label">Pin Code <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" [(ngModel)]="pincode" />
+                    </div>
+                    <div class="col-12 col-md-4 mb-2">
+                        <label class="form-check-label">Credit Period <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" [(ngModel)]="creditperiod"
+                            (keydown)="blockInvalidKeys($event)" />
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="commercial" role="tabpanel" aria-labelledby="commercial-tab">
+                <div class="tab-content" id="supplierTabsContent">
+                    <div class="tab-pane fade show active" id="commercial" role="tabpanel" aria-labelledby="general-tab"
+                        style="padding: 30px;">
+                        <div class="row mt-3">
+                            <div class="col-12 col-md-4 mb-2">
+                                <label class="form-check-label">Total Capital
+                                    Investment <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" [(ngModel)]="totalcapInv"
+                                    (keydown)="blockInvalidKeys($event)" />
+                            </div>
+                            <div class="col-12 col-md-4 mb-2">
+                                <label class="form-check-label">Bankers Name/Address <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" [(ngModel)]="Bankersname" />
+                            </div>
+                            <div class="col-12 col-md-3 mb-2">
+                                <label class="form-check-label">Bank Details <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control"
+                                    (change)="onFileSelected($event, 'bankDetails')" />
+                            </div>
+                            <div class="col-12 col-md-1 mt-4 mb-2">
+                                <button mat-raised-button color="primary"
+                                    (click)="viewFile('bankDetails')">View</button>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12 col-md-4 mb-2">
+                                <label class="form-check-label">SSI Reg. No. &
+                                    Others</label>
+                                <input type="text" class="form-control" [(ngModel)]="ssi" />
+                            </div>
+                            <div class="col-12 col-md-4 mb-2">
+                                <label class="form-check-label">ECC No</label>
+                                <input type="text" class="form-control" [(ngModel)]="ecc" />
+                            </div>
+                            <div class="col-12 col-md-4 mb-2">
+                                <label class="form-check-label">Currency Type <span class="text-danger">*</span></label>
+                                <select class="form-select" [(ngModel)]="selectedCurrency" (change)="currid()">
+                                    <option *ngFor="let Currency of currencyArray" [ngValue]="Currency">
+                                        {{ Currency.CurrDesc }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12 col-md-4 mb-2 mt-4">
+                                <input type="checkbox" style="padding: 8px;" class="form-check-input"
+                                    [(ngModel)]="registeredVendor" (change)="regVendor($event)" />
+                                <label class="form-check-label">Registered Vendor</label>
+                            </div>
+                            <div class="col-12 col-md-4 mb-2" *ngIf="gstshow">
+                                <label class="form-check-label">GST No</label>
+                                <input type="text" class="form-control" [(ngModel)]="gstno" />
+                            </div>
+                            <div class="col-12 col-md-3 mb-2" *ngIf="gstshow">
+                                <label class="form-check-label">GST Certificate</label>
+                                <input type="file" class="form-control"
+                                    (change)="onFileSelected($event, 'gstCertificate')" />
+                            </div>
+                            <div class="col-12 col-md-1 mt-4 mb-2">
+                                <button mat-raised-button color="primary"
+                                    (click)="viewFile('gstCertificate')">View</button>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12 col-md-4 mb-2">
+                                <label class="form-check-label">SME No</label>
+                                <input type="text" class="form-control" [(ngModel)]="smeno">
+                            </div>
+                            <div class="col-12 col-md-3 mb-2">
+                                <label class="form-check-label">SME Certificate</label>
+                                <input type="file" class="form-control"
+                                    (change)="onFileSelected($event, 'smeCertificate')" />
+                            </div>
+                            <div class="col-12 col-md-1 mt-4 mb-2">
+                                <button mat-raised-button color="primary"
+                                    (click)="viewFile('smeCertificate')">View</button>
+                            </div>
+                        </div>
+                        <div class="card mt-3" style="background-color:#f5f5f5;">
+                            <div class="card-body">
+                                <div class="row mt-3">
+                                    <div class="col-6">
+                                        <label class="form-check-label">Party Type <span class="text-danger">*</span>
+                                        </label>
+                                        <select class="form-select" [(ngModel)]="partytype">
+                                            <option [ngValue]="null">--Select--</option>
+                                            <option *ngFor="let party of partytypeListArray" [ngValue]="party.CTypeId">
+                                                {{ party.xxx }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-check-label">Ledger group
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <select class="form-select" [(ngModel)]="selectedLedger">
+                                            <option [ngValue]="null">--Select--</option>
+                                            <option *ngFor="let ledger of LedgerGroupListArray"
+                                                [ngValue]="ledger.AccountId">
+                                                {{ ledger.xxx }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="technical" role="tabpanel" aria-labelledby="technical-tab"
+                style="padding: 30px;" *ngIf="tabhide">
+                <div class="row mt-3">
+                    <div class="col-4">
+                        <label class="form-check-label" for="">Machinery Details</label>
+                        <input type="text" class="form-control" [(ngModel)]="machdetails">
+                    </div>
+                    <div class="col-4">
+                        <label class="form-check-label" for="">Measuring Inst. Details</label>
+                        <input type="text" class="form-control" [(ngModel)]="measuring">
+                    </div>
+                    <div class="col-4">
+                        <label class="form-check-label" for="">Quality System</label>
+                        <input type="text" class="form-control" [(ngModel)]="qualitySystem" />
+                    </div>
+                </div>
+                <h1 class="mt-3">Organisational Chart</h1>
+                <div class="card mt-0" style="background-color:#f5f5f5;">
+                    <div class="card-body">
+                        <h1>Man Power Details</h1>
+                        <div class="row">
+                            <div class="col-6">
+                                <label class="form-check-label" for="">Production</label>
+                                <input type="text" class="form-control" [(ngModel)]="production">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-check-label" for="">Quality</label>
+                                <input type="text" class="form-control" [(ngModel)]="quality">
+                            </div>
+                        </div>
+                        <div class="row mt-3 mb-3">
+                            <div class="col-6">
+                                <label class="form-check-label" for="">Others</label>
+                                <input type="text" class="form-control" [(ngModel)]="others">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-check-label" for="">Total</label>
+                                <input type="text" class="form-control" [(ngModel)]="total">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-6">
+                        <label class="form-check-label" for="">Weekly Holiday</label>
+                        <input type="text" class="form-control" [(ngModel)]="weeklyholiday">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-check-label" for="">Working hours</label>
+                        <input type="text" class="form-control" [(ngModel)]="workinghours">
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-6">
+                        <label class="form-check-label" for="">Shift Details</label>
+                        <input type="text" class="form-control" [(ngModel)]="shiftDetails">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-check-label" for="">Shift Timings</label>
+                        <input type="text" class="form-control" [(ngModel)]="shiftTimings">
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-4">
+                        <label class="form-check-label" for="">Expansion plan</label>
+                        <input type="text" class="form-control" [(ngModel)]="expansionPlan">
+                    </div>
+                    <div class="col-4">
+                        <label class="form-check-label" for="">Sanctioned Power Avl</label>
+                        <input type="text" class="form-control" [(ngModel)]="sanctionedPowAvl">
+                    </div>
+                    <div class="col-4">
+                        <label class="form-check-label" for="">Standby Power</label>
+                        <input type="text" class="form-control" [(ngModel)]="StandByPower">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row text-end">
+        <div>
+            <button mat-raised-button style="background-color:green;color: white;" (click)="onSubmit()">Save</button>
+            <button mat-raised-button style="background-color:red;color: white;margin-left: 10px;"
+                (click)="clear()">Clear</button>
+        </div>
+    </div>
+</div>

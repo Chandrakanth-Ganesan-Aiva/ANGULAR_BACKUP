@@ -1,0 +1,124 @@
+<h1 class="mt-2">Customer Product Packing Details</h1>
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <!-- Customer Name -->
+            <div class="col-md-6 col-sm-12">
+                <label for="">Customer Name</label>
+                <ng-select [items]="CustArray" bindLabel="custname" bindValue="custid" [(ngModel)]="custid"
+                    (change)="customer()" [disabled]="custshow">
+                </ng-select>
+            </div>
+
+            <!-- Product Name -->
+            <div class="col-md-6 col-sm-12">
+                <label for="">Product Name</label>
+                <ng-select [items]="ProductArray" bindLabel="prodname" bindValue="matlid" [(ngModel)]="prod"
+                    (change)="product($event)" [disabled]="show">
+                </ng-select>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-6 col-sm-12">
+                <label for="">Casting Weight</label>
+                <input type="text" class="form-control" [(ngModel)]="this.casting" readonly />
+            </div>
+        </div>
+        <div class="row mt-3" *ngIf="threefield">
+            <!-- Packing Material -->
+            <div class="col-md-6 col-sm-12">
+                <label for="">Packing Material</label>
+                <ng-select [items]="packageArray" bindLabel="rawmatname" bindValue="rawmatid"
+                    [(ngModel)]="packingmaterial" (change)="packing($event)">
+                </ng-select>
+            </div>
+            <!-- Weight -->
+            <div class="col-md-6 col-sm-12">
+                <label for="">Packing Weight</label>
+                <input type="text" class="form-control" [(ngModel)]="packingwt">
+            </div>
+        </div>
+        <div class="row mt-3" *ngIf="threefield">
+            <!-- Packing Quantity -->
+            <div class="col-md-6 col-sm-12">
+                <label for="">Packing Qty</label>
+                <input type="text" class="form-control" [(ngModel)]="packingqty">
+            </div>
+        </div>
+        <!-- Add Button -->
+        <div class="mt-3">
+            <button mat-raised-button class="btn btn-primary" (click)="add()"
+                style="background-color:#5161b6;color:white;font-size: 18px;">
+                Add
+            </button>
+        </div>
+        <!-- Table Display -->
+        <div class="table-responsive mt-3" *ngIf="Tableshow">
+            <table class="table table-bordered table-fixed"
+                style="width: 100%; table-layout: fixed; border: 1px solid #ddd;">
+                <thead>
+                    <tr>
+                        <th style="width: 300px;">Material Name</th>
+                        <th style="width: 200px;">UOM</th>
+                        <th style="width: 200px">Weight</th>
+                        <th style="width: 200px;">Pack Qty</th>
+                        <th style="width: 200px">Remove</th>
+                        <th style="width: 200px">Edit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let table of TableArray; let i = index">
+                        <td style="text-align: left">{{ table.rawmatname }}</td>
+                        <td>{{ table.uom }}</td>
+                        <!-- Editable Weight Column -->
+                        <td>
+                            <ng-container *ngIf="editIndex === i; else viewWeight">
+                                <input type="number" class="form-control" [(ngModel)]="table.packingwt">
+                            </ng-container>
+                            <ng-template #viewWeight>
+                                {{ table.packingwt }}
+                            </ng-template>
+                        </td>
+                        <!-- Editable Pack Qty Column -->
+                        <td>
+                            <ng-container *ngIf="editIndex === i; else viewPackQty">
+                                <input type="number" class="form-control" [(ngModel)]="table.packingqty">
+                            </ng-container>
+                            <ng-template #viewPackQty>
+                                {{ table.packingqty }}
+                            </ng-template>
+                        </td>
+                        <!-- Remove Button -->
+                        <td>
+                            <button mat-raised-button style="background-color: red; color: white;font-size: 18px;"
+                                (click)="removeRow(i)">
+                                Remove
+                            </button>
+                        </td>
+                        <!-- Edit / Save Button -->
+                        <td>
+                            <button mat-raised-button style="background-color: #5161b6;; color: white;font-size: 18px"
+                                *ngIf="editIndex !== i" (click)="edit(i)">
+                                Edit
+                            </button>
+                            <button mat-raised-button style="background-color: green; color: white;font-size: 18px"
+                                *ngIf="editIndex === i" (click)="saverow(i)">
+                                Save
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="text-end mt-3">
+            <button mat-raised-button class="btn btn-danger" style="background-color: red;color: white;font-size: 18px;"
+                (click)="clear()">
+                Clear
+            </button>
+            <button mat-raised-button class="btn btn-success ms-2"
+                style="background-color: green;color:white;font-size: 18px;" (click)="save()">
+                Save
+            </button>
+        </div>
+    </div>
+</div>

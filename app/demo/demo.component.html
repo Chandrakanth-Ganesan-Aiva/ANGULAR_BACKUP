@@ -1,0 +1,86 @@
+<div class="row overflow-hidden">
+    <div [hidden]="MainCard">
+        <mat-card>
+            <div class="warehouse-container ">
+                <div *ngFor="let item of FilterCatg" class="mat-elevation-z10 warehouse text-white" (click)="View()">
+                    <div class="rstock text-black"><label></label>{{ item.grntype }}</div>
+                    <!-- <div class="location-name mt-2 text-black"><label></label>{{ item.grntype }}</div> -->
+                </div>
+            </div>
+        </mat-card>
+    </div>
+    <div >
+        <mat-card>
+            <mat-card-header>
+                <mat-card-title style="color: brown;">Stock</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="row ">
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-4">
+                        <mat-form-field>
+                            <mat-label>Type</mat-label>
+                            <mat-select [formControl]="Type" (selectionChange)="TypeEvent()">
+                                <mat-option><ngx-mat-select-search placeholderLabel="Search"
+                                        noEntriesFoundLabel="Not Found"
+                                        [formControl]="FilterControl"></ngx-mat-select-search></mat-option>
+                                <mat-option *ngFor="let item of FilterCatg"
+                                    [value]="item.grntypeid">{{item.grntype}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class=" col-sm-6 col-md-4 col-lg-4">
+                        <button mat-raised-button color="accent" class="mt-2" (click)="back()">Back</button>
+
+                    </div>
+                </div>
+                <div class="mat-elevation-z8 mt-2">
+                    <mat-form-field appearance="fill">
+                        <mat-label>Material-Search</mat-label>
+                        <input matInput type="text" class="" placeholder="Search Material"
+                            (input)="materialInput($event)">
+                    </mat-form-field>
+                    <table mat-table #table [dataSource]="stockDataSource">
+                        <ng-container matColumnDef="Material">
+                            <th mat-header-cell *matHeaderCellDef> Material </th>
+                            <td mat-cell *matCellDef="let row"> {{row.RawMatName}} </td>
+                        </ng-container>
+                        <ng-container matColumnDef="Uom">
+                            <th mat-header-cell *matHeaderCellDef> Uom </th>
+                            <td mat-cell *matCellDef="let row"> {{row.uom}} </td>
+                        </ng-container>
+                        <ng-container matColumnDef="Avlstock">
+                            <th mat-header-cell *matHeaderCellDef> Avl_Stock</th>
+                            <td mat-cell *matCellDef="let row"> {{row.column}} </td>
+                        </ng-container>
+                        <ng-container matColumnDef="Minstock">
+                            <th mat-header-cell *matHeaderCellDef> Min_Stock </th>
+                            <td mat-cell *matCellDef="let row">{{row.Min_level}}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="MancfDt">
+                            <th mat-header-cell *matHeaderCellDef> Manf_Date </th>
+                            <td mat-cell *matCellDef="let row"> {{row.column}} </td>
+                        </ng-container>
+                        <ng-container matColumnDef="ExpiryDt">
+                            <th mat-header-cell *matHeaderCellDef> Expiry_Dt </th>
+                            <td mat-cell *matCellDef="let row"> {{row.column}} </td>
+                        </ng-container>
+                        <tr mat-header-row
+                            *matHeaderRowDef="['Material','Uom','Avlstock','Minstock','MancfDt','ExpiryDt']">
+                        </tr>
+                        <tr mat-row
+                            *matRowDef="let row; columns: ['Material','Uom','Avlstock','Minstock','MancfDt','ExpiryDt'];"
+                            [ngStyle]="{
+                            'color': row.Avl_stock === 0 ? 'brown' :
+                            row.Avl_stock < row.Min_level ? '#ffc211' : 'black'
+                          }">
+                        </tr>
+                    </table>
+                    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons
+                        aria-label="Select page of periodic elements">
+                    </mat-paginator>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>
