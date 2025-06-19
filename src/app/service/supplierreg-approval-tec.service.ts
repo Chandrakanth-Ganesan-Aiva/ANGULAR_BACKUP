@@ -8,23 +8,19 @@ import { environment } from '@env/environment.development';
 export class SupplierregApprovalTecService {
 
   constructor(private http: HttpClient) { }
-
   empid(empid: any) {
     return this.http.get(environment.Api + '/Purchase/Approvals/supregApptecemp?empid=' + empid)
   }
-
-  table() {
+  table(){
     return this.http.get(environment.Api + '/Purchase/Approvals/supregApptectable')
   }
-
-  input(code: any) {
+  input(code: any){
     return this.http.get(environment.Api + '/Purchase/Approvals/supregApptecinp?code=' + code)
   }
-  approve(data: any) {
+  approve(data: any){
     return this.http.post(environment.Api + '/Purchase/Approvals/supregApptec', data)
   }
-  unapprove(data: any) {
-    return this.http.post(environment.Api + '/Purchase/Approvals/supregApptecUnapp', data)
-  }
-  
+  unapprove(data: any){
+    return this.http.post(environment.Api + '/Purchase/Approvals/supregAppTecUnappr', data)
+  }  
 }

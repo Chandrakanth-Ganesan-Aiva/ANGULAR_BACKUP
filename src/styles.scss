@@ -104,3 +104,23 @@ mat-icon:hover {
   padding: 10px;  /* Increase padding */
   line-height: 1.5;  /* Improve readability */
 }
+::ng-deep .custom-dialog .mat-dialog-container {
+  padding: 0 !important;
+  overflow: visible !important;
+  max-height: none !important;
+}
+
+::ng-deep .custom-dialog .mat-dialog-content {
+  overflow: visible !important;
+  max-height: none !important;
+}
+#bootstrap-modals-root {
+  position: relative;
+  z-index: 3000; /* higher than Angular Material sidenav and overlays */
+}
+
+// button{
+//   margin: 0px 8px;
+
+// }
+

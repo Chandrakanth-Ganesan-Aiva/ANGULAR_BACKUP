@@ -24,8 +24,7 @@ export class ShelfLifeRecertificateComponent implements OnInit, AfterViewInit, O
   shelflifeDet: any[] = new Array()
   ngOnInit() {
     this.FromDate = this.date.transform(this.FromDate, 'yyyy-MM-dd')
-    const data = JSON.parse(sessionStorage.getItem('location') || '{}');
-    this.loactionId = data[data.length - 1]
+    this.loactionId  = JSON.parse(sessionStorage.getItem('location') || '{}');
     this.getShelfDet()
   }
   getShelfDet(){

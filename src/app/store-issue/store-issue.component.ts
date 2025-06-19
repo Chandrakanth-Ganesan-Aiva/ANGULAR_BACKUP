@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -9,6 +9,7 @@ import { DialogCompComponent } from '../dialog-comp/dialog-comp.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { EMPTY, map, of, switchMap } from 'rxjs';
 import { MatTableDataSource } from '@angular/material/table';
+import { data } from 'jquery';
 @Component({
   selector: 'app-store-issue',
   templateUrl: './store-issue.component.html',
@@ -25,7 +26,8 @@ export class StoreIssueComponent implements OnInit, OnDestroy {
   LoactionId: number = 0
   Empid: number = 0
 
-  constructor(private date: DatePipe, private toastr: ToastrService, private formBuilder: FormBuilder, private service: StoreIssueService, private dialog: MatDialog) {
+  constructor(private date: DatePipe, private toastr: ToastrService, private formBuilder: FormBuilder,
+    private service: StoreIssueService, private dialog: MatDialog, private router: Router) {
     this.form = this.formBuilder.group({
       IssueNo: new FormControl('', Validators.required),
       Issuedate: new FormControl({ value: this.date.transform(new Date(), 'yyyy-MM-dd'), disabled: true }, Validators.required),
@@ -43,34 +45,10 @@ export class StoreIssueComponent implements OnInit, OnDestroy {
   filterControl = new FormControl('')
   RefNofilterControl = new FormControl('')
   ngOnInit() {
-    const data = JSON.parse(sessionStorage.getItem('location') || '{}');
-    this.LoactionId = data[data.length - 1]
+    this.checkLayout();
+    this.LoactionId = JSON.parse(sessionStorage.getItem('location') || '{}');
     const user = JSON.parse(sessionStorage.getItem('session') || '{}');
     this.Empid = user.empid
-
-    // let ModeuleId = 166
-    // this.service.StoreissueloginDet(ModeuleId, this.LoactionId, this.Empid).subscribe({
-    //   next: (res: any) => {
-    //     if (res.length > 0) {
-    //       if (res[0].status == 'N') {
-    //         this.Error = res[0].Msg
-    //         this.userHeader = 'Error'
-    //         return this.opendialog()
-    //       }
-    //       this.Error = 'Already Logged in By <strong style="color:brown"> ' + res[0].empname + ' </strong> in <strong style="color:brown"> ' + res[0].loginsystem + ' </strong>'
-    //       this.userHeader = 'Information'
-    //       this.opendialog()
-    //       this.dialogRef.afterClosed().subscribe((res: any) => {
-    //         if (res) {
-    //           this.router.navigate(['/Dashboard']);
-    //         }
-    //       })
-    //     }else{
-    //       this.lockScreen()
-    //     }
-
-    //   }
-    // })
 
     this.getStockReqno()
     this.Disablebackbutton()
@@ -86,25 +64,14 @@ export class StoreIssueComponent implements OnInit, OnDestroy {
     ).subscribe((filtered) => this.RefnoDataArr = filtered)
   }
 
-  lockScreen() {
-    let ModeuleId = 166
-    let logoutStoreissue = {}
-    logoutStoreissue = {
-      modid: ModeuleId,
-      locid: this.LoactionId,
-      loginid: this.Empid
-    }
-    this.service.InsertScrrenlock(logoutStoreissue).subscribe({
-      next: (res: any) => {
-        if (res.length > 0) {
-          if (res[0].status == 'N') {
-            this.Error = res[0].Msg
-            this.userHeader = 'Error'
-            return this.opendialog()
-          }
-        }
-      }
-    })
+  isHalfWidth: boolean = true;
+  checkLayout() {
+    // Example: You can make this dynamic based on window width
+    this.isHalfWidth = window.innerWidth >= 992; // Bootstrap lg breakpoint
+  }
+  @HostListener('window:resize')
+  onResize() {
+    this.checkLayout();
   }
 
   Disablebackbutton() {
@@ -145,8 +112,6 @@ export class StoreIssueComponent implements OnInit, OnDestroy {
       this.form.controls['Refno'].setValue('')
       this.form.controls['Warehouse'].setValue('')
       this.form.controls['material'].setValue('')
-      this.MaterilaDetalis = []
-
       this.GetDepartment()
     }
 
@@ -181,8 +146,6 @@ export class StoreIssueComponent implements OnInit, OnDestroy {
       this.form.controls['Refno'].setValue('')
       this.form.controls['Warehouse'].setValue('')
       this.form.controls['material'].setValue('')
-      this.MaterilaDetalis = []
-
     }
   }
 
@@ -243,9 +206,6 @@ export class StoreIssueComponent implements OnInit, OnDestroy {
     }
     this.form.controls['Warehouse'].setValue('')
     this.form.controls['material'].setValue('')
-    this.MaterilaDetalis = []
-
-    this.viewbtn = false
   }
   warehousedata: any[] = new Array()
 
@@ -271,8 +231,6 @@ export class StoreIssueComponent implements OnInit, OnDestroy {
     if (this.form.controls['Warehouse'].value) {
       this.GetMaterial()
       // this.form.controls['material'].setValue('')
-      this.MaterilaDetalis = []
-
     }
 
   }
@@ -299,33 +257,10 @@ export class StoreIssueComponent implements OnInit, OnDestroy {
   }
 
   Rawmatid: any = 0
-  issueQtyvalue: any
-  Issuevalue: number = 0
-  issueQty(event: any) {
-    //debugger
-    this.issueQtyvalue = parseInt(event.target.value)
-    this.Issuevalue = parseInt(event.target.value)
-
-  }
-  Releasebtndisable = [false, false]
-  Isuuechck() {
-    this.Issuevalue = 0
-  }
   dataSource = new MatTableDataSource<any>()
-  viewbtn: any
   MaterialRealase: any[] = new Array()
-  cmpname: string = 'SFPL'
-  deptname: string = ''
-  Viewmat: boolean = false
-  RawmaterialInd: any
-  MaterilaDetalis: any[] = new Array()
-  IndentDetalisData: any[] = new Array()
-  StockAvl: number = 0
-  StockMinimumcheck: any
-  matlcolor: any
-  NostockMaterial: any[] = new Array()
   stockInfo: any
-  Add() {
+  View() {
     if (this.form.invalid) {
       return this.form.markAllAsTouched()
     } else {
@@ -371,13 +306,14 @@ export class StoreIssueComponent implements OnInit, OnDestroy {
           return this.opendialog();
         }
         this.form.disable()
-        this.form.controls['material'].enable()
         this.MaterialRealase = issueData;
         this.MaterialRealase = this.MaterialRealase.map((element: any) => ({
           ...element,
           stock: this.stockInfo.stock,
           PendingQty: element.srqty - element.minqty,
-          issueQty: ''
+          issueQty: '',
+          stockcheck: false,
+          stockcolor: false
         }))
         const isDuplicate = this.dataSource.data
           .find(row => row.RawMatID === this.Rawmatid)
@@ -386,33 +322,50 @@ export class StoreIssueComponent implements OnInit, OnDestroy {
           this.userHeader = 'Information';
           this.opendialog();
         } else {
-          this.Rawmateriladata = this.Rawmateriladata.filter((item: any) => item.RawMatID !== parseInt(this.form.controls['material'].value))
-          console.log(this.Rawmateriladata);
-
           this.dataSource.data = [...this.dataSource.data, ...this.MaterialRealase];
         }
+        this.dataSource.data.forEach((res: any) => {
+          if (res.stock < res.min_level) {
+            res.stockcheck = true
+          } else {
+            res.stockcheck = false
+          }
+        })
       });
     }
-
   }
   Clear() {
+    this.getStockReqno()
     this.form.reset()
     this.form.controls['Issuedate'].setValue(this.date.transform(new Date(), 'yyyy-MM-dd'))
-    this.form.controls['frmdate'].setValue(this.date.transform(new Date(), 'yyyy-MM-dd'))
+    // this.form.controls['frmdate'].setValue(this.date.transform(new Date(), 'yyyy-MM-dd'))
     this.form.controls['todate'].setValue(this.date.transform(new Date(), 'yyyy-MM-dd'))
     this.dataSource.data = []
-  }
-  Tab1 = 0;
-  tablabelname: string = '';
-  tabChangedRegular(e: MatTabChangeEvent) {
-    this.Tab1 = e.index;
-    this.tablabelname = e.tab.textLabel
+    this.issueDetDatasource.data = []
+    this.batchWiseDataSource.data = []
+    this.form.enable()
+    this.form.controls['Issuedate'].disable()
+    this.form.controls['frmdate'].setValue(this.date.transform(new Date(), 'yyyy-MM-dd'))
+    this.form.controls['todate'].disable()
   }
 
   issuedetalisIndex: number = 0
-
+  Issueqty: number = 0
+  PendingQty: number = 0
+  Sr_Ref_No: string = ''
+  Srid: number = 0
+  Uom: string = ''
+  stock: number = 0
+  deptname: string = ''
   onReleaseValidation(row: any, Index: number) {
+    this.Issueqty = row.issueQty
+    this.PendingQty = row.PendingQty
     this.issuedetalisIndex = Index
+    this.Sr_Ref_No = row.Sr_Ref_No
+    this.Srid = row.SRId
+    this.Uom = row.SRUom
+    this.stock = row.stock
+    this.deptname = row.deptname
     const detail = this.dataSource.data.find(
       d => d.RawMatID === row.RawMatID
     );
@@ -424,8 +377,6 @@ export class StoreIssueComponent implements OnInit, OnDestroy {
 
     // now you can destructure safely
     const { issueQty, PendingQty, stock, min_level } = row;
-    console.error(issueQty, PendingQty, stock, min_level);
-
     if (issueQty <= 0 || issueQty == '') {
       return this.showInfo('Issue Qty should be greater than zero.');
     }
@@ -443,7 +394,7 @@ export class StoreIssueComponent implements OnInit, OnDestroy {
     }
     if (issueQty > min_level) {
       this.Error = 'Shall I Issue More than Minimum Level Qty...'
-      this.userHeader = 'Save'
+      this.userHeader = 'Warning!!!'
       this.opendialog()
       this.dialogRef.afterClosed().subscribe((result: any) => {
         if (result == false) {
@@ -464,47 +415,43 @@ export class StoreIssueComponent implements OnInit, OnDestroy {
     this.opendialog();
   }
   IssuetableArr: any[] = new Array()
-  ExpiryDate: any
-  Issuedetalisarr: any[] = new Array()
-  Sr_Ref_No: string = ''
-  ind: any
-  batchqty: number = 0
-  BatchData: any[] = new Array()
-  balqty: number = 0
-  Batcharr: any[] = new Array()
-  ExpiryDateVailadCheck: any
-  GrnQty: number = 0
   IssueDettable: boolean = true
   issueDetDatasource = new MatTableDataSource<any>()
   batchWiseDataSource = new MatTableDataSource<any>()
   batchWiseArr: any[] = new Array()
   Release() {
-    this.dataSource.data.forEach((Material: any): any => {
-      if (Material.issueQty > 0) {
-        let dblQty = Material.issueQty
-        this.service.IssueDetTable(this.form.controls['Warehouse'].value, this.Rawmatid, this.LoactionId).subscribe({
-          next: (data: any) => {
-            if (data.length > 0) {
-              if (data[0].status == 'N') {
-                this.Error = data[0].Msg
-                this.userHeader = 'Error'
-                return this.opendialog()
-              }
-              this.IssuetableArr = data
-              if (this.form.controls['Warehouse'].value != 32) {
-                this.IssuetableArr.forEach((IssueTable: any) => {
-                  if (IssueTable.stocknew > 0) {
+    // this.issueDetDatasource.data=[]
+    this.stock_check()
+    if (this.Issueqty > 0) {
+      let dblQty: any = this.Issueqty
+      let dblQty1: any = this.Issueqty
+      this.service.IssueDetTable(this.form.controls['Warehouse'].value, this.Rawmatid, this.LoactionId).subscribe({
+        next: (data: any) => {
+          if (data.length > 0) {
+            if (data[0].status == 'N') {
+              this.Error = data[0].Msg
+              this.userHeader = 'Error'
+              return this.opendialog()
+            }
+            this.IssuetableArr = data
+            if (this.form.controls['Warehouse'].value != 32) {
+              this.IssuetableArr.forEach((IssueTable: any) => {
+                if (IssueTable.stocknew > 0) {
+                  if (dblQty > 0) {
                     if (dblQty <= IssueTable.stocknew) {
-                      this.issueDetDatasource.data = [...this.dataSource.data]
-                      this.issueDetDatasource.data = this.issueDetDatasource.data.map((element: any) => ({
-                        ...element,
-                        stocknew: element.stocknew,
-                        grnid: element.grnid,
-                        grnno: element.grnno,
-                        grn_ref_no: element.grn_ref_no,
-                        storeentryid: element.storeentryid
-                      }))
-                      this.service.BatchWiseTable(IssueTable.grnid).subscribe({
+                      let issuedData = {
+                        ...IssueTable,
+                        Sr_Ref_No: this.Sr_Ref_No,
+                        Srid: this.Srid,
+                        Uom: this.Uom,
+                        issueQty: this.Issueqty,
+                        SrQty: this.PendingQty,
+                        deptname: this.deptname
+                      };
+                      this.issueDetDatasource.data.push(issuedData);
+                      this.issueDetDatasource.data = [...this.issueDetDatasource.data];
+                      let tcount = 0
+                      this.service.BatchWiseTable(IssueTable.GRNID).subscribe({
                         next: (batch: any) => {
                           if (batch.length > 0) {
                             if (batch[0].status == 'N') {
@@ -513,133 +460,234 @@ export class StoreIssueComponent implements OnInit, OnDestroy {
                               return this.opendialog()
                             }
                             this.batchWiseArr = batch
-                            this.batchWiseArr=this.batchWiseArr.map((element:any)=>({
+                            this.batchWiseArr = this.batchWiseArr.map((element: any) => ({
                               ...element,
-                              Issue_Qty:''
+                              issueQty: '',
+                              isExpired: false
                             }))
-                            let tcount = 0
                             this.batchWiseArr.forEach((batchTabel: any) => {
                               if (batchTabel.balqty > 0) {
-                                let CurrDt :any=this.date.transform(new Date(), 'yyyy-MM-dd')
-                                this.batchWiseDataSource.data=[...this.batchWiseArr]
-                                if(batchTabel.batchdate < CurrDt){
-                                  // Style Color Red
-                                  for(let i=0;i< this.batchWiseDataSource.data.length;i++){
-                                    tcount = tcount + 1
-                                  }
+                                let CurrDt: any = this.date.transform(new Date(), 'yyyy-MM-dd')
+                                this.batchWiseDataSource.data = [...this.batchWiseArr]
+                                batchTabel.batchdate = '2025-04-05'
+                                console.warn(batchTabel.batchdate < CurrDt);
+                                if (batchTabel.batchdate < CurrDt) {
+                                  tcount = tcount + 1
+                                  batchTabel.isExpired = true;
+                                } else {
+                                  batchTabel.isExpired = false;
                                 }
-                                if(dblQty < batchTabel.balqty){
-                                  batchTabel.Issue_Qty=dblQty
-                                  dblQty=0
-                                }else{
-                                  dblQty=(Number(dblQty)-Number(batchTabel.balqty)).toFixed(3)
-                                  batchTabel.Issue_Qty=batchTabel.balqty
+                                dblQty = this.Issueqty
+                                if (dblQty < batchTabel.balqty) {
+                                  batchTabel.issueQty = dblQty
+                                  dblQty = 0
+                                } else {
+                                  dblQty = (Number(dblQty) - Number(batchTabel.balqty)).toFixed(3)
+                                  batchTabel.issueQty = batchTabel.balqty
                                 }
+                                console.log(this.batchWiseDataSource.data);
                               }
                             })
-                            if(tcount >0){
-                              this.Error='Already Expired this material. Please get the revalidation certificate otherwise you cannot issue'
-                              this.userHeader='Information'
+                            if (tcount > 0) {
+                              this.Error = 'Already Expired this material. Please get the revalidation certificate otherwise you cannot issue'
+                              this.userHeader = 'Information'
                               return this.opendialog()
                             }
-                            tcount = 0
-                            dblQty = 0
                           }
                         },
                       })
+
+                      tcount = 0
+                      dblQty = 0
                     }
-                    console.log(this.issueDetDatasource.data);
+                    else {
+                      let tcount = 0
+                      let issuedData = {
+                        ...IssueTable,
+                        Sr_Ref_No: this.Sr_Ref_No,
+                        Srid: this.Srid,
+                        Uom: this.Uom,
+                        issueQty: this.Issueqty,
+                        SrQty: this.PendingQty
+                      };
+                      this.issueDetDatasource.data.push(issuedData);
+                      this.issueDetDatasource.data = [...this.issueDetDatasource.data];
+                      // console.log(this.issueDetDatasource.data);
+                      this.service.BatchWiseTable(IssueTable.GRNID).subscribe({
+                        next: (batch: any) => {
+                          if (batch.length > 0) {
+                            if (batch[0].status == 'N') {
+                              this.Error = batch[0].Msg
+                              this.userHeader = 'Error'
+                              return this.opendialog()
+                            }
+
+                            this.batchWiseArr = batch
+                            this.batchWiseArr = this.batchWiseArr.map((element: any) => ({
+                              ...element,
+                              Issue_Qty: '',
+                              isExpired: false
+                            }))
+                            this.batchWiseArr.forEach((batchTabel: any) => {
+                              if (batchTabel.balqty > 0) {
+                                let CurrDt: any = this.date.transform(new Date(), 'yyyy-MM-dd')
+                                this.batchWiseDataSource.data = [...this.batchWiseArr]
+                                if (batchTabel.batchdate < CurrDt) {
+                                  tcount = tcount + 1
+                                  batchTabel.isExpired = true;
+                                } else {
+                                  batchTabel.isExpired = false;
+                                }
+                                if (dblQty1 < batchTabel.balqty) {
+                                  batchTabel.issueQty = dblQty
+                                  dblQty1 = 0
+                                } else {
+                                  dblQty1 = (Number(dblQty1) - Number(batchTabel.balqty)).toFixed(3)
+                                  batchTabel.issueQty = batchTabel.balqty
+                                }
+                              }
+                            })
+                            dblQty = this.Issueqty
+                            if (IssueTable.stocknew < dblQty) {
+                              IssueTable.issueQty = IssueTable.stocknew
+                              dblQty = dblQty - IssueTable.stocknew
+                            } else {
+                              IssueTable.issueQty = dblQty
+                            }
+                            console.log(this.batchWiseDataSource.data);
+
+                          }
+                        },
+                      })
+                      if (tcount > 0) {
+                        this.Error = 'Already Expired this material. Please get the revalidation certificate otherwise you cannot issue'
+                        this.userHeader = 'Information'
+                        return this.opendialog()
+                      }
+                    }
                     this.IssueDettable = false
                   }
+                }
+              })
+              console.log(this.issueDetDatasource.data);
+            }
+            else {
+              if (this.stock > 0) {
+                this.IssuetableArr.forEach((IssueTable: any) => {
+                  this.issueDetDatasource.data.push({
+                    ...IssueTable,
+                    Sr_Ref_No: this.Sr_Ref_No,
+                    Srid: this.Srid,
+                    Uom: this.Uom,
+                    issueQty: this.Issueqty,
+                    SrQty: this.PendingQty
+                  })
+                  this.issueDetDatasource.data = [...this.issueDetDatasource.data]
+                  console.log(this.issueDetDatasource.data);
                 })
               }
-            }else {
-              this.Error = 'No records Found For this <strong style=color:"brown"> ' + this.Rawmatid + ' <strong> '
-              this.userHeader = 'Information'
-              return this.opendialog()
             }
-          },
+          }
+          else {
+            this.Error = 'No records Found For this <strong style=color:"brown"> ' + this.Rawmatid + ' <strong> '
+            this.userHeader = 'Information'
+            return this.opendialog()
+          }
+        },
+      })
+    }
+    this.Rawmateriladata = this.Rawmateriladata.filter((item: any) => item.RawMatID !== parseInt(this.form.controls['material'].value))
+    console.log(this.Rawmateriladata);
+  }
+  stock_check() {
+    this.dataSource.data.forEach((Material: any) => {
+      let warehouse = this.form.controls['Warehouse'].value
+      if (this.Issueqty > 0) {
+        this.service.StockCheck(Material.rawmatid, this.LoactionId, warehouse).subscribe({
+          next: (res: any) => {
+            if (res.length > 0) {
+              if (res[0].status == 'N') {
+                this.Error = res[0].Msg
+                this.userHeader = 'Error'
+                return this.opendialog()
+              }
+              let errn = 0
+              res.forEach((element: any) => {
+                if (Material.issueQty > 0) {
+                  let stockupdateArr = {
+                    Grnid: element.grnid,
+                    StoreEntryId: element.StoreEntryId,
+                    WareHouse: warehouse
+                  }
+                  this.service.stockupdate(stockupdateArr).subscribe({
+                    next: (res: any) => {
+                      if (res.length > 0) {
+                        if (res[0].status == 'N') {
+                          this.Error = res[0].Msg
+                          this.userHeader = 'Error'
+                          return this.opendialog()
+                        }
+
+                      }
+                    }
+                  })
+                }
+                if (errn == 0 && Material.issueQty > 0) {
+                  Material.issueQty = 0
+                  Material.stockcolor = true
+                  errn = 0
+                }
+              });
+            }
+          }
         })
       }
     })
-    // this.service.Batch(parseInt(this.Batchwise[i].GRNID)).subscribe({
-    //   next: (data: any) => {
-    //       this.BatchData = data
-    //   }
-    // })
-
-
   }
-  ExpirydateRawmatid: number = 0
-  RemoveExpiryDateMatl() {
-    this.MaterilaDetalis.splice(this.issuedetalisIndex, 1);
-    for (let i = 0; i < this.Issuedetalisarr.length; i++) {
-      if (this.Issuedetalisarr[i].MaterialID === this.ExpirydateRawmatid) {
-        this.Issuedetalisarr.splice(i, 1);
-      }
-    }
-    for (let i = 0; i < this.Batcharr.length; i++) {
-      if (this.Batcharr[i].MaterialID === this.ExpirydateRawmatid) {
-        this.Batcharr.splice(i, 1);
 
-      }
-    }
-    this.Releasebtndisable[this.issuedetalisIndex] = false
-    this.Issueqtymodaldisable[this.issuedetalisIndex] = false
-    this.form.controls['material'].enable()
-    if (this.Rawmateriladata.length === this.ReleaseAllMaterial.length) {
-      this.savebtn = true
-    } else {
-      this.savebtn = false
-    }
-  }
-  BatchEmptyClear() {
-    this.Tab1 = 0
-    this.MaterilaDetalis.splice(this.issuedetalisIndex, 1);
-    this.Releasebtndisable[this.issuedetalisIndex] = false
-    this.Issueqtymodaldisable[this.issuedetalisIndex] = false
-    this.form.controls['material'].enable()
-    if (this.Rawmateriladata.length === this.ReleaseAllMaterial.length) {
-      this.savebtn = true
-    } else {
-      this.savebtn = false
 
-    }
-  }
   ReleaseAllMaterial: any[] = new Array()
   savebtn: boolean = false
   MaterialAllReleasebtn: boolean = true
   Issueqtymodaldisable = [false, false]
 
   Deletemat(index: number) {
-    const [removed] = this.dataSource.data.splice(index, 1);
-    this.dataSource.data = [...this.dataSource.data];
-    this.Rawmateriladata = [
-      ...this.Rawmateriladata,
-      { RawMatID: removed.RawMatID, RawMatName: removed.gStrMatDisp }
-    ];
-    console.log(this.Rawmateriladata);
-    this.form.controls['material'].setValue("")
-  }
-  batchwiseindex: number = 0
-  DeleteBatchwise(Index: number) {
-    this.batchwiseindex = Index
-    this.Tab1 = 0
-    this.MaterilaDetalis.splice(Index, 1);
-    this.Issuedetalisarr.splice(Index, 1);
-    this.Batcharr.splice(Index, 1);
-    this.Releasebtndisable[Index] = false
-    this.Issueqtymodaldisable[Index] = false
-    this.form.controls['material'].enable()
-    if (this.Rawmateriladata.length === this.ReleaseAllMaterial.length) {
-      // this.MaterialAllReleasebtn = true
+    this.Error = 'Do You Want To Delete ?'
+    this.userHeader = 'Warning!!!'
+    this.opendialog()
+    this.dialogRef.afterClosed().subscribe((res: any) => {
+      if (res) {
+        const [removed] = this.dataSource.data.splice(index, 1);
+        this.dataSource.data = [...this.dataSource.data];
+        if (removed?.RawMatID) {
+          const rawMatId = removed.RawMatID;
 
-      this.savebtn = true
-    } else {
+          this.issueDetDatasource.data = this.issueDetDatasource.data.filter(
+            item => item.Rawmatid !== rawMatId
+          );
+          this.issueDetDatasource.data = [...this.issueDetDatasource.data]
+          this.batchWiseDataSource.data = this.batchWiseDataSource.data.filter(
+            item => item.rawmatid !== rawMatId
+          );
+          this.batchWiseDataSource.data = [...this.batchWiseDataSource.data]
 
-      this.savebtn = false
 
-    }
+        }
+        this.Rawmateriladata = [
+          ...this.Rawmateriladata,
+          { RawMatID: removed.RawMatID, RawMatName: removed.gStrMatDisp }
+        ];
+        this.form.controls['material'].enable()
+        if (this.dataSource.data.length == 0) {
+          this.Clear()
+        }
+      } else {
+        this.Error = 'Delete Cancelled?'
+        this.userHeader = 'Information'
+        return this.opendialog()
+      }
+    })
+
 
   }
 
@@ -656,128 +704,83 @@ export class StoreIssueComponent implements OnInit, OnDestroy {
     this.StoreIssue_invent_batchqtyissue = []
     this.StoreIssue_Invent_MinMaterial = []
     this.UpdateStoreIssue = []
-    for (let i = 0; i < this.Issuedetalisarr.length; i++) {
+    this.issueDetDatasource.data.forEach((res: any) => {
       this.StoreIssue_Invent_MinMaterial.push({
-        Rawmatid: this.Issuedetalisarr[i].MaterialID,
-        IssueQty: this.Issuedetalisarr[i].IssueQty,
-        Uom: this.Issuedetalisarr[i].Uom,
-        GrnNo: this.Issuedetalisarr[i].GRnNO,
+        Rawmatid: res.MaterialID,
+        IssueQty: res.IssueQty,
+        Uom: res.Uom,
+        GrnNo: res.GRnNO,
         Empid: this.Empid,
-        Grnid: this.Issuedetalisarr[i].Grnid,
+        Grnid: res.Grnid,
         Min_ref_no: this.StockReqNo,
-        Srid: this.Issuedetalisarr[i].Srid,
-        StoreEntryId: this.Issuedetalisarr[i].StoreEntryId,
-        InventRawmatid: this.Issuedetalisarr[i].MaterialID,
-        InventProdid: this.Issuedetalisarr[i].MaterialID,
-        InventGrnid: this.Issuedetalisarr[i].Grnid,
-        InventMinQty: this.Issuedetalisarr[i].IssueQty,
+        Srid: res.Srid,
+        StoreEntryId: res.StoreEntryId,
+        InventRawmatid: res.MaterialID,
+        InventProdid: res.MaterialID,
+        InventGrnid: res.Grnid,
+        InventMinQty: res.IssueQty,
         WarehouseLocationId: this.form.controls['Warehouse'].value,
         CurrencyId: 1,
-        Exrate: this.Issuedetalisarr[i].ExRate,
+        Exrate: res.ExRate,
         LocationId: this.LoactionId,
         StrIssRef_no: this.StockReqNo
       })
-    }
+    })
+
     console.log(this.StoreIssue_Invent_MinMaterial, 'StoreIssue_Invent_MinMaterial');
-    if (this.Batcharr.length !== 0) {
-      for (let i = 0; i < this.Batcharr.length; i++) {
+    if (this.batchWiseDataSource.data.length !== 0) {
+      this.batchWiseDataSource.data.forEach((res: any) => {
         this.StoreIssue_invent_batchqtyissue.push({
-          Grnno: this.Batcharr[i].Grnno,
-          GrnId: this.Batcharr[i].GrnId,
-          Grn_Ref_No: this.Batcharr[i].GrnRefNo,
-          RawMatId: this.Batcharr[i].MaterialID,
-          BatchNo: this.Batcharr[i].BatchNo,
-          ExpiryDate: this.Batcharr[i].ExpiryDate,
-          BatchId: this.Batcharr[i].BatchId,
-          IssQty: this.Batcharr[i].IssueQty
+          Grnno: res.Grnno,
+          GrnId: res.GrnId,
+          Grn_Ref_No: res.GrnRefNo,
+          RawMatId: res.MaterialID,
+          BatchNo: res.BatchNo,
+          ExpiryDate: res.ExpiryDate,
+          BatchId: res.BatchId,
+          IssQty: res.IssueQty
         })
-        console.log(this.StoreIssue_invent_batchqtyissue, 'StoreIssue_invent_batchqtyissue');
-      }
-    }
-    if (this.Batcharr.length !== 0) {
-
-      this.UpdateStoreIssue.push({
-        Deptid: this.Deptid,
-        StrIssRef_no: this.StockReqNo,
-        LocationId: this.LoactionId,
-        Empid: this.Empid,
-        IssueId: this.Empid,
-        ComputerName: 'Tab Entry',
-        StoreIssue_Invent_MinMaterial: this.StoreIssue_Invent_MinMaterial,
-        StoreIssue_invent_batchqtyissue: this.StoreIssue_invent_batchqtyissue
       })
-      console.log(this.UpdateStoreIssue, 'saveData');
+      console.log(this.StoreIssue_invent_batchqtyissue, 'StoreIssue_invent_batchqtyissue');
     } else {
-
-      this.UpdateStoreIssue.push({
-        Deptid: this.Deptid,
-        StrIssRef_no: this.StockReqNo,
-        LocationId: this.LoactionId,
-        Empid: this.Empid,
-        IssueId: this.Empid,
-        ComputerName: 'Tab Entry',
-        StoreIssue_Invent_MinMaterial: this.StoreIssue_Invent_MinMaterial,
-        StoreIssue_invent_batchqtyissue: []
-      })
-      console.log(this.UpdateStoreIssue, 'saveData');
+      this.StoreIssue_invent_batchqtyissue = []
     }
+    this.UpdateStoreIssue.push({
+      Deptid: this.Deptid,
+      StrIssRef_no: this.StockReqNo,
+      LocationId: this.LoactionId,
+      Empid: this.Empid,
+      IssueId: this.Empid,
+      ComputerName: 'Tab Entry',
+      StoreIssue_Invent_MinMaterial: this.StoreIssue_Invent_MinMaterial,
+      StoreIssue_invent_batchqtyissue: this.StoreIssue_invent_batchqtyissue
+    })
+    console.log(this.UpdateStoreIssue, 'saveData');
+
 
     this.service.Save(this.UpdateStoreIssue).subscribe({
-      next: (data: any) => {
+      next: (res: any) => {
+        if (res.length > 0) {
+          if (res[0].status == 'N') {
+            this.Error = res[0].Msg
+            this.userHeader = 'Error'
+            return this.opendialog()
+          } else {
+            this.Error = res[0].Msg
+            this.userHeader = 'Information'
+            this.opendialog()
+            this.dialogRef.afterClosed().subscribe((res: any) => {
+              if (res == true) {
+                this.Clear()
+              }
+            })
+          }
 
-        this.StoreIssueSave = data
-        // console.log(this.StoreIssueSave, 'Save');
-        this.Sts = this.StoreIssueSave[0].status
-        this.Msg = this.StoreIssueSave[0].Msg
-        if (this.Sts === 'Y') {
-          const Save = document.getElementById('Save') as HTMLInputElement
-          Save.click()
-        } else {
-          const Save = document.getElementById('Save') as HTMLInputElement
-          Save.click()
         }
       }
-
     })
 
   }
-  finalSave() {
-    this.getStockReqno()
-    this.UpdateStoreIssue = []
-    this.StoreIssue_invent_batchqtyissue = []
-    this.StoreIssue_Invent_MinMaterial = []
-    this.viewbtn = false
-    this.form.reset()
-    this.MaterialRealase = []
-    this.Issuedetalisarr = []
-    this.Batcharr = []
-    this.BatchData = []
-    this.form.enable()
-    this.Viewmat = false
-
-    this.savebtn = false
-    this.MaterilaDetalis = []
-    this.Releasebtndisable = [false, false]
-    this.Issueqtymodaldisable = [false, false]
-  }
-
-  ViewMaterilaDetalis: any[] = new Array()
-  View(Index: number) {
-    const MaterailTabView = document.getElementById('MaterailTabView') as HTMLInputElement
-    MaterailTabView.click()
-    this.ViewMaterilaDetalis = []
-    this.ViewMaterilaDetalis.push({
-      MaterialName: this.MaterilaDetalis[Index].gStrMatDisp,
-      SRUom: this.MaterilaDetalis[Index].SRUom,
-      loc_id: this.MaterilaDetalis[Index].loc_id,
-      max_level: this.MaterilaDetalis[Index].max_level,
-      reorder_level: this.MaterilaDetalis[Index].reorder_level,
-      deptname: this.MaterilaDetalis[Index].deptname,
-      popend: this.MaterilaDetalis[Index].popend,
-    })
-    // console.log(this.ViewMaterilaDetalis, 'view');
-  }
-
   Error: string = ''
   userHeader: string = ''
   dialogRef!: MatDialogRef<DialogCompComponent>;
@@ -790,13 +793,16 @@ export class StoreIssueComponent implements OnInit, OnDestroy {
   }
   ngOnDestroy() {
     let ModeuleId = 166
-    let logoutStoreissue = {}
-    logoutStoreissue = {
+    let logoutStoreissue: any[] = new Array()
+
+    logoutStoreissue.push({
       locid: this.LoactionId,
       loginid: this.Empid,
       modid: ModeuleId,
       loginsystem: 'Tab-Entry'
-    }
+    })
+
+
     this.service.UpdateStoreissueLogout(logoutStoreissue).subscribe({
       next: (res: any) => {
         if (res.length > 0) {
@@ -809,7 +815,6 @@ export class StoreIssueComponent implements OnInit, OnDestroy {
         }
       }
     })
-
   }
 }
 

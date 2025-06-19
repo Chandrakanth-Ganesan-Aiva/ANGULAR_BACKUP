@@ -50,8 +50,7 @@ export class CustomerReturnComponent implements OnInit, AfterViewInit,OnDestroy 
       InvoiceNo: ['', [Validators.required]],
 
     })
-    const data = JSON.parse(sessionStorage.getItem('location') || '{}');
-    this.LocationId = data[data.length - 1]
+    this.LocationId = JSON.parse(sessionStorage.getItem('location') || '{}');
     this. getStockReqno() 
     // 
   }

@@ -9,7 +9,7 @@
             <div class="col-12 col-sm-12 col-m- col-lg-6 mat-elevation-z8">
                 <form [formGroup]="form">
                     <div class="row">
-                        <div class="col-12 col-sm-12 col-md-6  col-lg-6">
+                        <div class="col-6 col-sm-6 col-md-6  col-lg-6">
                             <mat-form-field>
                                 <mat-label>Category</mat-label>
                                 <mat-select formControlName="category"(selectionChange)="CategoryEvent()">
@@ -23,7 +23,14 @@
                                 <mat-error >Field must be required</mat-error>
                             </mat-form-field>
                         </div>
-                        <div class="col-12 col-sm-12 col-md-6  col-lg-6">
+                        <div class="col-6 col-sm-6 col-md-6 col-lg-3">
+                            <mat-form-field>
+                                <mat-label>Make</mat-label>
+                                <input type="text" matInput formControlName="make">
+                                <mat-error>Field must be required</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-6 col-sm-6 col-md-6  col-lg-6">
                             <mat-form-field>
                                 <mat-label>Department</mat-label>
                                 <mat-select formControlName="Dept">
@@ -35,14 +42,21 @@
                                 <mat-error>Field must be required</mat-error>
                             </mat-form-field>
                         </div>
-                        <div class="col-12 col-sm-12 col-md-6  col-lg-6">
+                        <div class="col-6 col-sm-6 col-md-6 col-lg-3">
+                            <mat-form-field>
+                                <mat-label>Weight</mat-label>
+                                <input type="text" matInput formControlName="weight">
+                                <mat-error>Field must be required</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-6 col-sm-6 col-md-6  col-lg-6">
                             <mat-form-field>
                                 <mat-label>Item Code</mat-label>
                                 <input type="text" matInput formControlName="itemCode">
                                 <mat-error>Field must be required</mat-error>
                             </mat-form-field>
                         </div>
-                        <div class="col-12 col-sm-12 col-md-6  col-lg-6">
+                        <div class="col-6 col-sm-6 col-md-6  col-lg-6">
                             <mat-form-field>
                                 <mat-label>Drawing No</mat-label>
                                 <input type="text" matInput formControlName="drgo">
@@ -63,7 +77,7 @@
                                 <mat-error>Field must be required</mat-error>
                             </mat-form-field>
                         </div>
-                        <div class="col-12 col-sm-12 col-md-6 col-lg-3">
+                        <div class="col-6 col-sm-6 col-md-6 col-lg-3">
                             <mat-form-field>
                                 <mat-label>UOM</mat-label>
                                 <mat-select formControlName="Uom">
@@ -75,17 +89,10 @@
                                 <mat-error>Field must be required</mat-error>
                             </mat-form-field>
                         </div>
-                        <div class="col-12 col-sm-12 col-md-6 col-lg-3">
-                            <mat-form-field>
-                                <mat-label>Make</mat-label>
-                                <input type="text" matInput formControlName="make">
-                                <mat-error>Field must be required</mat-error>
-                            </mat-form-field>
-                        </div>
-                        <div class="col-12 col-sm-12 col-md-6 col-lg-3">
+                        <div class="col-6 col-sm-6 col-md-6 col-lg-3">
                             <mat-form-field>
                                 <mat-label>Location</mat-label>
-                                <mat-select>
+                                <mat-select formControlName="loc_id">
                                     <mat-option><ngx-mat-select-search placeholderLabel="---Search---"
                                             noEntriesFoundLabel="No Records Found"
                                             [formControl]="RawMatLocFilterArr"></ngx-mat-select-search></mat-option>
@@ -94,14 +101,7 @@
                                 <mat-error>Field must be required</mat-error>
                             </mat-form-field>
                         </div>
-                        <div class="col-12 col-sm-12 col-md-6 col-lg-3">
-                            <mat-form-field>
-                                <mat-label>Weight</mat-label>
-                                <input type="text" matInput formControlName="weight">
-                                <mat-error>Field must be required</mat-error>
-                            </mat-form-field>
-                        </div>
-                        <div class="col-6 col-sm-12 col-md-6 col-lg-3">
+                        <div class="col-6 col-sm-6 col-md-6 col-lg-3">
                             <mat-form-field>
                                 <mat-label>Grade</mat-label>
                                 <mat-select formControlName="grade">
@@ -113,16 +113,28 @@
                                 <mat-error>Field must be required</mat-error>
                             </mat-form-field>
                         </div>
-                        <div class="col-6 col-sm-6 col-md-4 col-lg-3 ">
-                            <mat-checkbox  color="primary"  formControlName="saleable" (change)="saleableEvent($event)">Salable</mat-checkbox>
+                        <div class="col-6 col-sm-6 col-md-6 col-lg-3">
+                            <mat-form-field>
+                                <mat-label>HsnCode</mat-label>
+                                <mat-select formControlName="hsncode">
+                                    <mat-option><ngx-mat-select-search placeholderLabel="---Search---"
+                                            noEntriesFoundLabel="No Records Found"
+                                            [formControl]="hsnArrFormcontrol"></ngx-mat-select-search></mat-option>
+                                    <mat-option *ngFor="let item of hsnArrFilter" [value]="item.hsncode">{{item.hsncode}}</mat-option>
+                                </mat-select>
+                                <mat-error>Field must be required</mat-error>
+                            </mat-form-field>
                         </div>
-                        <div class="col-6 col-sm-6 col-md-4 col-lg-3 ">
+                        <div class="col-4 col-sm-4 col-md-4 col-lg-3 ">
+                            <mat-checkbox  color="primary"  formControlName="saleable" >Salable</mat-checkbox>
+                        </div>
+                        <div class="col-4 col-sm-4 col-md-4 col-lg-3 ">
                             <mat-checkbox  color="primary"  formControlName="shelflife">Shelflife</mat-checkbox>
                         </div>
-                        <div class="col-6 col-sm-6 col-md-4 col-lg-3 ">
+                        <div class="col-4 col-sm-4 col-md-4 col-lg-3 ">
                             <mat-checkbox  color="primary"  formControlName="qcReq">Qc Req</mat-checkbox>
                         </div>
-                        <div class="modal-footer p-2">
+                        <div class="modal-footer p-2 " >
                           <button mat-raised-button type="button" style="background-color: green;color: white;" (click)="saveVaild()">Save</button>
                         </div>
                     </div>
@@ -130,6 +142,10 @@
             </div>
             <div class="col-12 col-sm-12 col-m- col-lg-6">
                 <div class="mat-elevation-z8 table-wrapper">
+                    <mat-form-field>
+                        <mat-label>Search</mat-label>
+                        <input type="text" matInput (input)="Search($event)">
+                    </mat-form-field>
                     <h4 class="m-2">Rawmaterial Master</h4>
                     <table mat-table #table [dataSource]="dataSource">
                         <ng-container matColumnDef="SNo">

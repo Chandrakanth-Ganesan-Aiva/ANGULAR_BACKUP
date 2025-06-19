@@ -1,0 +1,23 @@
+
+table {
+
+    th {
+      margin: 0%;
+      background-color: #ffffff;
+      color: rgb(2, 2, 2);
+      border: 1px solid silver;
+      text-align: center;
+    }
+  
+    td {
+      border: 1px solid silver;
+    }
+  }
+  
+  tr:last-child {
+    border: 1px solid silver !important;
+  }
+  mat-dialog-content{
+    width: 100vh;
+    height: 100vh;
+  }

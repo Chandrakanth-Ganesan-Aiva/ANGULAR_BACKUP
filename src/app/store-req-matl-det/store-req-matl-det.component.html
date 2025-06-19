@@ -1,0 +1,490 @@
+<!-- <mat-dialog-content> -->
+<mat-card *ngIf="data.Comp_Name == 'PurchaseRequestionMatl'">
+    <mat-card-header>Store Requestion Material Detail</mat-card-header>
+    <mat-card-content>
+        <form [formGroup]="PurchaseForm">
+            <div class="row ">
+                <div class="col-12 col-sm-12 col-md-10 col-lg-10">
+                    <mat-form-field appearance="fill">
+                        <mat-label>Search Material</mat-label>
+                        <mat-select formControlName="Material" (selectionChange)="MatlChangeEvent()">
+                            <mat-option> <ngx-mat-select-search placeholderLabel="Search..."
+                                    noEntriesFoundLabel="No Results Found"
+                                    [formControl]="filterMatl"></ngx-mat-select-search></mat-option>
+                            <mat-option *ngFor="let option of rawmaterialArr" [value]="option.RawMatID">
+                                {{ option.rawmatname }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="col-6 col-sm-6 col-md-2 col-lg-2">
+                    <mat-form-field>
+                        <mat-label>Uom</mat-label>
+                        <input type="text" matInput formControlName="uom" readonly />
+                    </mat-form-field>
+                </div>
+                <div class="col-6 col-sm-6 col-md-3 col-lg-3">
+                    <mat-form-field>
+                        <mat-label>Quantity</mat-label>
+                        <input type="text" matInput formControlName="Qty" />
+                        <mat-error>Field Reqiured</mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="col-6 col-sm-6 col-md-3 col-lg-3">
+                    <mat-form-field>
+                        <mat-label>Indent Pending</mat-label>
+                        <input type="text" matInput formControlName="IndentPen" />
+
+                    </mat-form-field>
+                </div>
+                <div class="col-6 col-sm-6 col-md-3 col-lg-3">
+                    <mat-form-field>
+                        <mat-label>Store. Req. Pend</mat-label>
+                        <input type="text" matInput formControlName="StReqPen" readonly />
+
+                    </mat-form-field>
+                </div>
+                <div class="col-4 col-sm-6 col-md-3 col-lg-3">
+                    <mat-form-field>
+                        <mat-label>Allocated Qty</mat-label>
+                        <input type="text" matInput formControlName="AllocQty" readonly />
+
+                    </mat-form-field>
+                </div>
+                <div class="row m-0 p-0">
+                    <div class="col-lg-8">
+                        <div class="row">
+                            <div class="col-6 col-sm-6 col-md-3 col-lg-4">
+                                <mat-form-field>
+                                    <mat-label>Minimum</mat-label>
+                                    <input type="text" matInput formControlName="Min" readonly />
+
+                                </mat-form-field>
+                            </div>
+                            <div class="col-6 col-sm-6 col-md-3 col-lg-4">
+                                <mat-form-field>
+                                    <mat-label>Maximum</mat-label>
+                                    <input type="text" matInput formControlName="Max" readonly />
+
+                                </mat-form-field>
+                            </div>
+                            <div class="col-6 col-sm-6 col-md-3 col-lg-4">
+                                <mat-form-field>
+                                    <mat-label>Reorder</mat-label>
+                                    <input type="text" matInput formControlName="Reorder" readonly />
+                                </mat-form-field>
+                            </div>
+                            <div class="col-6 col-sm-6 col-md-3 col-lg-4">
+                                <mat-form-field>
+                                    <mat-label>Plan_Tot</mat-label>
+                                    <input type="text" matInput formControlName="PlanTot" readonly />
+
+                                </mat-form-field>
+                            </div>
+                            <div class="col-6 col-sm-6 col-md-3 col-lg-4"
+                                *ngIf="this.data.frm_model !==1 || this.data.frm_model !==9">
+                                <mat-form-field>
+                                    <mat-label>Pack_Qty</mat-label>
+                                    <input type="text" matInput formControlName="PackQty" readonly />
+
+                                </mat-form-field>
+                            </div>
+
+                            <div class="col-6 col-sm-6 col-md-3 col-lg-4">
+                                <mat-form-field>
+                                    <mat-label>Iss_Qty</mat-label>
+                                    <input type="text" matInput formControlName="IssQty" readonly />
+
+                                </mat-form-field>
+                            </div>
+
+                            <div class="col-6 col-sm-6 col-md-3 col-lg-4">
+                                <mat-form-field>
+                                    <mat-label>Location</mat-label>
+                                    <input type="text" matInput formControlName="Location" readonly />
+
+                                </mat-form-field>
+                            </div>
+                            <div class="col-6 col-sm-6 col-md-3 col-lg-4"
+                                *ngIf="this.data.frm_model !==1 || this.data.frm_model !==9">
+                                <mat-form-field>
+                                    <mat-label>Balance Qty</mat-label>
+                                    <input type="text" matInput formControlName="balanceQty" readonly />
+
+                                </mat-form-field>
+                            </div>
+                            <div class="col-6 col-sm-6 col-md-3 col-lg-4">
+                                <mat-form-field>
+                                    <mat-label>StockAvl</mat-label>
+                                    <input type="text" matInput formControlName="StockAvl"
+                                        [style.background-color]="stockColor" [style.color]="stockTextColor" readonly />
+                                </mat-form-field>
+
+                            </div>
+                            <div class="col-6 col-sm-6 col-md-3 col-lg-4" *ngIf="this.data.frm_model !==9">
+                                <mat-form-field>
+                                    <mat-label>Priority</mat-label>
+                                    <mat-select formControlName="Priority">
+                                        <mat-option value="1"> Low</mat-option>
+                                        <mat-option value="2">Medium</mat-option>
+                                        <mat-option value="3">High</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-6 col-sm-6 col-md-3 col-lg-6"
+                                *ngIf="data.frm_model === 9 &&(data.deptId == 12 || data.deptId == 49 || data.deptId == 79)">
+                                <mat-form-field>
+                                    <mat-label>Machine</mat-label>
+                                    <mat-select formControlName="Machine" (selectionChange)="MachChangeEvent()">
+                                        <mat-option> <ngx-mat-select-search placeholderLabel="Search..."
+                                                noEntriesFoundLabel="No Results Found"
+                                                [formControl]="filterMach"></ngx-mat-select-search></mat-option>
+                                        <mat-option *ngFor="let option of MachArrFilter" [value]="option.machid">
+                                            {{ option.machname }}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error>Field Must Be Required</mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+                                <mat-form-field>
+                                    <mat-label>Spectifiaction</mat-label>
+                                    <!-- <mat-input-container floatPlaceholder="auto" > -->
+                                        <textarea matInput formControlName="Spec" placeholder="" style="field-sizing: content;"></textarea>
+                                    <!-- </mat-input-container>  -->
+
+                                </mat-form-field>
+                            </div>
+                            <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+                                <mat-form-field style="field-sizing: content;">
+                                    <mat-label>Descripation</mat-label>
+                                    <!-- <mat-input-container floatPlaceholder="auto" > -->
+                                        <textarea matInput formControlName="Desc" placeholder=""></textarea>
+                                    <!-- </mat-input-container> -->
+                                    <mat-error>Field Reqiured</mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="viewbtnmobile">
+                                <button mat-raised-button type="button" color="primary"
+                                    (click)="getIndentPendingView()">Indent_Pend_View</button>
+                                <button mat-raised-button type="button" class="ml-3" color="primary"
+                                    (click)="MatlPrevIssueRec()">Pre_Rec</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 mat-elevation-z4">
+                        <div class="row">
+                            <label style="color: brown;">Dept Detail</label>
+                            <div class="col-6 col-sm-6 col-md-3 col-lg-6">
+                                <mat-form-field>
+                                    <mat-label>Dept Stock</mat-label>
+                                    <input type="text" matInput formControlName="DeptStock" readonly />
+
+                                </mat-form-field>
+                            </div>
+                            <div class="col-6 col-sm-6 col-md-3 col-lg-6">
+                                <mat-form-field>
+                                    <mat-label>Max Stock</mat-label>
+                                    <input type="text" matInput formControlName="MaxStock" readonly />
+
+                                </mat-form-field>
+                            </div>
+                            <div class="col-6 col-sm-6 col-md-3 col-lg-6">
+                                <mat-form-field>
+                                    <mat-label>Allow Qty</mat-label>
+                                    <input type="text" matInput formControlName="AllowQty" readonly />
+
+                                </mat-form-field>
+                            </div>
+                            <div class="col-6 col-sm-6 col-md-3 col-lg-6">
+                                <mat-form-field>
+                                    <mat-label>Dept_Stock_Qty</mat-label>
+                                    <input type="text" matInput formControlName="DeptStckQty" readonly />
+
+                                </mat-form-field>
+                            </div>
+                            <div class="col-6 col-sm-6 col-md-3 col-lg-6">
+                                <mat-form-field>
+                                    <mat-label>Allow_Pack_Qty</mat-label>
+                                    <input type="text" matInput formControlName="AllowPackQty" readonly />
+
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="viewbtnlab">
+            <button mat-raised-button type="button" color="primary"
+                (click)="getIndentPendingView()">Indent_Pend_View</button>
+            <button mat-raised-button type="button" class="ml-3" color="primary"
+                (click)="MatlPrevIssueRec()">Pre_Rec</button>
+        </div>
+        <div class="float-end m-2">
+            <button mat-raised-button type="button" color="primary" (click)="AddVaild()">Add</button>
+            <button mat-raised-button type="button" class="ml-3" color="warn" (click)="closeDialog()">Close</button>
+            <button mat-raised-button type="button" class="ml-3" color="accent" (click)="Update()">Store Req Matl
+                Update</button>
+        </div>
+    </mat-card-content>
+</mat-card>
+
+<mat-card *ngIf="data.Comp_Name =='PurchaseRequestionSch'" class="p-2">
+    <mat-card-header>
+        <mat-card-title>Add Delivery Schedules For This Material</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <form [formGroup]="Schform">
+            <div class="row">
+                <div class="col-6">
+                    <mat-form-field>
+                        <mat-label>OrderQty</mat-label>
+                        <input type="text" matInput formControlName="OrderQty" readonly />
+                    </mat-form-field>
+                </div>
+                <div class="col-6">
+                    <mat-form-field>
+                        <mat-label>Uom</mat-label>
+                        <input type="text" matInput formControlName="Uom" readonly />
+                    </mat-form-field>
+                </div>
+                <div class="col-6">
+                    <mat-form-field>
+                        <mat-label>Qty</mat-label>
+                        <input type="text" matInput formControlName="Qty" />
+                        <mat-error>Field must be required</mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="col-6">
+                    <mat-form-field>
+                        <mat-label>StockQty</mat-label>
+                        <input type="text" matInput formControlName="StockQty" readonly />
+                    </mat-form-field>
+                </div>
+                <div class="col-6">
+                    <mat-form-field appearance="fill">
+                        <mat-label>Schdule_Dt</mat-label>
+                        <input matInput [matDatepicker]="picker" formControlName="Schdule_Dt"
+                            (dateChange)="schduleDateChangeEvent($event)">
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                        <mat-error>Field Required</mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="col-6">
+                    <mat-form-field>
+                        <mat-label>Comments</mat-label>
+                        <mat-input-container floatPlaceholder="auto">
+                            <textarea matInput formControlName="Comments" placeholder=""></textarea>
+                        </mat-input-container>
+                    </mat-form-field>
+                </div>
+                <div>
+                    <div class="fw-bolder fs-5 p-2" *ngIf="this.data.IsEdit == 'Edit'">
+                        Order Qty:
+                        <strong style="color: brown;">{{ Schform.controls['OrderQty'].value }}</strong> |
+                        Remaining:
+                        <strong style="color: brown;">{{ Schform.controls['OrderQty'].value - totalSchQty() }}</strong>
+                    </div>
+                    <div class="fw-bolder fs-5 p-2" *ngIf="this.data.IsEdit == 'Update'">
+                        Order Qty:
+                        <strong style="color: brown;">{{ Schform.controls['OrderQty'].value }}</strong> |
+                        Schedule Qty:
+                        <strong style="color: brown;" >{{ totalSchQty() }}</strong> |
+                        Remaining:
+                        <strong style="color: brown;">{{ Schform.controls['OrderQty'].value - totalSchQty() }}</strong>
+                    </div>
+                    <ng-container *ngIf="this.data.IsEdit == 'Update'">
+                        <button mat-raised-button type="button" class="float-end mb-3 ml-4" (click)="UpdateSch()"
+                            color="primary" [disabled]="UpdatebtnIsEditUpdate">Update</button>
+                        <button mat-raised-button color="primary" type="button" class="float-end mb-3"
+                            (click)="Insert()" [disabled]="UpdateAdd">Add</button>
+                    </ng-container>
+                    <ng-container *ngIf="this.data.IsEdit == 'Edit'">
+                        <button mat-raised-button color="primary" type="button" class="float-end mb-3  mr-4"
+                            [disabled]="EditUpdate" [hidden]="UpdateBtn" (click)="UpdateSch()">Update</button>
+                        <button [hidden]="cancelBtn" mat-raised-button color="warn" type="button "
+                            class="float-end mb-3 mr-4" (click)="Cancelbtn()">Cancel</button>
+                        <button mat-raised-button color="primary" type="button" class="float-end mb-3 mr-4"
+                            (click)="Insert()" [hidden]="AddBtn">Add</button>
+                    </ng-container>
+                </div>
+            </div>
+        </form>
+        <div class="mat-elevation-z8">
+            <table mat-table #table [dataSource]="SchdataSource">
+                <ng-container matColumnDef="Qty">
+                    <th mat-header-cell *matHeaderCellDef> Quantity </th>
+                    <td mat-cell *matCellDef="let row"> {{row.SchQty}} </td>
+                    <td mat-footer-cell *matFooterCellDef> <strong>Total</strong> {{totalSchQty()}} </td>
+                </ng-container>
+                <ng-container matColumnDef="Uom">
+                    <th mat-header-cell *matHeaderCellDef> Uom </th>
+                    <td mat-cell *matCellDef="let row"> {{row.Uom}} </td>
+                </ng-container>
+                <ng-container matColumnDef="SchDate">
+                    <th mat-header-cell *matHeaderCellDef> SchDate </th>
+                    <td mat-cell *matCellDef="let row"> {{row.SchDate}} </td>
+                </ng-container>
+                <ng-container matColumnDef="SuppCommDt">
+                    <th mat-header-cell *matHeaderCellDef> SuppCommDt </th>
+                    <td mat-cell *matCellDef="let row"> {{row.CommDt}} </td>
+                </ng-container>
+                <ng-container matColumnDef="Delete">
+                    <th mat-header-cell *matHeaderCellDef style="width: 10rem;"> Action </th>
+                    <td mat-cell *matCellDef="let row;let i=index" style="text-align: center;width: 10rem;">
+                        <mat-icon color="primary" *ngIf="data.isSch ==true" (click)="edit(row,i)">edit</mat-icon>
+                        <mat-icon color="warn" class="ml-2" (click)="deletsch(row,i)">delete</mat-icon>
+                    </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="['Qty','Uom','SchDate','SuppCommDt','Delete']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['Qty','Uom','SchDate','SuppCommDt','Delete'];"></tr>
+                <tr mat-footer-row *matFooterRowDef="['Qty']; sticky: true"></tr>
+            </table>
+        </div>
+        <button mat-raised-button type="button" class="mt-3 float-end" color="warn"
+            (click)="closeDialog()">Close</button>
+    </mat-card-content>
+</mat-card>
+
+<mat-card *ngIf="data.Comp_Name =='PurchaseRequestionOldPo'" class="p-2">
+    <div class="mat-elevation-z8">
+        <mat-form-field>
+            <mat-label>Search</mat-label>
+            <input type="text" matInput (input)="SearchOldPo($event)">
+        </mat-form-field>
+        <table mat-table #table [dataSource]="OldPodataSource">
+            <ng-container matColumnDef="PONO">
+                <th mat-header-cell *matHeaderCellDef> PONO </th>
+                <td mat-cell *matCellDef="let row"> {{row.pono}} </td>
+            </ng-container>
+            <ng-container matColumnDef="PODate">
+                <th mat-header-cell *matHeaderCellDef> PO_Date </th>
+                <td mat-cell *matCellDef="let row"> {{row.podate | date:'yyyy-MM-dd' }}
+            </ng-container>
+            <ng-container matColumnDef="Supplier">
+                <th mat-header-cell *matHeaderCellDef> Supplier </th>
+                <td mat-cell *matCellDef="let row"> {{row.supname}} </td>
+            </ng-container>
+            <ng-container matColumnDef="PORate">
+                <th mat-header-cell *matHeaderCellDef> PO_Rate </th>
+                <td mat-cell *matCellDef="let row"> {{row.porate}} </td>
+            </ng-container>
+            <ng-container matColumnDef="Discount">
+                <th mat-header-cell *matHeaderCellDef> Discount </th>
+                <td mat-cell *matCellDef="let row"> {{row.discount}} </td>
+            </ng-container>
+            <ng-container matColumnDef="Freight">
+                <th mat-header-cell *matHeaderCellDef> Freight </th>
+                <td mat-cell *matCellDef="let row"> {{row.freight}} </td>
+            </ng-container>
+            <ng-container matColumnDef="CST">
+                <th mat-header-cell *matHeaderCellDef> CST </th>
+                <td mat-cell *matCellDef="let row"> {{row.cst}} </td>
+            </ng-container>
+            <ng-container matColumnDef="POid">
+                <th mat-header-cell *matHeaderCellDef> POid </th>
+                <td mat-cell *matCellDef="let row"> {{row.poid}} </td>
+            </ng-container>
+            <ng-container matColumnDef="Gross">
+                <th mat-header-cell *matHeaderCellDef> Gross </th>
+                <td mat-cell *matCellDef="let row"> {{row.gtotal}} </td>
+            </ng-container>
+            <tr mat-header-row
+                *matHeaderRowDef="['PONO','PODate','Supplier','PORate','Discount','Freight','CST','POid','Gross']">
+            </tr>
+            <tr mat-row
+                *matRowDef="let row; columns: ['PONO','PODate','Supplier','PORate','Discount','Freight','CST','POid','Gross'];">
+            </tr>
+        </table>
+        <button mat-raised-button type="button" class="m-2 float-end" color="warn"
+            (click)="closeDialog()">Close</button>
+    </div>
+</mat-card>
+
+<ng-template #matlprevrec class="p-2">
+    <!-- Dialog Header -->
+    <div
+        style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px;background-color:  #084eaa;">
+        <mat-dialog-title style="color: #ffffff; font-weight: bold; font-size: 1rem; margin: 0;">
+            Material Previous Issue Record
+        </mat-dialog-title>
+        <mat-icon style="cursor: pointer;color: rgb(255, 255, 255);" (click)="matlprevrecclose()">close</mat-icon>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="mat-elevation-z8 m-2">
+        <table mat-table #table [dataSource]="MatlPrevIssueRecDatasource">
+            <ng-container matColumnDef="sr_ref_no">
+                <th mat-header-cell *matHeaderCellDef>SR_No</th>
+                <td mat-cell *matCellDef="let row"> {{row.Sr_Ref_No}} </td>
+            </ng-container>
+            <ng-container matColumnDef="srdate">
+                <th mat-header-cell *matHeaderCellDef> SR_Date </th>
+                <td mat-cell *matCellDef="let row"> {{row.SRDate | date:'yyyy-MM-dd' }} </td>
+            </ng-container>
+            <ng-container matColumnDef="Department">
+                <th mat-header-cell *matHeaderCellDef> Department </th>
+                <td mat-cell *matCellDef="let row"> {{row.deptname}} </td>
+            </ng-container>
+            <ng-container matColumnDef="srqty">
+                <th mat-header-cell *matHeaderCellDef> SR_Qty </th>
+                <td mat-cell *matCellDef="let row"> {{row.qty}} </td>
+            </ng-container>
+            <ng-container matColumnDef="Enteredby">
+                <th mat-header-cell *matHeaderCellDef>Entered By </th>
+                <td mat-cell *matCellDef="let row"> {{row.empname}} </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="['sr_ref_no','srdate','Department','srqty','Enteredby']"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['sr_ref_no','srdate','Department','srqty','Enteredby'];"></tr>
+        </table>
+    </div>
+</ng-template>
+
+<!-- Indent PendingView -->
+<ng-template #indentPendingView class="p-2">
+    <!-- Dialog Header -->
+    <div
+        style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px;background-color:  #084eaa;">
+        <mat-dialog-title style="color: #ffffff; font-weight: bold; font-size: 1rem; margin: 0;">
+            Indent Pending Material
+        </mat-dialog-title>
+        <mat-icon style="cursor: pointer;color: rgb(255, 255, 255);" (click)="indentPendingClose()">close</mat-icon>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="mat-elevation-z8 m-2">
+        <table mat-table #table [dataSource]="indentPendingViewDatasource">
+            <ng-container matColumnDef="prid">
+                <th mat-header-cell *matHeaderCellDef>PRID</th>
+                <td mat-cell *matCellDef="let row"> {{row.prid}} </td>
+            </ng-container>
+            <ng-container matColumnDef="prdate">
+                <th mat-header-cell *matHeaderCellDef> PR_Date </th>
+                <td mat-cell *matCellDef="let row"> {{row.PRDate | date:'yyyy-MM-dd' }} </td>
+            </ng-container>
+            <ng-container matColumnDef="Indentno">
+                <th mat-header-cell *matHeaderCellDef> Indent_No </th>
+                <td mat-cell *matCellDef="let row"> {{row.PR_Ref_No}} </td>
+            </ng-container>
+            <ng-container matColumnDef="poqty">
+                <th mat-header-cell *matHeaderCellDef> PO_Qty </th>
+                <td mat-cell *matCellDef="let row"> {{row.poqty}} </td>
+            </ng-container>
+            <ng-container matColumnDef="Bal">
+                <th mat-header-cell *matHeaderCellDef>Bal </th>
+                <td mat-cell *matCellDef="let row"> {{row.bal}} </td>
+            </ng-container>
+            <ng-container matColumnDef="Deptname">
+                <th mat-header-cell *matHeaderCellDef> Deptname </th>
+                <td mat-cell *matCellDef="let row"> {{row.deptname}} </td>
+            </ng-container>
+            <ng-container matColumnDef="Status">
+                <th mat-header-cell *matHeaderCellDef>Status </th>
+                <td mat-cell *matCellDef="let row"> {{row.SubStatus}} </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="['prid','prdate','Indentno','poqty','Bal','Deptname','Status']"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['prid','prdate','Indentno','poqty','Bal','Deptname','Status'];">
+            </tr>
+        </table>
+    </div>
+</ng-template>

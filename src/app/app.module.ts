@@ -12,7 +12,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { InventoryMainModuleComponent } from './inventory-main-module/inventory-main-module.component';
 import { PurchaseRequestComponent } from './purchase-request/purchase-request.component';
 import { SetupComponent } from './setup/setup.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -63,10 +62,8 @@ import { ShelfLifeBatchQtyComponent } from './shelf-life-batch-qty/shelf-life-ba
 import { StoreToStoreMomentComponent } from './store-to-store-moment/store-to-store-moment.component';
 import { StoreissuelogoutComponent } from './storeissuelogout/storeissuelogout.component';
 import { IndentEntryComponent } from './indent-entry/indent-entry.component';
-import { PurchaseMainModuleComponent } from './purchase-main-module/purchase-main-module.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { GrnWithoutBillENtryApprComponent } from './grn-without-bill-entry-appr/grn-without-bill-entry-appr.component';
-import { ApprovalmainModuleComponent } from './approvalmain-module/approvalmain-module.component';
 import { WeighmentRejApprComponent } from './weighment-rej-appr/weighment-rej-appr.component';
 import { WeighmentDelayApprComponent } from './weighment-delay-appr/weighment-delay-appr.component';
 import { GrndeleteComponent } from './grndelete/grndelete.component';
@@ -117,15 +114,19 @@ import { GRNEntryComponent } from './grnentry/grnentry.component';
 import { GrnSubmitToAccountsComponent } from './grn-submit-to-accounts/grn-submit-to-accounts.component';
 import { ItemMasterComponent } from './item-master/item-master.component';
 import { SuppliergstComponent } from './suppliergst/suppliergst.component';
+import { SupplierregComponent } from './supplierreg/supplierreg.component';
 import { GrnPrintComponent } from './grn-print/grn-print.component';
 import { StockReportComponent } from './stock-report/stock-report.component';
-import { SupplierregComponent } from './supplierreg/supplierreg.component';
+import { NgxPrintModule } from 'ngx-print';
+import { PrintPageComponent } from './print-page/print-page.component';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { StoreReqMatlDetComponent } from './store-req-matl-det/store-req-matl-det.component';
+import { IndentApprovalComponent } from './indent-approval/indent-approval.component';
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     DashboardComponent,
-    InventoryMainModuleComponent,
     PurchaseRequestComponent,
     SetupComponent,
     DemoComponent,
@@ -142,9 +143,7 @@ import { SupplierregComponent } from './supplierreg/supplierreg.component';
     StoreToStoreMomentComponent,
     StoreissuelogoutComponent,
     IndentEntryComponent,
-    PurchaseMainModuleComponent,
     GrnWithoutBillENtryApprComponent,
-    ApprovalmainModuleComponent,
     WeighmentRejApprComponent,
     WeighmentDelayApprComponent,
     GrndeleteComponent,
@@ -184,9 +183,13 @@ import { SupplierregComponent } from './supplierreg/supplierreg.component';
     CustomerPackingDetComponent,
     SuppliergstComponent,
     SupplierregComponent,
+    //
     GrnSubmitToAccountsComponent,
     GrnPrintComponent,
     StockReportComponent,
+    PrintPageComponent,
+    StoreReqMatlDetComponent,
+    IndentApprovalComponent,
     // DashboardCommericaComponent
   ],
   imports: [
@@ -208,8 +211,8 @@ import { SupplierregComponent } from './supplierreg/supplierreg.component';
     MatFormFieldModule, MatSelectModule,
     FormsModule, ReactiveFormsModule, NgxMatSelectSearchModule,
     NgSelectModule,
-    MatCheckboxModule, TagModule,
-    InputOtpModule, MatExpansionModule, MatStepperModule, MatDialogModule,
+    MatCheckboxModule, TagModule, NgxPrintModule,
+    InputOtpModule, MatExpansionModule, MatStepperModule, MatDialogModule, DragDropModule,
     FieldsetModule, MatTooltipModule, DialogModule, NgxSpinnerModule, ConfirmDialogModule, TooltipModule, MatProgressSpinnerModule,
     TableModule, ContextMenuModule, MatSidenavModule, MatListModule, MatTableModule, MatPaginatorModule, MatSortModule,
     HttpClientModule, MatAutocompleteModule, MatTabsModule, NgMultiSelectDropDownModule, MatButtonToggleModule, MatProgressBarModule,

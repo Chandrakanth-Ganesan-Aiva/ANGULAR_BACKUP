@@ -27,8 +27,7 @@ export class GrnWithoutBillENtryApprComponent implements OnInit {
       Date: new FormControl(''),
       EmpName: new FormControl('', Validators.required)
     })
-    const data = JSON.parse(sessionStorage.getItem('location') || '{}')
-    this.LoactionId = data[data.length - 1];
+    this.LoactionId  = JSON.parse(sessionStorage.getItem('location') || '{}')
     const Emp = JSON.parse(sessionStorage.getItem('session') || '{}');
     this.Empid = Emp.empid;
     this.GrnForm.controls['EmpName'].setValue(Emp.cusername);

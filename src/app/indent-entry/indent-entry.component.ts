@@ -1,867 +1,545 @@
 import { DatePipe } from '@angular/common';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+import { AfterViewInit, Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { IndentEntryService } from '../service/indent-entry.service';
-import { NgxSpinnerService } from 'ngx-spinner';
-import { data } from 'jquery';
-import { style } from '@angular/animations';
-import { PurchaseRequestService } from '../service/purchase-request.service';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { DialogCompComponent } from '../dialog-comp/dialog-comp.component';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
+import { tap, map, forkJoin } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-indent-entry',
   templateUrl: './indent-entry.component.html',
   styleUrls: ['./indent-entry.component.scss'],
 })
-export class IndentEntryComponent implements OnInit {
-  indentForm!: FormGroup;
-  StoreReqFrom!: FormGroup;
-  currentDate = new Date();
-  LoactionId: number = 0;
-  Empid: number = 0;
-  apiErrorMsg: any
-  srtype: number = 1;
-  Empname: number = 0
-  constructor(
-    private date: DatePipe,
-    private service: IndentEntryService,
-    private fb: FormBuilder,
-    private spinner: NgxSpinnerService,
+export class IndentEntryComponent implements OnInit, AfterViewInit {
 
-  ) { }
-  @ViewChild('apierrorDialog') apierrorDialog!: ElementRef;
-  @ViewChild('StoreRelease') StoreRelease!: ElementRef;
-  @ViewChild('closeButton') closeButton!: ElementRef;
-  @ViewChild('ViewinTab') ViewinTab!: ElementRef
+  form!: FormGroup;
+  Empid: number = 0
+  loactionId: number = 0
+  constructor(private date: DatePipe, private fb: FormBuilder, private service: IndentEntryService, private dialog: MatDialog) {
+    this.loactionId = JSON.parse(sessionStorage.getItem('location') || '{}');
 
-  ngOnInit(): void {
-    const data = JSON.parse(sessionStorage.getItem('location') || '{}');
-    this.LoactionId = data[data.length - 1];
-    // console.log(this.LoactionId);
     const user = JSON.parse(sessionStorage.getItem('session') || '{}');
+    console.log(user);
+
     this.Empid = user.empid;
-    this.Empname = user.cusername;
-    this.indentForm = this.fb.group({
-      indentNo: new FormControl('', Validators.required),
-      Date: new FormControl(this.date.transform(this.currentDate, 'yyyy-MM-dd'), Validators.required),
+    this.form = this.fb.group({
+      StockReqNo: new FormControl(''),
+      IndentDate: new FormControl({ value: this.date.transform(new Date(), 'yyyy-MM-dd'), disabled: true }),
+      FromDate: new FormControl(this.date.transform(new Date(), 'yyyy-MM-dd')),
+      Todate: new FormControl({ value: this.date.transform(new Date(), 'yyyy-MM-dd'), disabled: true }),
+      costcenter: new FormControl('', Validators.required),
+      Category: new FormControl(''),
       dept: new FormControl('', Validators.required),
-      deptname: new FormControl(''),
-      category: new FormControl('', Validators.required),
-      categoryid: new FormControl(''),
-      Approved: new FormControl('', Validators.required),
-      Approvedid: new FormControl(''),
-      indenttype: new FormControl('', Validators.required),
+      prnewtype: new FormControl('1'),
+      Approvedby: new FormControl(''),
+      Emp: new FormControl(user.cusername),
+      PurDeptResponse: new FormControl('', Validators.required),
+      Rawmaterial: new FormControl('', Validators.required),
+      Capex: new FormControl(''),
       desc: new FormControl(''),
-      frmdate: new FormControl('', Validators.required),
-      todate: new FormControl('', Validators.required),
-    });
-    this.indentForm.controls['Date'].setValue(this.date.transform(this.currentDate, 'yyyy-MM-dd'));
-    this.indentForm.controls['indenttype'].setValue('Regular');
-    this.getpath();
-    this.indentForm.controls['indenttype'].valueChanges.subscribe((res) => {
-      if (res == 'Regular') {
-        this.srtype = 1;
-      } else if (res == 'Capex') {
-        this.srtype = 2;
-      } else {
-        return;
-      }
-    });
-    this.StoreReqFrom = this.fb.group({
-      dept: new FormControl('', Validators.required),
-      deptid: new FormControl(''),
-      material: new FormControl('', Validators.required),
-      Empname: new FormControl('', Validators.required),
-      EmpId: new FormControl(''),
-      refno: new FormControl('', Validators.required),
-      SrRefno: new FormControl('')
-    });
-    this.indentForm.controls['frmdate'].setValue(
-      this.date.transform(this.currentDate, 'yyyy-MM-dd')
-    );
-    this.indentForm.controls['todate'].setValue(
-      this.date.transform(this.currentDate, 'yyyy-MM-dd')
-    );
+      CapexDesc: new FormControl(''),
+      IndentRaiseEmp: new FormControl('', Validators.required),
+    })
   }
-  indentPath: string = '';
+  @ViewChild('dataSourcePaginator', { static: false }) dataSourcePaginator!: MatPaginator;
+  @ViewChild('oldPoPaginator', { static: false }) oldPoPaginator!: MatPaginator;
+  @ViewChild('oldPoPaginator1', { static: false }) oldPoPaginator1!: MatPaginator;
+  @ViewChild('OldIndentpaginator', { static: false }) OldIndentpaginator!: MatPaginator;
 
-  getpath() {
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.dataSourcePaginator
+    this.oldPoDataSource.paginator = this.oldPoPaginator
+    this.oldPoDataSource2.paginator = this.oldPoPaginator1
+    this.OldIndentDataSource.paginator = this.OldIndentpaginator
+  }
+  filteredOptions: any[] = [];
+  filterControl = new FormControl('');
+  EmpfilterControl = new FormControl('');
+  ngOnInit() {
+    this.getStockReqno()
+    this.GetDepartment()
+    this.getcostCenter()
+    this.category()
+    this.filterControl.valueChanges.pipe(map((search) =>
+      this.MaterialArr.filter((option: any) =>
+        option.PartyName.toLowerCase().includes(search?.toLowerCase() || '')
+      ))
+    ).subscribe((filtered) => (this.MaterialArrfilter = filtered));
 
-    // this.LoactionId=324324234
-    this.service.Indentpath(this.LoactionId).subscribe({
-      next: (data: any) => {
-        console.log(data, 'path');
-        if (data.length > 0) {
-          if (data[0].status === 'N') {
-            this.apiErrorMsg = '';
-            this.apiErrorMsg = data[0].Msg;
-            this.apierrorDialog.nativeElement.click();
-            return;
+    this.EmpfilterControl.valueChanges.pipe(map((search) =>
+      this.EmpArr.filter((option: any) =>
+        option.PartyName.toLowerCase().includes(search?.toLowerCase() || '')
+      ))
+    ).subscribe((filtered) => (this.EmpArrfilter = filtered));
+  }
+
+  StockReq: any[] = new Array();
+  StockReqNo: string = ''
+  getStockReqno() {
+    this.service.Stockreno(this.form.controls['FromDate'].value, this.loactionId).subscribe({
+      next: (res: any) => {
+        if (res.length > 0) {
+          if (res[0].staus == 'N') {
+            this.Error = res[0].Msg
+            this.userHeader = 'Error'
+            return this.opendialog()
           }
-          this.indentPath = data[0].prefix + data[0].prefixseperator + data[0].compshort + data[0].prefixseperator + data[0].yeardisplay + data[0].prefixseperator;
-          this.GetPathNo()
+          this.StockReq = res
+          this.form.controls['StockReqNo'].setValue(this.StockReq[0].translno)
         }
-      },
-      error: (error: any) => {
-        this.apiErrorMsg = '';
-        this.apiErrorMsg = error;
-        this.apierrorDialog.nativeElement.click();
-        return;
-      },
-
-    });
+      }
+    })
   }
-GetPathNo(){
-  this.service.IndentTrano(this.indentPath).subscribe({
-    next: (res: any) => {
-      // console.log(res, 'pathTranno');
-      if (res.length > 0) {
-        if (res[0].status === 'N') {
-          this.apiErrorMsg = '';
-          this.apiErrorMsg = res[0].Msg;
-          this.apierrorDialog.nativeElement.click();
-          return;
+  frmDatechangeEvent(e: any) {
+    if (this.form.controls['FromDate'].value) {
+      this.form.controls['FromDate'].setValue(this.date.transform(e.target.value, 'yyyy-MM-dd'))
+      this.GetDepartment()
+    }
+  }
+  DepartmentArr: any[] = []
+  GetDepartment() {
+    this.service.Department(this.loactionId, this.form.controls['FromDate'].value, this.form.controls['Todate'].value).subscribe({
+      next: (res: any) => {
+        if (res.length > 0) {
+          if (res[0].staus == 'N') {
+            this.Error = res[0].Msg
+            this.userHeader = 'Error'
+            return this.opendialog()
+          }
+          this.DepartmentArr = res
+          this.form.controls['dept'].setValue(res[0].deptid)
+          this.form.controls['Category'].setValue(res[0].catid)
+          this.getApprovedby()
+          this.category()
+        } else {
+          this.Error = 'No Indent Entry Founded From Date <strong style="color:brown;">  ' + this.form.controls['FromDate'].value + '</strong> To Date <strong style="color:brown;">  ' + this.form.controls['Todate'].value + '</strong>'
+          this.userHeader = 'Information'
+          return this.opendialog()
         }
-        this.indentForm.controls['indentNo'].setValue(
-          this.indentPath + res[0].TranNo
+      }
+    })
+  }
+
+  categoryArr: any[] = new Array()
+  category() {
+    this.service.Category(this.loactionId, this.Empid).subscribe({
+      next: (res: any) => {
+        if (res.length > 0) {
+          if (res[0].staus == 'N') {
+            this.Error = res[0].Msg
+            this.userHeader = 'Error'
+            return this.opendialog()
+          }
+          this.categoryArr = res
+          this.form.controls['Category'].setValue(res[0].catid)
+        }
+      }
+    })
+  }
+  costcentreArr: any[] = []
+  getcostCenter() {
+    this.service.CostCenter().subscribe({
+      next: (res: any) => {
+        if (res.length > 0) {
+          if (res[0].staus == 'N') {
+            this.Error = res[0].Msg
+            this.userHeader = 'Error'
+            return this.opendialog()
+          }
+          this.costcentreArr = res
+          this.form.controls['costcenter'].setValue(res[0].costcentreid)
+        }
+      }
+    })
+  }
+  deptChangeevent() {
+    if (this.form.controls['dept'].value) {
+      this.getApprovedby()
+      this.getIndentRawmaterial()
+      this.getInedntEmp()
+      this.getResponsableEmp()
+    }
+  }
+  ApprovedbyArr: any[] = []
+  getApprovedby() {
+    this.service.Approvedby(this.loactionId, this.form.controls['dept'].value).subscribe({
+      next: (res: any) => {
+        if (res.length > 0) {
+          if (res[0].staus == 'N') {
+            this.Error = res[0].Msg
+            this.userHeader = 'Error'
+            return this.opendialog()
+          }
+          this.ApprovedbyArr = res
+          this.form.controls['Approvedby'].setValue(res[0].empid)
+        }
+      }
+    })
+  }
+  MaterialArr: any[] = []
+  MaterialArrfilter: any[] = []
+  getIndentRawmaterial() {
+    this.service.StoreMatl(this.loactionId, this.form.controls['dept'].value).subscribe({
+      next: (res: any) => {
+        if (res.length > 0) {
+          if (res[0].staus == 'N') {
+            this.Error = res[0].Msg
+            this.userHeader = 'Error'
+            return this.opendialog()
+          }
+          this.MaterialArr = res
+          this.MaterialArrfilter = res
+        }
+      }
+    })
+  }
+
+  EmpArr: any[] = []
+  EmpArrfilter: any[] = []
+  getInedntEmp() {
+    this.service.StoreRelaseEmp(this.loactionId, this.form.controls['dept'].value, this.form.controls['Category'].value).subscribe({
+      next: (res: any) => {
+        if (res.length > 0) {
+          if (res[0].staus == 'N') {
+            this.Error = res[0].Msg
+            this.userHeader = 'Error'
+            return this.opendialog()
+          }
+          this.EmpArr = res
+          this.EmpArrfilter = res
+        }
+      }
+    })
+  }
+  ResponsableEmpArr: any[] = []
+  getResponsableEmp() {
+    this.service.ResponsableEmp().subscribe({
+      next: (res: any) => {
+        if (res.length > 0) {
+          if (res[0].staus == 'N') {
+            this.Error = res[0].Msg
+            this.userHeader = 'Error'
+            return this.opendialog()
+          }
+          this.ResponsableEmpArr = res
+        }
+      }
+    })
+  }
+  PrTypeChangeEvent() {
+    if (this.form.controls['prnewtype'].value == 2) {
+      this.getCapex()
+    } else {
+      this.form.controls['desc'].setValue('')
+      this.CapexText = ''
+      this.capexattach = ''
+    }
+  }
+  CapexArr: any[] = new Array()
+  getCapex() {
+    this.service.Capex(this.loactionId).subscribe({
+      next: (res: any) => {
+        if (res.length > 0) {
+          if (res[0].staus == 'N') {
+            this.Error = res[0].Msg
+            this.userHeader = 'Error'
+            return this.opendialog()
+          }
+          this.CapexArr = res
+        }
+      }
+    })
+  }
+  ProjName: string = ''
+  CapexText: any
+  capexattach: any
+  CapexChangeEvent() {
+    if (this.form.controls['Capex'].value) {
+      this.CapexArr.filter((item: any) => {
+        if (this.form.controls['Capex'].value == item.capexno) {
+          this.form.controls['desc'].setValue(item.description)
+          this.CapexText = item.capexattach
+          this.capexattach = item.capexattach
+        }
+      })
+    }
+  }
+  selectedFile: File | null = null;
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedFile = input.files[0];
+      console.log('Selected file:', this.selectedFile);
+    }
+  }
+
+  AddAttachment(): void {
+    if (!this.selectedFile) {
+      alert('Please select a file first.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', this.selectedFile);
+  }
+  dataSource: any = new MatTableDataSource()
+  ViewType: string = ''
+  getStoreRelease() {
+    console.log(1);
+    console.log(this.form);
+
+    if (this.form.invalid) return this.form.markAllAsTouched()
+    this.ViewType = 'PoQty'
+    console.log(2);
+    let deptid = this.form.controls['dept'].value
+    let prtype = this.form.controls['prnewtype'].value
+    let IndentEmp = this.form.controls['IndentRaiseEmp'].value
+    let Rawmatid = this.form.controls['Rawmaterial'].value
+    let Frmdate = this.form.controls['FromDate'].value
+    let Todate = this.form.controls['Todate'].value
+    this.service.View(this.loactionId, deptid, prtype, IndentEmp, Rawmatid, Frmdate, Todate).pipe(
+      tap((res: any) => {
+        if (res.length > 0) {
+          if (res[0].status === 'N') {
+            this.Error = res[0].Msg;
+            this.userHeader = 'Error';
+            return this.opendialog();
+          }
+        }
+      }),
+      switchMap((res: any) => {
+        this.dataSource.data = res;
+        const pocalls = res.map((item: any) =>
+          this.service.PoPending(this.loactionId, item.RawMatID, this.ViewType).pipe(map((poPend: any) => {
+            if (poPend.length > 0) {
+              if (poPend[0].status === 'N') {
+                this.Error = poPend[0].Msg;
+                this.userHeader = 'Error';
+                return this.opendialog();
+              }
+              return {
+                ...item,
+                IssueQty: '',
+                Select: false,
+                PoPendingQty: poPend[0]?.bal
+              }
+            }
+          }))
         );
-        this.getdept()
-      }
-    },
-    error: (error: any) => {
-      this.apiErrorMsg = '';
-      this.apiErrorMsg = error;
-      this.apierrorDialog.nativeElement.click();
-    },
-  });
-}
-
-
-  frmdate(e: any) {
-    this.indentForm.controls['frmdate'].setValue(e.target.value)
-    this.getdept();
-  }
-  deptdata: any[] = new Array();
-  getdept() {
-    this.service.Dept(this.LoactionId, this.indentForm.controls['Date'].value, this.indentForm.controls['frmdate'].value, this.indentForm.controls['todate'].value).subscribe({
-      next: (res: any) => {
-        this.deptdata = res
-        // console.log(this.deptdata, 'dept');
-        if (res.length > 0) {
-          if (res[0].status == 'N') {
-            this.apiErrorMsg = '';
-            this.apiErrorMsg = res[0].Msg;
-            this.apierrorDialog.nativeElement.click();
-            return;
-          }
-        }
-      },
-      error: (error: any) => {
-        this.apiErrorMsg = '';
-        this.apiErrorMsg = error;
-        this.apierrorDialog.nativeElement.click();
-        return;
-      },
-    });
-  }
-  deptevent(e: any) {
-    this.indentForm.controls['dept'].setValue(e)
-    this.deptdata.filter(res => {
-      if (parseInt(this.indentForm.controls['dept'].value) === parseInt(res.DeptId)) {
-        let deptname = res.DeptName
-        this.indentForm.controls['deptname'].setValue(deptname)
-        // console.log(this.indentForm.controls['deptname'].value);
-
-      }
-      this.indentForm.controls['category'].setValue('')
-      this.indentForm.controls['Approved'].setValue('')
+        return forkJoin(pocalls)
+      })
+    ).subscribe((finalData: any) => {
+      this.dataSource.data = finalData;
+      this.dataSource.data = [...this.dataSource.data]
+      this.dataSource.paginator = this.dataSourcePaginator;
     })
-    if (parseInt(this.indentForm.controls['dept'].value) > 0) {
-      this.getCategory();
+  }
+  materialInput(e: any) {
+    let searchValue = e.target.value
+    if (searchValue) {
+      this.dataSource.filter = searchValue.trim().toLowerCase();
+      this.dataSource.data = [...this.dataSource.data]
     }
+    this.dataSource.data = [... this.dataSource.data]
   }
-  getCategory() {
-    this.service.Category(this.Empid, this.LoactionId).subscribe({
-      next: (data: any) => {
-        if (data.length > 0) {
-          // console.log(data, 'category');
-          if (data[0].status == 'N') {
-            this.apiErrorMsg = '';
-            this.apiErrorMsg = data[0].Msg;
-            this.apierrorDialog.nativeElement.click();
-            return;
-          }
-          this.indentForm.controls['category'].setValue(data[0].Category);
-          this.indentForm.controls['categoryid'].setValue(data[0].CatId);
-        }
-      },
-      complete: () => {
-        this.getApproved();
-      },
-    });
-  }
-  appr: any[] = new Array();
-  getApproved() {
-    this.service.Approvedby(this.LoactionId, this.indentForm.controls['dept'].value).subscribe({
+  @ViewChild('Oldpo') Oldpo!: TemplateRef<any>
+  oldpodialog: any = ''
+  RawmatName: string = ''
+  SelectRawmatid: number = 0
+  OldIndentDataSource = new MatTableDataSource()
+  getOldpo(row: any) {
+    this.ViewType = 'OldIndent'
+    this.RawmatName = row.gStrMatDisp
+    this.SelectRawmatid = row.RawMatID
+    this.oldpodialog = this.dialog.open(this.Oldpo, {
+      disableClose: true,
+    })
+    this.getOldPoUnit()
+    this.getOldPoUnit2()
+    this.ViewType = 'OldIndent'
+    this.service.PoPending(this.loactionId, row.RawMatID, this.ViewType).subscribe({
       next: (res: any) => {
-        this.appr = res;
-        // console.log(this.appr);
         if (res.length > 0) {
-          // console.log(res, 'approved');
-          if (res[0].status == 'N') {
-            this.apiErrorMsg = '';
-            this.apiErrorMsg = res[0].Msg;
-            this.apierrorDialog.nativeElement.click();
-            return;
+          if (res[0].staus == 'N') {
+            this.Error = res[0].Msg
+            this.userHeader = 'Error'
+            return this.opendialog()
           }
-          if (res.length === 1) {
-            this.indentForm.controls['Approved'].setValue(res[0].ApprovedBy);
-            this.indentForm.controls['Approvedid'].setValue(res[0].ApprovedById);
-          }
-        }
-      },
-      error: (err) => {
-        this.apiErrorMsg = '';
-        this.apiErrorMsg = err;
-        this.apierrorDialog.nativeElement.click();
-      },
-    });
-  }
-  ApprovedbyEvent(e:any){
-    this.indentForm.controls['Approvedid'].setValue(e);
-    console.log(this.indentForm.controls['Approvedid'].value);
-
-  }
-  ViewStoreReq: any;
-  onSubmit() {
-    this.ViewStoreReq = true;
-    if (this.indentForm.invalid) {
-      return;
-    } else {
-      this.StoreRelease.nativeElement.click();
-      this.StoreReqFrom.controls['dept'].setValue(this.indentForm.controls['deptname'].value);
-      this.StoreReqFrom.controls['deptid'].setValue(this.indentForm.controls['dept'].value);
-      this.indentForm.disable()
-      this.getRefno()
-
-    }
-  }
-  RefnoArr: any[] = new Array()
-  getRefno() {
-    this.service.SrRefNo(this.LoactionId, this.indentForm.controls['frmdate'].value, this.indentForm.controls['todate'].value,
-      this.StoreReqFrom.controls['deptid'].value).subscribe({
-        next: (res: any) => {
-          this.RefnoArr = res
-          console.log(this.RefnoArr, 'Refnoarr');
-          if (this.RefnoArr.length > 0) {
-            if (res[0].status == 'N') {
-              this.apiErrorMsg = '';
-              this.apiErrorMsg = res[0].Msg;
-              this.apierrorDialog.nativeElement.click();
-              return;
-            }
-          }
-          if (this.RefnoArr.length === 1) {
-            this.StoreReqFrom.controls['refno'].setValue(this.RefnoArr[0].SrNo)
-            this.StoreReqFrom.controls['SrRefno'].setValue(this.RefnoArr[0].Sr_Ref_No)
-            this.StoreReqFrom.controls['Empname'].setValue(this.RefnoArr[0].Empname)
-            this.StoreReqFrom.controls['EmpId'].setValue(this.RefnoArr[0].Empid)
-            this.getRawmat()
-          }
-        },
-        error: (err) => {
-          this.apiErrorMsg = '';
-          this.apiErrorMsg = err;
-          this.apierrorDialog.nativeElement.click();
-        },
-        complete: () => { },
-      })
-  }
-  refNoeEnent(e: any) {
-    if (e.target.value > 0) {
-      this.RefnoArr.filter(res => {
-        if (res.SrNo == e.target.value) {
-          console.log(res.Empname,res.Empid);
-          this.StoreReqFrom.controls['SrRefno'].setValue(res.Sr_Ref_No)
-          this.StoreReqFrom.controls['Empname'].setValue(res.Empname)
-          this.StoreReqFrom.controls['EmpId'].setValue(res.Empid)
-        }
-      })
-    }
-    this.StoreReqFrom.controls['material'].setValue('')
-    if (this.MainTabelRelease.length == 0) {
-      this.getRawmat()
-    }
-    if (this.MainTabelRelease.length > 0) {
-      for (let j = 0; j < this.MainTabelRelease.length; j++) {
-        for (let i = 0; i < this.viewStoreData.length; i++) {
-          console.log(parseInt(this.MainTabelRelease[j].RawMatId), parseInt(this.viewStoreData[i].RawMatId));
-          if (parseInt(this.MainTabelRelease[j].RawMatId) === parseInt(this.viewStoreData[i].RawMatId)) {
-            const RawMaterialiD = [parseInt(this.MainTabelRelease[j].RawMatId)]
-            console.log(RawMaterialiD);
-            this.Rawmateriladata = this.Rawmateriladata.filter((item: any) => !RawMaterialiD.includes(item.RawMatId));
-            console.log(this.Rawmateriladata, ' this.Rawmateriladata');
-          } else {
-            this.getRawmat()
-          }
+          this.OldIndentDataSource.data = res;
+          this.OldIndentDataSource.data = [...this.OldIndentDataSource.data]
+          this.OldIndentDataSource.paginator = this.OldIndentpaginator
         }
       }
-    }
+    })
   }
-  Rawmatid: any;
-  Rawmateriladata: any = new Array
-  Rawmaterial: any
-  getRawmat() {
-    this.service.Material(this.LoactionId, this.indentForm.controls['dept'].value, this.StoreReqFrom.controls['SrRefno'].value).subscribe({
+  closeDialog() {
+    this.oldpodialog.close()
+  }
+  oldPoDataSource = new MatTableDataSource()
+  getOldPoUnit() {
+    this.service.IndentEntry_OldPo(this.SelectRawmatid, this.loactionId).subscribe({
       next: (res: any) => {
-        this.Rawmaterial = res;
         if (res.length > 0) {
-          if (res[0].status == 'N') {
-            this.apiErrorMsg = '';
-            this.apiErrorMsg = res.Msg;
-            this.apierrorDialog.nativeElement.click();
+          if (res[0].staus == 'N') {
+            this.Error = res[0].Msg
+            this.userHeader = 'Error'
+            return this.opendialog()
           }
-          this.Rawmateriladata = []
-          for (let i = 0; i < this.Rawmaterial.length; i++) {
-            this.Rawmateriladata.push({
-              Rawmatname: this.Rawmaterial[i].rawmatname,
-              RawMatId: this.Rawmaterial[i].RawMatID
-            })
-          }
-          if (this.MainTabelRelease.length > 0) {
-            for (let j = 0; j < this.MainTabelRelease.length; j++) {
-              for (let i = 0; i < this.viewStoreData.length; i++) {
-                console.log(parseInt(this.MainTabelRelease[j].RawMatId), parseInt(this.viewStoreData[i].RawMatId));
-                if (parseInt(this.MainTabelRelease[j].RawMatId) === parseInt(this.viewStoreData[i].RawMatId)) {
-                  const RawMaterialiD = [parseInt(this.MainTabelRelease[j].RawMatId)]
-                  console.log(RawMaterialiD);
-                  this.Rawmateriladata = this.Rawmateriladata.filter((item: any) => !RawMaterialiD.includes(item.RawMatId));
-                  console.log(this.Rawmateriladata, ' this.Rawmateriladata');
-                }
-              }
-            }
-          }
-          console.log(this.Rawmateriladata, 'mat');
+
+          this.oldPoDataSource.data = res;
+          this.oldPoDataSource.data = [...this.oldPoDataSource.data]
+          console.log(this.oldPoDataSource.data);
+          this.oldPoDataSource.paginator = this.oldPoPaginator
+
+          // this.dataSource.paginator = this.dataSourcePaginator
         }
-      },
-      error: (err) => {
-        this.apiErrorMsg = '';
-        this.apiErrorMsg = err;
-        this.apierrorDialog.nativeElement.click();
-      },
-    });
-  }
-  materialevent(e: any) {
-    this.Rawmatid = e
-    console.log(this.Rawmatid, 'this.Rawmatid')
-    if (this.Rawmatid > 0) {
-      this.StoreReqFrom.controls['material'].disable()
-      this.StoreReqFrom.controls['refno'].disable()
-      if (this.viewStoreData.length > 0) {
-        let matadd = 0
-        for (let i = 0; i < this.viewStoreData.length; i++) {
-          if (this.viewStoreData[i].RawMatId == this.Rawmatid) {
-            matadd = 1;
-            this.Error = 2
-            this.apiErrorMsg = '';
-            this.apiErrorMsg = ''+this.viewStoreData[i].gStrMatDisp+ ' .This Material Is Already Added to The Tabel Please Select Another Material';
-            this.StoreReqFrom.controls['material'].enable()
-            this.StoreReqFrom.controls['refno'].enable()
-            this.apierrorDialog.nativeElement.click();
-            return;
-          }
-        }
-        if (matadd != 1) {
-          this.ViewStore();
-        }
-      } else {
-        this.ViewStore();
       }
-    } else {
-      this.StoreReqFrom.controls['material'].enable()
-      this.StoreReqFrom.controls['refno'].enable()
-    }
+    })
   }
-
-  Cuurentqtyvaild(e: any, Index: number) {
-    // console.log(Index);
-
-
-    if (parseInt(this.viewStoreData[Index].Currqty) == undefined || parseInt(this.viewStoreData[Index].Currqty) == 0 || this.viewStoreData[Index].Currqty === '' || this.viewStoreData[Index].Currqty === null) {
-      this.Error = 2
-      this.apiErrorMsg = ''
-      e.target.value = ''
-      this.viewStoreData[Index].Currqty = ''
-      this.apiErrorMsg = 'Qty is Required for ' + this.viewStoreData[Index].gStrMatDisp + ' ';
-      this.apierrorDialog.nativeElement.click();
-      return
+  oldPoDataSource2 = new MatTableDataSource()
+  getOldPoUnit2() {
+    let Locid: number = 0
+    if (this.loactionId == 1) {
+      Locid = 2
     }
-    else if (parseInt(this.viewStoreData[Index].Currqty) > this.viewStoreData[Index].Pen_Qty) {
-      this.Error = 3
-      this.apiErrorMsg = ''
-      this.apiErrorMsg = 'Quantity cannot be greater than Pending quantity,' + this.viewStoreData[Index].gStrMatDisp + ',For Pending Qty Is ' + '\n' + '' + this.viewStoreData[Index].Pen_Qty + ',You Will Entered as ' + this.viewStoreData[Index].Currqty + '';
-      this.apiErrorMsg.split(',').join('\n')
-      this.viewStoreData[Index].Currqty = ''
-      e.target.value = ''
-      this.apierrorDialog.nativeElement.click();
-      return;
-    }
-  }
-
-  viewStoreData: any[] = new Array()
-  Tabeldata: any[] = new Array()
-  POpendiongArr: any[] = new Array()
-  ViewStore() {
-    this.spinner.show()
-    console.log(this.StoreReqFrom.controls['EmpId'].value, 'em');
-
-    this.service.ViewStoreRelease(this.LoactionId, this.srtype, this.indentForm.controls['frmdate'].value, this.indentForm.controls['todate'].value,
-      this.StoreReqFrom.controls['deptid'].value, this.StoreReqFrom.controls['EmpId'].value, this.Rawmatid, this.StoreReqFrom.controls['SrRefno'].value).subscribe({
-        next: (res: any) => {
-          this.Tabeldata = res
-          // console.log(res, 'Tabel');
-          this.spinner.hide()
-          if (res.length > 0) {
-            if (res[0].status === 'N') {
-              this.apiErrorMsg = '';
-              this.apiErrorMsg = res[0].Msg;
-              this.apierrorDialog.nativeElement.click();
-              return;
-            }
-            this.spinner.show()
-            this.service.PoPendingQty(this.LoactionId, this.Rawmatid).subscribe({
-              next: (data: any) => {
-                this.POpendiongArr = data
-                // console.log(data, 'po pending qty');
-                this.spinner.hide()
-                if (data.length > 0) {
-                  if (data[0].status === 'N') {
-                    this.apiErrorMsg = '';
-                    this.apiErrorMsg = data[0].Msg;
-                    this.apierrorDialog.nativeElement.click();
-                    return;
-                  }
-                  for (let i = 0; i < this.Tabeldata.length; i++) {
-                    for (let j = 0; j < this.POpendiongArr.length; j++) {
-                      let Iss_Qty = this.Tabeldata[i].minqty + this.Tabeldata[i].prqty
-                      let Pen_Qty = this.Tabeldata[i].srqty - this.Tabeldata[i].minqty + this.Tabeldata[i].prqty
-                      if (this.Tabeldata[i].priority === 1) {
-                        this.priority = 'Low'
-                      } else if (this.Tabeldata[i].priority === 2) {
-                        this.priority = 'Medium'
-                      } else {
-                        this.priority = 'High'
-                      }
-                      if (this.LoactionId === 1) {
-                        this.minlevel = this.Tabeldata[i].minlevel
-                        this.maxlevel = this.Tabeldata[i].maxlevel
-                        this.reorderlevel = this.Tabeldata[i].reorder_level
-                      } else if (this.LoactionId === 2) {
-                        this.minlevel = this.Tabeldata[i].minlevel2
-                        this.maxlevel = this.Tabeldata[i].maxlevel2
-                        this.reorderlevel = this.Tabeldata[i].reorder_leve2
-                      } else if (this.LoactionId === 3) {
-                        this.minlevel = this.Tabeldata[i].minlevel3
-                        this.maxlevel = this.Tabeldata[i].maxlevel3
-                        this.reorderlevel = this.Tabeldata[i].reorder_level3
-                      } else {
-                        this.minlevel = this.Tabeldata[i].minlevel6
-                        this.maxlevel = this.Tabeldata[i].maxlevel6
-                        this.reorderlevel = this.Tabeldata[i].reorder_level6
-                      }
-                      this.viewStoreData.push({
-                        Sr_Ref_No: this.Tabeldata[i].Sr_Ref_No,
-                        SRDate: this.Tabeldata[i].SRDate,
-                        RawMatId: this.Tabeldata[i].RawMatID,
-                        gStrMatDisp: this.Tabeldata[i].gStrMatDisp,
-                        srqty: this.Tabeldata[i].srqty,
-                        SRUom: this.Tabeldata[i].SRUom,
-                        Iss_Qty: Iss_Qty,
-                        Pen_Qty: Pen_Qty,
-                        rstock: this.Tabeldata[i].rstock,
-                        Pend_PO_Qty: this.POpendiongArr[j].bal,
-                        min_level: this.minlevel,
-                        max_level: this.maxlevel,
-                        reorder_level: this.reorderlevel,
-                        priorityname: this.priority,
-                        priority: this.Tabeldata[i].priority,
-                        Desc: this.indentForm.controls['desc'].value,
-                        Spec: this.Tabeldata[i].descrip,
-                        capexno: this.Tabeldata[i].capexno,
-                        SRId: this.Tabeldata[i].SRId,
-                        Empid: this.StoreReqFrom.controls['EmpId'].value
-                      })
-                    }
-                    this.service.UpateRecords(this.Tabeldata[i].SRId).subscribe({
-                      next: (res: any) => {
-                        console.log(res, 'rs');
-
-                        if (res.length > 0) {
-                          if (res[0].status == 'N') {
-                            this.apiErrorMsg = '';
-                            this.apiErrorMsg = res[0].Msg;
-                            this.apierrorDialog.nativeElement.click();
-                            return;
-                          }
-                          for (let k = 0; k < res.length; k++) {
-                            this.updateRecords.push({
-                              SRID: res[k].SRID,
-                              Srchid: res[k].SRSchID,
-                              SrchDate: res[k].SrScheduleDate,
-                              scscheduleqty: res[k].scscheduleqty
-                            })
-                          }
-                        }
-
-                      }
-                    })
-                  }
-                  for (let i = 0; i < this.viewStoreData.length; i++) {
-                    if (parseInt(this.Rawmatid) === parseInt(this.viewStoreData[i].RawMatId)) {
-                      const RawMaterialiD = [parseInt(this.viewStoreData[i].RawMatId)]
-                      this.Rawmateriladata = this.Rawmateriladata.filter((item: any) => !RawMaterialiD.includes(item.RawMatId));
-                    }
-                  }
-                }
-              }
-            })
-            console.log(this.viewStoreData, 'viewStoreData');
-          } else {
-            this.Error = 2
-            this.apiErrorMsg = 'No Records To Found';
-            this.StoreReqFrom.controls['material'].enable()
-            this.StoreReqFrom.controls['refno'].enable()
-            this.apierrorDialog.nativeElement.click();
+    this.service.IndentEntry_OldPo(this.SelectRawmatid, Locid).subscribe({
+      next: (res: any) => {
+        if (res.length > 0) {
+          if (res[0].staus == 'N') {
+            this.Error = res[0].Msg
+            this.userHeader = 'Error'
+            return this.opendialog()
           }
-        },
-      });
-
+          this.oldPoDataSource2.data = res;
+          this.oldPoDataSource2.data = [...this.oldPoDataSource2.data]
+          this.oldPoDataSource2.paginator = this.oldPoPaginator1
+          // this.dataSource.paginator = this.dataSourcePaginator
+        }
+      }
+    })
   }
-  updateRecords: any[] = new Array()
-  ReleaseSinglemat: any[] = new Array()
-  Releasebtndis: any
-  Currqtydis: any
-  Releasestore(Index: number) {
-    if (this.viewStoreData.length > 0) {
-      if (this.viewStoreData[Index].Currqty > 0) {
-        // this.viewStoreData[Index].rstock=10
-        // if(parseInt(this.viewStoreData[Index].rstock) > parseInt(this.viewStoreData[Index].max_level)){
-        //   this.Error = 3
-        //   this.apiErrorMsg = ''
-        //   this.apiErrorMsg = 'For This Material : ' + '' + this.viewStoreData[Index].gStrMatDisp + '.Availabel Stock is Greater Than The Maxmium Stock Please Cross Verfiy Before Convert An Indent Entry';
-        //   this.apierrorDialog.nativeElement.click();
-        //   this.viewStoreData[Index].Releasebtndis = false
-        //   this.viewStoreData[Index].Currqtydis = false
-        // }
-        if (parseInt(this.viewStoreData[Index].Currqty) > parseInt(this.viewStoreData[Index].Pen_Qty)) {
-          this.Error = 3
-          this.apiErrorMsg = ''
-          this.apiErrorMsg = 'Quantity cannot be greater than Pending quantity ' + '' + ',' + this.viewStoreData[Index].gStrMatDisp + '.For Pending Qty Is ' + '\n' + '' + this.viewStoreData[Index].Pen_Qty + '.You Will Entered as. ' + this.viewStoreData[Index].Currqty + '';
-          this.viewStoreData[Index].Currqty = ''
-          this.apierrorDialog.nativeElement.click();
-          return;
+
+  CurrentQtyEvent(row: any) {
+    let PendingQty: number = row.srqty - (row.minqty + row.prqty)
+    if (row.IssueQty > PendingQty) {
+      row.IssueQty = ''
+      this.Error = 'Quantity cannot be greater than pending quantity'
+      this.userHeader = 'Information'
+      return this.opendialog()
+    }
+  }
+  getSaveVaild() {
+    let isSelected = this.dataSource.data.filter((item: any) => item.Select)
+    console.log(isSelected);
+
+
+    if (isSelected.length == 0) {
+      this.Error = 'Select Atleast One Material To Convert Requestion To Indent '
+      this.userHeader = 'Information'
+      return this.opendialog()
+    }
+    const hasInvalidIssueQty = isSelected.some((item: any) => !item.IssueQty || Number(item.IssueQty) <= 0);
+    if (hasInvalidIssueQty) {
+      this.Error = 'Select Indent Material IssueQty Should Be Greater Than Zero '
+      this.userHeader = 'Information'
+      return this.opendialog()
+    }
+    else {
+      this.Error = 'Do You Want To Save ?'
+      this.userHeader = 'Save'
+      this.opendialog()
+      this.dialogRef.afterClosed().subscribe((res: boolean) => {
+        if (res) {
+          this.Save()
         } else {
-          this.ReleaseSinglemat.push({
-            Sr_Ref_No: this.viewStoreData[Index].Sr_Ref_No,
-            SRDate: this.viewStoreData[Index].SRDate,
-            RawMatId: this.viewStoreData[Index].RawMatId,
-            gStrMatDisp: this.viewStoreData[Index].gStrMatDisp,
-            srqty: this.viewStoreData[Index].srqty,
-            SRUom: this.viewStoreData[Index].SRUom,
-            Iss_Qty: this.viewStoreData[Index].Iss_Qty,
-            Pen_Qty: this.viewStoreData[Index].Pen_Qty,
-            Currqty: this.viewStoreData[Index].Currqty,
-            rstock: this.viewStoreData[Index].rstock,
-            Pend_PO_Qty: this.viewStoreData[Index].Pend_PO_Qty,
-            min_level: this.viewStoreData[Index].min_level,
-            max_level: this.viewStoreData[Index].max_level,
-            reorder_level: this.viewStoreData[Index].reorder_level,
-            priorityname: this.viewStoreData[Index].priorityname,
-            priority: this.viewStoreData[Index].priority,
-            Desc: this.viewStoreData[Index].Desc,
-            Spec: this.viewStoreData[Index].Spec,
-            capexno: this.viewStoreData[Index].capexno,
-            SRId: this.viewStoreData[Index].SRId,
-            Empid: this.viewStoreData[Index].Empid
-          })
-          this.viewStoreData[Index].Releasebtndis = true
-          this.viewStoreData[Index].Currqtydis = true
-          this.StoreReqFrom.controls['material'].enable()
-          this.StoreReqFrom.controls['material'].setValue('')
+          this.Error = 'Save Cancelled'
+          this.userHeader = 'Information'
+          return this.opendialog()
         }
-        console.log(this.ReleaseSinglemat,'a');
-
-      } else {
-        this.Error = 2
-        this.apiErrorMsg = ''
-        this.viewStoreData[Index].Currqty = ''
-        this.apiErrorMsg = 'Qty is Required for ' + this.viewStoreData[Index].gStrMatDisp + ' ';
-        this.apierrorDialog.nativeElement.click();
-        return
-      }
+      })
     }
-    if (this.Rawmateriladata.length === 0) {
-      this.StoreReqFrom.controls['refno'].enable()
-    }
-
   }
-
-  minlevel: number = 0
-  maxlevel: number = 0
-  reorderlevel: number = 0
-  priority: string = ''
-  Spec: string = ''
-  Error: number = 0
-  QtyVaildation() {
-    this.Error = 2
-    this.StoreRelease.nativeElement.click();
-  }
-  Releasebtn: any;
-  Currqty: number = 0
-  MainTabelRelease: any[] = new Array()
-  MaintabelShow: boolean = false
-
-  Release() {
-    for (let i = 0; i < this.viewStoreData.length; i++) {
-      if (this.viewStoreData[i].Currqty == '' || this.viewStoreData[i].Currqty == 0 || this.viewStoreData[i].Currqty == null || this.viewStoreData[i].Currqty == undefined) {
-        this.Error = 2
-        this.apiErrorMsg = ''
-        this.apiErrorMsg = 'Qty is Required for ' + this.viewStoreData[i].gStrMatDisp + ' ';
-        this.apierrorDialog.nativeElement.click();
-        return
-      }
-    }
-    if (this.ReleaseSinglemat.length > 0) {
-      this.MaintabelShow = true
-      this.MainTabelRelease = []
-      for (let i = 0; i < this.ReleaseSinglemat.length; i++) {
-        this.MainTabelRelease.push({
-          gStrMatDisp: this.ReleaseSinglemat[i].gStrMatDisp,
-          RawMatId: this.ReleaseSinglemat[i].RawMatId,
-          SRUom: this.ReleaseSinglemat[i].SRUom,
-          Currqty: this.ReleaseSinglemat[i].Currqty,
-          rstock: this.ReleaseSinglemat[i].rstock,
-          min_level: this.ReleaseSinglemat[i].min_level,
-          max_level: this.ReleaseSinglemat[i].max_level,
-          reorder_level: this.ReleaseSinglemat[i].reorder_level,
-          Spec: this.ReleaseSinglemat[i].Spec,
-          Desc: this.ReleaseSinglemat[i].Desc,
-          priorityname: this.ReleaseSinglemat[i].priorityname,
-          priority: this.ReleaseSinglemat[i].priority,
-          capexno: this.ReleaseSinglemat[i].capexno,
-          SRId: this.ReleaseSinglemat[i].SRId,
-          Empid: this.ReleaseSinglemat[i].Empid,
-        })
-      }
-      console.log(this.MainTabelRelease, 'MainTabelRelease');
-      this.closeButton.nativeElement.click();
-    } else {
-      this.Error = 2
-      this.apiErrorMsg = 'At least Add One Material For Release';
-      this.StoreReqFrom.controls['material'].enable()
-      this.apierrorDialog.nativeElement.click();
-    }
-
-  }
-
-
-
-  Clear() {
-    this.service.Material(this.LoactionId, this.indentForm.controls['dept'].value, this.StoreReqFrom.controls['SrRefno'].value).subscribe({
-      next: (res: any) => {
-      }
-    })
-    this.StoreReqFrom.controls['refno'].setValue('')
-    this.StoreReqFrom.controls['material'].setValue('')
-    this.indentForm.controls['frmdate'].setValue(this.indentForm.controls['Date'].value)
-    this.StoreReqFrom.enable()
-    this.viewStoreData = []
-    this.MainTabelRelease = []
-    this.ReleaseSinglemat = []
-    console.log(this.Rawmateriladata);
-
-  }
-  UpdateEntry: any[] = new Array()
-  Msg: String = ''
-  Sts: string = ''
-  IndentEntry: any[] = new Array()
-  Qty: number = 0
-  SrchQty: number = 0
-  IndentEntrySch: any[] = new Array()
   Save() {
-    this.getpath();
-    this.UpdateEntry = []
-    this.IndentEntry = []
-    this.IndentEntrySch = []
-    for (let i = 0; i < this.MainTabelRelease.length; i++) {
-      this.IndentEntry.push({
-        RawmatID: this.MainTabelRelease[i].RawMatId,
-        PRQty: this.MainTabelRelease[i].Currqty,
-        PRUom: this.MainTabelRelease[i].SRUom,
-        MaterialDesc: this.MainTabelRelease[i].Desc,
-        MaterialSpec: this.MainTabelRelease[i].Spec,
-        SRID: this.MainTabelRelease[i].SRId,
-        DescRemark: this.MainTabelRelease[i].Desc,
-        priority: this.MainTabelRelease[i].priority,
-        capexno: this.MainTabelRelease[i].capexno,
-        capexnumber: '',
-        capexattach: '',
-      })
-    }
-    console.log(this.MainTabelRelease,this.updateRecords);
+    let SaveArr = {}
+    let MatlArr: any[] = []
+    let isSelected = this.dataSource.data.filter((item: any) => item.Select)
+    console.log(isSelected);
 
-    for (let i = 0; i < this.MainTabelRelease.length; i++) {
-      this.updateRecords.forEach(res => {
-        if (res.SRID === this.MainTabelRelease[i].SRId) {
-          if (this.MainTabelRelease[i].Currqty <= res.scscheduleqty && res.scscheduleqty > 0) {
-            this.SrchQty = this.MainTabelRelease[i].Currqty
-            this.IndentEntrySch.push({
-              SChdate: res.SrchDate,
-              SchQty: this.SrchQty,
-              Srchid: res.Srchid,
-              RawmatID: this.MainTabelRelease[i].RawMatId
-            })
-            this.SrchQty = this.SrchQty - this.SrchQty
-          }
-          if (this.MainTabelRelease[i].Currqty > res.scscheduleqty && res.scscheduleqty > 0) {
-            this.IndentEntrySch.push({
-              SChdate: res.SrchDate,
-              SchQty: res.scscheduleqty,
-              Srchid: res.Srchid,
-              RawmatID: this.MainTabelRelease[i].RawMatId
-            })
-            this.SrchQty = this.SrchQty - res.scscheduleqty
-          }
-        }
+    isSelected.forEach((Matl: any) => {
+      MatlArr.push({
+        Rawmatid: Matl.RawMatID,
+        Prqty: parseInt(Matl.IssueQty),
+        Uom: Matl.Uom,
+        SrId: Matl.SRId,
+        Materialspec: Matl.MaterialSpec,
+        MaterialDesc: Matl.MaterialSpec,
+        DescRemark: Matl.Desc,
+        Priority: Matl.priority,
+        capexno: Matl.capexno,
+        capexnumber: Matl.capexnumber,
+        capexattach: Matl.capexattach
       })
+    });
+    SaveArr = {
+      pr_ref_no: this.form.controls['StockReqNo'].value,
+      DeptID: this.form.controls['dept'].value,
+      capexattach: parseInt(this.form.controls['Capex'].value ? this.form.controls['Capex'].value : 0),
+      costcenter: parseInt(this.form.controls['costcenter'].value),
+      pr_newtype: parseInt(this.form.controls['prnewtype'].value),
+      PRDesc: this.form.controls['desc'].value ? this.form.controls['desc'].value : '',
+      ApprovedBy: this.form.controls['Approvedby'].value,
+      LocationId: this.loactionId,
+      Empid: this.Empid,
+      PurResponsable: this.form.controls['PurDeptResponse'].value,
+      MatlDetail: MatlArr,
     }
-    console.log(this.IndentEntrySch, ' this.IndentEntry');
-    this.UpdateEntry.push({
-      PR_Ref_No: this.indentForm.controls['indentNo'].value,
-      DeptID: this.indentForm.controls['dept'].value,
-      EmpID: this.Empid,
-      ApprovalBy: this.indentForm.controls['Approvedid'].value,
-      PRDesc: this.indentForm.controls['desc'].value,
-      PrNewType: this.srtype,
-      CostCenterID: 13,
-      LocationId: this.LoactionId,
-      LoginEmpId: this.Empid,
-      IndentEntry: this.IndentEntry,
-      IndentEntrySch: this.IndentEntrySch
-    })
-    console.log(this.UpdateEntry, 'saveArr');
-
-    this.service.Update(this.UpdateEntry).subscribe({
-      next: (res: any) => {
-        console.log(res, 'indentEntry');
-        this.Sts = res[0].status;
-        this.Msg = res[0].Msg;
-        if (this.Sts === 'Y') {
-          const Save = document.getElementById('Save') as HTMLInputElement
-          Save.click()
+    console.log(SaveArr);
+    this.service.Save(SaveArr).subscribe({
+      next: (data: any) => {
+        if (data[0].status == 'N') {
+          this.Error = data[0].Msg
+          this.userHeader = 'Error'
+          return this.opendialog()
         } else {
-          const Save = document.getElementById('Save') as HTMLInputElement
-          Save.click()
-          return;
+          this.Error = data[0].Msg
+          this.userHeader = 'Information'
+          this.opendialog()
+          this.dialogRef.afterClosed().subscribe((res: any) => {
+            if (res) {
+              this.form.reset()
+              this.form.controls['prnewtype'].setValue('1')
+              this.form.controls['FromDate'].setValue(this.date.transform(new Date(), 'yyyy-MM-dd'))
+              this.form.controls['Todate'].setValue(this.date.transform(new Date(), 'yyyy-MM-dd'))
+              this.form.controls['Todate'].disable()
+              this.dataSource.data = []
+              this.oldPoDataSource.data = []
+              this.oldPoDataSource2.data = []
+              this.form.markAsUntouched()
+              this.getStockReqno()
+              this.GetDepartment()
+              this.getcostCenter()
+              this.category()
+            }
+          })
         }
       }
     })
+  }
+  Error: string = ''
+  userHeader: string = ''
+  dialogRef!: MatDialogRef<DialogCompComponent>;
+  opendialog() {
+    this.dialogRef = this.dialog.open(DialogCompComponent, {
+      disableClose: true,
+      width: 'auto',
+      data: { Msg: this.Error, Type: this.userHeader }
+    });
 
-
-  }
-  finalSave() {
-    this.getpath();
-    this.UpdateEntry = []
-    this.viewStoreData = []
-    this.MainTabelRelease = []
-    this.ReleaseSinglemat = []
-    this.StoreReqFrom.reset()
-    this.indentForm.controls['Date'].setValue(this.date.transform(this.currentDate, 'yyyy-MM-dd'));
-    this.indentForm.controls['frmdate'].setValue(this.indentForm.controls['Date'].value)
-    this.indentForm.controls['todate'].setValue(this.indentForm.controls['Date'].value)
-    this.indentForm.enable()
-    this.StoreReqFrom.enable()
-    this.viewStoreData[this.addmatIndex].Currqtydis = false
-    this.viewStoreData[this.addmatIndex].Releasebtndis = false
-    this.MaintabelShow = false
-    this.indentForm.controls['dept'].setValue('')
-    this.indentForm.controls['category'].setValue('')
-    this.indentForm.controls['Approved'].setValue('')
-  }
-  savetimeerror() {
-    this.UpdateEntry = []
-  }
-  QtyVaildation1() {
-    this.MaintabelShow = false
-    this.MainTabelRelease = []
-    this.StoreRelease.nativeElement.click();
-  }
-  addmatIndex: number = 0
-  deletemat(Index: any) {
-    this.addmatIndex = Index
-    this.Rawmateriladata.push({
-      Rawmatname: this.viewStoreData[Index].gStrMatDisp,
-      RawMatId: this.viewStoreData[Index].RawMatId
-    })
-
-    this.viewStoreData[Index].Releasebtndis = false
-    this.viewStoreData[Index].Currqtydis = false
-
-    this.viewStoreData.splice(Index, 1)
-    this.ReleaseSinglemat.splice(Index, 1)
-    this.MainTabelRelease.splice(Index, 1)
-    this.updateRecords.splice(Index, 1)
-    console.log(this.MainTabelRelease,'sa');
-    console.log( this.ReleaseSinglemat,'sa2');
-    console.log( this.viewStoreData,'sa3');
-
-
-  }
-  apiError() {
-    this.spinner.show();
-  }
-  TabViewMaterial: string = '';
-  TabViewUOM: string = '';
-  TabViewMaxlevel: number = 0;
-  TabViewReorderlevel: number = 0;
-  TabViewpriority: string = '';
-  TabViewminlevel: number = 0
-  TabViewstock: number = 0
-  tabView(Index: number) {
-    this.TabViewMaterial = this.viewStoreData[Index].gStrMatDisp
-    this.TabViewUOM = this.viewStoreData[Index].SRUom
-    this.TabViewMaxlevel = this.viewStoreData[Index].max_level
-    this.TabViewReorderlevel = this.viewStoreData[Index].reorder_level
-    this.TabViewpriority = this.viewStoreData[Index].priority
-    this.TabViewminlevel = this.viewStoreData[Index].min_level
-    this.TabViewstock = this.viewStoreData[Index].rstock
-    this.ViewinTab.nativeElement.click()
-  }
-  closeViewTab() {
-    this.StoreRelease.nativeElement.click()
-
-  }
-  ClearAll(){
-    this.getpath();
-    this.UpdateEntry = []
-    this.viewStoreData = []
-    this.MainTabelRelease = []
-    this.ReleaseSinglemat = []
-    this.StoreReqFrom.reset()
-    this.indentForm.controls['Date'].setValue(this.date.transform(this.currentDate, 'yyyy-MM-dd'));
-    this.indentForm.controls['frmdate'].setValue(this.indentForm.controls['Date'].value)
-    this.indentForm.controls['todate'].setValue(this.indentForm.controls['Date'].value)
-    this.indentForm.enable()
-    this.StoreReqFrom.enable()
-    this.viewStoreData[this.addmatIndex].Currqtydis = false
-    this.viewStoreData[this.addmatIndex].Releasebtndis = false
-    this.MaintabelShow = false
-    this.indentForm.controls['dept'].setValue('')
-    this.indentForm.controls['category'].setValue('')
-    this.indentForm.controls['Approved'].setValue('')
   }
 }
+
+

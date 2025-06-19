@@ -41,9 +41,12 @@ export class ItemmasterService {
     const url=environment.Api +`/Master/itemMasItemMaster?Rawmatname=${Rawmatname}`
     return this.http.get<any>(url)
   }
-  // itemMas-ExistingItemCheck
   exisitingItemCheck(Rawmatname:any):Observable<any>{
     const url=environment.Api +`/Master/itemMas-ExistingItemCheck?Rawmatname=${Rawmatname}`
     return this.http.get<any>(url)
+  }
+  ItemMasSave(ItemMasUpdate:any):Observable<any>{
+    const url =environment.Api +`/Master/ItemMas-Update`
+    return this.http.post<any>(url,ItemMasUpdate)
   }
 }

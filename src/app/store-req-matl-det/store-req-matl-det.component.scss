@@ -1,0 +1,130 @@
+mat-form-field {
+  width: 100%;
+}
+
+mat-card {
+  background-color: rgb(243, 247, 251);
+}
+
+table {
+  th {
+    margin: 0%;
+    background-color: #3f51b5;
+    color: white;
+    border: 1px solid silver;
+    text-align: center;
+  }
+
+  td {
+      padding: 6px;
+    border: 1px solid silver;
+  }
+}
+
+
+tr:last-child {
+  border: 1px solid silver !important;
+}
+
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+mat-card {
+  margin: 1%;
+  border: 1px solid #286cc5;
+}
+
+mat-card-header {
+  color: brown;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: larger;
+}
+
+.viewbtnmobile {
+  display: none;
+}
+.low-stock .mat-form-field-flex {
+  background-color: #ffcccc !important;
+  color: black;
+  transition: background-color 0.3s ease;
+}
+
+.normal-stock .mat-form-field-flex {
+  background-color: #ffffff !important;
+  color: black;
+  transition: background-color 0.3s ease;
+}
+textarea{
+  resize: none;
+}
+
+@media screen and (max-width: 575px) {
+
+  table th,
+  td,
+  mat-option,
+  input,
+  mat-label,
+  button {
+    font-size: small;
+  }
+
+  mat-card {
+    margin: 0%;
+    overflow: scroll;
+  }
+
+  .viewbtnmobile {
+    display: none;
+  }
+
+  .viewbtnlab {
+    display: block;
+    margin: 10px;
+  }
+}
+
+@media screen and (min-width: 576px) and (max-width: 749px) {
+
+  table th,
+  td,
+  mat-option,
+  input,
+  mat-label,
+  .button {
+    font-size: smaller;
+  }
+
+  .viewbtnmobile {
+    display: block;
+    margin: 10px;
+  }
+
+  .viewbtnlab {
+    display: none;
+  }
+}
+
+@media screen and (min-width: 749px) and (max-width: 992px) {
+
+  table th,
+  td,
+  mat-option,
+  input,
+  mat-label,
+  button {
+    font-size: smaller;
+  }
+
+  .viewbtnmobile {
+    display: block;
+  }
+
+  .viewbtnlab {
+    display: none;
+  }
+}

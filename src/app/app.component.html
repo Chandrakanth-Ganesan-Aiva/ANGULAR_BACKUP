@@ -1,24 +1,32 @@
-<ng-container *ngIf="UserName">
+<ng-container *ngIf="showNavbar">
     <ngx-spinner size="medium" type="ball-scale-multiples">
         <mat-spinner color="accent"></mat-spinner>
     </ngx-spinner>
-    <mat-toolbar class="navbar" [hidden]="Toolbar">
+    <mat-toolbar class="navbar" [hidden]="Toolbar" style="display: flex;gap: 20px; align-items: center;">
         <mat-icon class="mr-3 fs-2 animate__flip" (click)="toggleSidenav()">menu</mat-icon>
-        <h3 class=" ml-1 text-white ">AIVA VENTURES</h3>
+        <h3 style="pointer-events: none;" class="text-white">AIVA VENTURES</h3>
         <span class="example-spacer"></span>
-        <div class="search-container mr-4">
-            <input type="search" class="form-control search" placeholder="Search MenuId"
-                matTooltip="After Type MenuId Press Enter Button To Open That Menu" (keydown)="InputEvent($event)">
-        </div>
-        <div class="nav-icons d-none d-md-flex -mb-3">
-            <a class="text-color-secondary " href="http://dataserver:1436/Reports/Pages/Folder.aspx"> <mat-icon
-                    class="mr-4 fs-3 " matTooltip="REPORT">bar_chart</mat-icon></a>
-            <mat-icon class="mr-4 fs-3 " [matTooltip]="UserName">person</mat-icon>
-            <mat-icon class="mr-4 fs-3 " matTooltip="LOGOUT" (click)="Logout()">exit_to_app</mat-icon>
+        <input type="text" matInput placeholder="Search" [formControl]="searchControl" [matAutocomplete]="auto">
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="SearchBarOptionSelect($event)">
+            <ng-container *ngFor="let option of filteredOptions; let i = index">
+                <mat-option [value]="option.SubMenuId" class="option">
+                    {{ option.SubMenuName }}
+                </mat-option>
+                <mat-divider *ngIf="i < filteredOptions.length - 1"></mat-divider>
+            </ng-container>
+        </mat-autocomplete>
+        <div class="nav-icons d-none d-md-flex">
+            <mat-icon class="fs-3 " matTooltip="Home" routerLink="Dashboard">home</mat-icon>
+            <mat-icon class="fs-3 " matTooltip="REPORT" (click)="barChart()">bar_chart </mat-icon>
+            <mat-icon class="fs-3 " [matTooltip]="UserName">person</mat-icon>
+            <mat-icon class="fs-3 " matTooltip="LOGOUT" (click)="Logout()">exit_to_app</mat-icon>
         </div>
         <mat-icon class="more-options d-md-none" (click)="toggleMoreOptions()"
             [matMenuTriggerFor]="moreMenu">more_vert</mat-icon>
         <mat-menu #moreMenu="matMenu">
+            <button mat-menu-item routerLink="Dashboard">
+                <mat-icon>home</mat-icon> Home
+            </button>
             <button mat-menu-item (click)="openReports()">
                 <mat-icon>bar_chart</mat-icon> Report
             </button>
@@ -77,11 +85,9 @@
                                 <input type="search" class="form-control" placeholder="Search"
                                     (input)="SearchEvent($event)">
                             </div>
-                            <div *ngFor="let subMenu of SubMenuArr" [routerLink]="['/', subMenu.route]"
-                                class="sidenavContent" (click)="toggleSidenav()">
-                                <a [routerLink]="['/', subMenu.route]">
-                                    {{ subMenu.SubMenuName }}
-                                </a>
+                            <div style="cursor: pointer;" *ngFor="let subMenu of MenuRights" class="sidenavContent"
+                                (click)="toogleMenu(subMenu)">
+                                <a >{{ subMenu.SubMenuName }}</a>
                             </div>
                         </div>
                     </div>
@@ -94,8 +100,29 @@
         </mat-sidenav-container>
     </div>
 </ng-container>
-<ng-container *ngIf="!UserName">
+<ng-container *ngIf="!showNavbar">
     <router-outlet></router-outlet>
 </ng-container>
 <!-- </router-outlet>  -->
 <!-- </mat-sidenav-content> -->
+
+<div id="modals-root">
+  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+       aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Modal content will be inserted dynamically -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Understood</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

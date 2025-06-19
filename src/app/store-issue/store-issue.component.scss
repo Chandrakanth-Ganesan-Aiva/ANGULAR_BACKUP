@@ -24,12 +24,31 @@ table {
 tr:last-child {
   border: 1px solid silver !important;
 }
+
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-  
+label {
+  font-weight: bolder;
+  font-size: medium;
+  color: brown;
+  margin-bottom: 5px;
+}
+.expired-row {
+  background-color: #ffcccc; /* light red */
+  color: red;
+  font-weight: bold;
+}
+.stockcheck{
+  color: red;
+  font-weight: bolder;
+}
+.stock{
+  color: rgb(234, 175, 247);
+  font-weight: bold;
+}
 @media only screen and (max-width: 799px) {
   .title {
     font-size: x-large;

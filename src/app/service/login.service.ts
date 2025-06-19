@@ -27,7 +27,7 @@ export class LoginService {
     this.Chstr = "";
     this.CrStr = "";
     this.l = Strvar.length;
-    for (let i = 1; i <= this.l; i++) { 
+    for (let i = 1; i <= this.l; i++) {
       this.Ch = Strvar.substr(i - 1, 1);
       this.CrStr = this.Ch.charCodeAt(0) + (5);
       if (i < 3) {
@@ -86,10 +86,7 @@ export class LoginService {
   Loginattempt(Empid: any) {
     return this.http.get(environment.Api + '/login/LoginAttempt?Empid=' + Empid)
   }
-  OTPInsert(Empid: any, LocationId: any, Otp: any, FrmDate: any, TOdate: any, CreatedSystem: any, OtpValid: any) {
-    return this.http.get(environment.Api + '/login/OtpInsert?Empid=' + Empid + '&LocationId=' + LocationId + '&Otp=' + Otp + '&FrmDate=' + FrmDate + '&TOdate=' + TOdate +
-      '&CreatedSystem=' + CreatedSystem + '&OtpValid=' + OtpValid)
-  }
+
   Otpvaild(Empid: any, LocationId: any, Frmdate: any) {
     return this.http.get(environment.Api + '/login/OtpVaildation?Empid=' + Empid + '&LocationId=' + LocationId + '&Frmdate=' + Frmdate)
   }
@@ -134,6 +131,20 @@ export class LoginService {
 
   // ---------------------------------Forget Password-----------------------------------
 
+  UserNameCheck(usern: any, dob: any) {
+    return this.http.get(environment.Api + '/login/UserNameCheck?usern=' + usern + '&dob=' + dob)
+  }
+  OTP( empname: any, otp: any,Mail:any) {
+    return this.http.get(environment.Api + '/login/OTP?empname=' + empname      + '&otp=' + otp + '&Mail=' + Mail)
+  }
+  InsertOtp(empid: any, entrydate: any, empname: any, otp: any, Mail: any) {
+    return this.http.get(environment.Api + '/login/InsertOtp?empid='  + empid +'&entrydate=' + entrydate +  '&empname=' + empname 
+      + '&otp=' + otp + '&Mail=' + Mail)
+  }
+  UpdatePass(UpdatePass:any) {
+    return this.http.put(environment.Api + '/login/UpdatePass',UpdatePass)
+  }
+
   Mail(Loginname: any, Empid: any) {
     return this.http.get(environment.Api + '/login/Email?Loginname=' + Loginname + '&Empid=' + Empid)
   }
@@ -160,7 +171,7 @@ export class LoginService {
   SubMenuList(MainMenuId: any, MainId: any): Observable<any[]> {
     return this.http.get<any[]>(environment.Api + '/login/SubMenus?MainMenuId=' + MainMenuId + '&MainId=' + MainId)
   }
-  SubMenuInput() {
-    return this.http.get(environment.Api + '/login/SubMenusInput')
+  SubMenuInput(SubMenuName: any): Observable<any[]> {
+    return this.http.get<any[]>(environment.Api + '/login/SubMenusInput?SubMenuName=' + SubMenuName)
   }
 }

@@ -40,6 +40,7 @@ export class SupplierregApprovalTecComponent {
   lastselectedArray: any[] = []
   inputArray: any[] = []
   approveArray: any[] = []
+  selectInputArray: any[] = []
   load() {
     this.service.empid(this.empid).subscribe((result: any) => {
       this.loadArray = result
@@ -49,56 +50,71 @@ export class SupplierregApprovalTecComponent {
     })
   }
   select(event: any, row: any) {
-    this.lastselectedArray = []
-    this.inputArray = []
-    this.approveArray = []
     if (event.target.checked) {
-      this.selectedArray.push(row)
-    }
-    else {
-      this.selectedArray = this.selectedArray.filter((item: any) => item !== row)
-      this.partyid = null
-      this.MachineryDetails = null
-      this.Measuring = null
-      this.Qs = null
-      this.production = null
-      this.quality = null
-      this.others = null
-      this.total = null
-      this.weeklyHoliday = null
-      this.workingHours = null
-      this.shiftDetails = null
-      this.shiftTimings = null
-      this.exp_plan = null
-      this.sanctioned_pow_Avl = null
-      this.standBy_Power = null
-    }
-    if (this.selectedArray.length > 0) {
-      this.lastselectedArray.push(this.selectedArray[this.selectedArray.length - 1])
-      if (this.lastselectedArray.length > 0) {
-        this.service.input(this.lastselectedArray[0].code).subscribe((result: any) => {
-          this.inputArray = result
-          this.partyid = this.inputArray[0].partyid
-          this.MachineryDetails = this.inputArray[0].machdet
-          this.Measuring = this.inputArray[0].measinst
-          this.Qs = this.inputArray[0].manpowerqlty
-          this.production = this.inputArray[0].manpowerprod
-          this.quality = this.inputArray[0].manpowerqlty
-          this.others = this.inputArray[0].manpowerothers
-          this.total = this.inputArray[0].manpowertotal
-          this.weeklyHoliday = this.inputArray[0].weeklyholiday
-          this.workingHours = this.inputArray[0].workhours
-          this.shiftDetails = this.inputArray[0].shiftdet
-          this.shiftTimings = this.inputArray[0].shifttime
-          this.exp_plan = this.inputArray[0].expansionplan
-          this.sanctioned_pow_Avl = this.inputArray[0].sanctionedpower
-          this.standBy_Power = this.inputArray[0].standbypower
-        })
+      // Add to selectedArray
+      this.selectedArray.push(row);
+      console.log(this.selectedArray);
+
+      // Fetch and add to selectInputArray
+      this.service.input(row.code).subscribe((result: any) => {
+        if (result && result.length > 0) {
+          const input = result[0];
+          this.selectInputArray.push(input);
+          this.partyid = input.partyid;
+          this.MachineryDetails = input.machdet;
+          this.Measuring = input.measinst;
+          this.Qs = input.manpowerqlty;
+          this.production = input.manpowerprod;
+          this.quality = input.manpowerqlty;
+          this.others = input.manpowerothers;
+          this.total = input.manpowertotal;
+          this.weeklyHoliday = input.weeklyholiday;
+          this.workingHours = input.workhours;
+          this.shiftDetails = input.shiftdet;
+          this.shiftTimings = input.shifttime;
+          this.exp_plan = input.expansionplan;
+          this.sanctioned_pow_Avl = input.sanctionedpower;
+          this.standBy_Power = input.standbypower;
+        }
+      });
+
+    } else {
+      // Remove from selectedArray
+      this.selectedArray = this.selectedArray.filter((item: any) => item !== row);
+      console.log(this.selectedArray);
+
+      // Remove from selectInputArray using partyid
+      this.selectInputArray = this.selectInputArray.filter((item: any) => item.partyid !== row.partyid);
+      console.log(this.selectInputArray)
+
+      // Clear form fields if nothing is selected
+      if (this.selectedArray.length === 0) {
+        this.partyid = null;
+        this.MachineryDetails = null;
+        this.Measuring = null;
+        this.Qs = null;
+        this.production = null;
+        this.quality = null;
+        this.others = null;
+        this.total = null;
+        this.weeklyHoliday = null;
+        this.workingHours = null;
+        this.shiftDetails = null;
+        this.shiftTimings = null;
+        this.exp_plan = null;
+        this.sanctioned_pow_Avl = null;
+        this.standBy_Power = null;
       }
+    }
+
+    // Optional: Always update last selected if anything is selected
+    if (this.selectedArray.length > 0) {
+      this.lastselectedArray = [this.selectedArray[this.selectedArray.length - 1]];
+    } else {
+      this.lastselectedArray = [];
     }
   }
   approve() {
-    console.log(this.selectedArray);
     if (this.selectedArray.length > 0) {
       const datePipe = new DatePipe('en-US');
       const formattedDate = datePipe.transform(new Date(), 'yyyy-MM-dd HH:mm:ss.SSS');
@@ -119,6 +135,30 @@ export class SupplierregApprovalTecComponent {
             this.Error = result.message
             this.userHeader = 'Information'
             this.opendialog()
+            this.loadArray = []
+            this.tableArray = []
+            this.selectedArray = []
+            this.lastselectedArray = []
+            this.inputArray = []
+            this.partyid = null
+            this.MachineryDetails = null
+            this.Measuring = null
+            this.Qs = null
+            this.production = null
+            this.quality = null
+            this.others = null
+            this.total = null
+            this.weeklyHoliday = null
+            this.workingHours = null
+            this.shiftDetails = null
+            this.shiftTimings = null
+            this.exp_plan = null
+            this.sanctioned_pow_Avl = null
+            this.standBy_Power = null
+            this.approveArray = []
+            this.Error = ''
+            this.userHeader = ''
+            this.load()
           })
         }
       })
@@ -172,19 +212,71 @@ export class SupplierregApprovalTecComponent {
     })
   }
   unapprove() {
+    console.log(this.selectInputArray);
     console.log(this.selectedArray);
     if (this.selectedArray.length > 0) {
       const datePipe = new DatePipe('en-US');
       const formattedDate = datePipe.transform(new Date(), 'yyyy-MM-dd HH:mm:ss.SSS');
       for (let i = 0; i < this.selectedArray.length; i++) {
         this.approveArray.push({
-          empid: this.empid,
-          today: formattedDate,
-          partyid: this.selectedArray[i].partyid
+          Partyid: this.selectedArray[i].partyid,
+          code: this.selectedArray[i].code,
+          name: this.selectedArray[i].name,
+          address: this.selectedArray[i].address,
+          issupplier: this.selectedArray[i].IsSupplier,
+          IsSubcontractor: this.selectedArray[i].IsSubcontractor,
+          IsCustomer: this.selectedArray[i].IsCustomer, // Corrected
+          partygroup: this.selectedArray[i].PartyGroup,
+          partytype: this.selectedArray[i].partytype,
+          contact: this.selectInputArray[i].contact,
+          phone: this.selectInputArray[i].phone,
+          email: this.selectInputArray[i].email,
+          web_site: this.selectInputArray[i].web_site,
+          pannumber: this.selectInputArray[i].pannumber,
+          pincode: this.selectInputArray[i].pincode,
+          currid: this.selectInputArray[i].currid,
+          stateid: this.selectInputArray[i].stateid,
+          countryid: this.selectInputArray[i].countryid,
+          cityid: this.selectInputArray[i].cityid,
+          creditperiod: this.selectedArray[i].Creditperiod,
+          gstno: this.selectedArray[i].gstno,
+          sup_eccno: this.selectInputArray[i].sup_eccno,
+          ctypeid: this.selectInputArray[i].ctypeid,
+          establishment: this.selectInputArray[i].establishment,
+          executive: this.selectInputArray[i].executive,
+          majcustomer: this.selectInputArray[i].majcustomer,
+          capital: this.selectInputArray[i].capital,
+          ssiregno: this.selectInputArray[i].ssiregno,
+          bankersname: this.selectInputArray[i].bankersname,
+          org_type: this.selectInputArray[i].org_type,
+          sup_type: this.selectedArray[i].sup_type,
+          machdet: this.selectInputArray[i].machdet,
+          measinst: this.selectInputArray[i].measinst,
+          qltysystem: this.selectInputArray[i].qltysystem,
+          manpowerprod: this.selectInputArray[i].manpowerprod,
+          manpowerqlty: this.selectInputArray[i].manpowerqlty,
+          manpowerothers: this.selectInputArray[i].manpowerothers,
+          manpowertotal: this.selectInputArray[i].manpowertotal,
+          weeklyholiday: this.selectInputArray[i].weeklyholiday,
+          workhours: this.selectInputArray[i].workhours,
+          shiftdet: this.selectInputArray[i].shiftdet,
+          shifttime: this.selectInputArray[i].shifttime,
+          expansionplan: this.selectInputArray[i].expansionplan,
+          sanctionedpower: this.selectInputArray[i].sanctionedpower,
+          standbypower: this.selectInputArray[i].standbypower,
+          AddressProofType: this.selectedArray[i].AddressProofType,
+          SMEno: this.selectedArray[i].SMEno,
+          PanCardName: this.selectedArray[i].PanCardName,
+          GstCertificateName: this.selectedArray[i].GstCertificateName,
+          AddressProofName: this.selectedArray[i].AddressProofName,
+          BankDetailsName: this.selectedArray[i].BankDetailsName,
+          SmeCertificateName: this.selectedArray[i].SmeCertificateName
         })
       }
-      this.Error = 'Are you sure to Approve?'
-      this.userHeader = 'Save'
+      console.log(this.approveArray);
+
+      this.Error = 'Are you sure to Unapprove?'
+      this.userHeader = 'Warning!!!'
       this.opendialog()
       this.dialogRef.afterClosed().subscribe((result: boolean) => {
         if (result) {
@@ -193,6 +285,30 @@ export class SupplierregApprovalTecComponent {
             this.Error = result.message
             this.userHeader = 'Information'
             this.opendialog()
+            this.loadArray = []
+            this.tableArray = []
+            this.selectedArray = []
+            this.lastselectedArray = []
+            this.inputArray = []
+            this.partyid = null
+            this.MachineryDetails = null
+            this.Measuring = null
+            this.Qs = null
+            this.production = null
+            this.quality = null
+            this.others = null
+            this.total = null
+            this.weeklyHoliday = null
+            this.workingHours = null
+            this.shiftDetails = null
+            this.shiftTimings = null
+            this.exp_plan = null
+            this.sanctioned_pow_Avl = null
+            this.standBy_Power = null
+            this.approveArray = []
+            this.Error = ''
+            this.userHeader = ''
+            this.load()
           })
         }
       })

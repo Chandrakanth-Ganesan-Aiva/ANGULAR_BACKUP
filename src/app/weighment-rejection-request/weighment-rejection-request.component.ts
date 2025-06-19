@@ -38,8 +38,7 @@ export class WeighmentRejectionRequestComponent implements OnInit, AfterViewInit
     this.WeighRejReqForm = this.fb.group({
       Supplier: new FormControl('', Validators.required)
     })
-    let Location = JSON.parse(sessionStorage.getItem('location') || '{}')
-    this.LocationId = Location[Location.length - 1];
+    this.LocationId  = JSON.parse(sessionStorage.getItem('location') || '{}')
     let Emp = JSON.parse(sessionStorage.getItem('session') || '{}')
     this.Empid = Emp.empid
     this.filterControl.valueChanges.pipe(startWith(''),map((serach:any)=>

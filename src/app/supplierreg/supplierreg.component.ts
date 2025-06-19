@@ -451,7 +451,7 @@ export class SupplierregComponent {
                                             this.opendialog();
                                             return;
                                           }
-                                          this.Error = 'Are you sure to Approve?';
+                                          this.Error = 'Are you sure to Save?';
                                           this.userHeader = 'Save';
                                           this.opendialog();
                                           this.dialogRef.afterClosed().subscribe((result: boolean) => {
@@ -535,7 +535,74 @@ export class SupplierregComponent {
                                                   this.Error = res.message
                                                   this.userHeader = 'Information';
                                                   this.opendialog();
-                                                  this.clear()
+                                                  this.type = '';
+                                                  this.supplier = 'General'
+                                                  this.show = false;
+                                                  this.tabhide = false;
+                                                  this.firstcard = true
+                                                  this.orghide = false
+                                                  this.suppliercode = null
+                                                  this.selectedCountryID = null
+                                                  this.selectedStateID = null
+                                                  this.table = false
+                                                  this.area = null
+                                                  this.newOrganisation = ''
+                                                  this.selectorgname = ''
+                                                  this.suppname = ''
+                                                  this.contactperson = ''
+                                                  this.contactno = ''
+                                                  this.email = ''
+                                                  this.faxno = ''
+                                                  this.website = ''
+                                                  this.panno = ''
+                                                  this.Establishyear = ''
+                                                  this.executive = ''
+                                                  this.majorCust = ''
+                                                  this.companyaddr = ''
+                                                  this.pincode = ''
+                                                  this.creditperiod = ''
+                                                  this.totalcapInv = ''
+                                                  this.Bankersname = ''
+                                                  this.ssi = ''
+                                                  this.gstno = ''
+                                                  this.registeredVendor = true
+                                                  this.ecc = ''
+                                                  this.currencytype = ''
+                                                  this.currencyid
+                                                  this.smeno = ''
+                                                  this.tngstno = ''
+                                                  this.cgstno = ''
+                                                  this.servicetaxNo = ''
+                                                  this.partytype = ''
+                                                  this.ledger = ''
+                                                  this.selectedLedger = null
+                                                  this.selectedCurrency = null;
+                                                  this.machdetails = ''
+                                                  this.measuring = ''
+                                                  this.qualitySystem = ''
+                                                  this.production = ''
+                                                  this.quality = ''
+                                                  this.others = ''
+                                                  this.total = ''
+                                                  this.weeklyholiday = ''
+                                                  this.workinghours = ''
+                                                  this.shiftDetails = ''
+                                                  this.shiftTimings = ''
+                                                  this.expansionPlan = ''
+                                                  this.sanctionedPowAvl = ''
+                                                  this.StandByPower = ''
+                                                  this.userHeader = ''
+                                                  this.Error = ''
+                                                  this.Addressprooftype = ''
+                                                  this.gstshow = true
+                                                  this.stateArray = []
+                                                  this.areaArray = []
+                                                  this.newOrgArray = []
+                                                  this.SaveArray = []
+                                                  this.partyArray = []
+                                                  this.ledgerArrayList = []
+                                                  this.partytypeListArray = []
+                                                  this.uploadedFiles = {};
                                                 },
                                                 error: (err) => {
                                                   console.error('Upload failed', err);
@@ -725,6 +792,7 @@ export class SupplierregComponent {
         this.ledgerArrayList = []
         this.partytypeListArray = []
         this.uploadedFiles = {};
+        this.smeno = ''
       }
     })
   }

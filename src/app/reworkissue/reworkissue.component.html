@@ -1,225 +1,218 @@
-<mat-card-header class="justify-content-center mt-1">
-  <mat-card-title class="title" style="font-family: 'Times New Roman', Times, serif;">REWORK ISSUE</mat-card-title>
-</mat-card-header>
-
-<div class="container-fluid">
-  <mat-card>
-    <mat-card-content>
-      <form [formGroup]="ReworkIssueForm" #invalidfocus>
-        <div class="row mb-2">
-          <div class="col">
-            <label for="exampleFormControlInput3" class="form-label">Issue No <span>*</span> </label>
-            <input type="text" class="form-control" formControlName="IssueNo" readonly>
-            <mat-error *ngIf="viewbtn && ReworkIssueForm.controls['IssueNo'].invalid">Issue No Required</mat-error>
-          </div>
-          <div class="col">
-            <label for="exampleFormControlInput3" class="form-label">Issue Date <span>*</span> </label>
-            <input type="date" class="form-control" [value]="this.Issuedate" readonly>
-          </div>
+<mat-card>
+  <mat-card-header class="justify-content-center p-1 ">
+    <mat-card-title style="color: brown;font-size: xx-large;">Rework Issue</mat-card-title>
+  </mat-card-header>
+  <mat-divider></mat-divider>
+  <mat-card-content class="p-3">
+    <!-- <div class="row mt-2"> -->
+    <!-- <div class="col-lg-4 "> -->
+    <form [formGroup]="form" class="mat-elevation-z8 overflow-hidden ">
+      <div class="row p-2">
+        <div class="col-12 col-sm-6 col-md-6 col-lg-6">
+          <mat-form-field>
+            <mat-label>Issue No </mat-label>
+            <input type="text" matInput formControlName="IssueNo" readonly>
+            <mat-error>Field Required</mat-error>
+          </mat-form-field>
         </div>
-        <div class="row">
-          <div class="col ">
-            <label for="exampleFormControlInput3" class="form-label">From Dt <span>*</span> </label>
-            <input type="date" class="form-control" formControlName="FrmDate" (change)="Frmdatevent($event)">
-          </div>
-          <div class="col ">
-            <label for="exampleFormControlInput3" class="form-label">To Dt <span>*</span> </label>
-            <input type="date" class="form-control" formControlName="Todate">
-          </div>
+        <div class="col-12 col-sm-6 col-md-6 col-lg-6">
+          <mat-form-field>
+            <mat-label>Issue Date</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="Issuedate">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error>Field Required</mat-error>
+          </mat-form-field>
         </div>
-        <div class="row mb-2">
-          <div class="col" style="width: fit-content;">
-            <label for="exampleFormControlInput3" class="form-label">Department <span>*</span> </label>
-            <mat-select class="form-control" placeholder="--Select--" formControlName='Department'
-              (selectionChange)="DeptEvent()">
-              <mat-option *ngFor="let item of Deptdata" [value]="item.DeptId">{{item.DeptName}}</mat-option>
+        <div class="col-12 col-sm-6 col-md-6 col-lg-6">
+          <mat-form-field>
+            <mat-label>From Date</mat-label>
+            <input matInput [matDatepicker]="picker1" formControlName="frmdate" (dateChange)="Frmdatevent($event)">
+            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+            <mat-datepicker #picker1></mat-datepicker>
+            <mat-error>Field Required</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-sm-6 col-md-6 col-lg-6">
+          <mat-form-field>
+            <mat-label>To Date</mat-label>
+            <input matInput [matDatepicker]="picker2" formControlName="todate">
+            <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+            <mat-datepicker #picker2></mat-datepicker>
+            <mat-error>Field Required</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-sm-6 col-md-6 col-lg-6">
+          <mat-form-field>
+            <mat-label>Department</mat-label>
+            <mat-select formControlName="Department" (selectionChange)="DeptEvent()">
+              <mat-option *ngFor="let item of DepatmentArr" [value]="item.DeptId">{{item.DeptName}}</mat-option>
             </mat-select>
-            <mat-error *ngIf="viewbtn && ReworkIssueForm.controls['Department'].invalid">Department
-              Required</mat-error>
-          </div>
-          <div class="col">
-            <label for="exampleFormControlInput3" class="form-label">Ref. No <span>*</span> </label>
-            <mat-select class="form-control" placeholder="--Select--" formControlName="Refno"
-              (selectionChange)="RefnoEvent()">
-              <mat-option *ngFor="let item of RefnoData" [value]="item.SrNo">{{item.Sr_Ref_No}}</mat-option>
-            </mat-select>
-            <mat-error *ngIf="viewbtn && ReworkIssueForm.controls['Department'].invalid">Ref.No Required</mat-error>
-          </div>
+            <mat-error>Field Required</mat-error>
+          </mat-form-field>
         </div>
-        <div class="row mb-2">
-          <div class="col">
-            <label for="exampleFormControlInput3" class="form-label">Warehouse <span>*</span> </label>
-            <mat-select class="form-control" placeholder="--Select--" formControlName="Warehouse">
-              <mat-option selected *ngFor="let item of warehouseData"
+        <div class="col-12 col-sm-6 col-md-6 col-lg-6">
+          <mat-form-field>
+            <mat-label>Ref_No</mat-label>
+            <mat-select formControlName="Refno" (selectionChange)="RefnoEvent()">
+              <mat-option *ngFor="let item of RefnoDataArr" [value]="item.SrNo">{{item.Sr_Ref_No}}</mat-option>
+            </mat-select>
+            <mat-error>Field Required</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-sm-6 col-md-6 col-lg-9">
+          <mat-form-field>
+            <mat-label>Material</mat-label>
+            <mat-select formControlName="material">
+              <mat-option *ngFor="let item of Rawmateriladata" [value]="item.RawMatID">{{item.RawMatName}}</mat-option>
+            </mat-select>
+            <mat-error>Field Required</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+          <mat-form-field>
+            <mat-label>WareHouse</mat-label>
+            <mat-select formControlName="Warehouse">
+              <mat-option *ngFor="let item of WarehouseArr"
                 [value]="item.Location_ID">{{item.LocationName}}</mat-option>
             </mat-select>
-            <mat-error *ngIf="viewbtn && ReworkIssueForm.controls['Department'].invalid">Warehouse Required</mat-error>
-          </div>
-          <div class="col">
-            <label for="exampleFormControlInput3" class="form-label">Material <span>* </span>
-            </label>
-            <mat-select class="form-control" placeholder="--Select--" formControlName="material"
-              (selectionChange)="getMaterialDetails()">
-              <mat-option *ngFor="let item of Materialdata" [value]="item.RawMatID">{{item.RawMatName}}</mat-option>
-            </mat-select>
-            <mat-error *ngIf="viewbtn && ReworkIssueForm.controls['Department'].invalid">Material Required</mat-error>
-          </div>
+            <mat-error>Field Required</mat-error>
+          </mat-form-field>
         </div>
-        <div class="col model-footer viewbtn">
-          <button mat-raised-button type="button" color="primary" (click)="View()" [disabled]="Addbtn">Add</button>
-        </div>
-      </form>
 
-    </mat-card-content>
-    <mat-card-content *ngIf="ViewMaterial">
-      <mat-tab-group mat-align-tabs="start" [selectedIndex]="Tab1" (selectedTabChange)="tabChangedRegular($event)"
-        class="mattab mt-2">
-        <mat-tab label="Material Detalis">
-          <table style="width: 100%;padding:1%">
-            <thead>
-              <tr>
-                <th class="head" style="width: 10%;">Ref_No</th>
-                <th class="head" style="width: 8%;">Date</th>
-                <th class="head">Material</th>
-                <th class="head">UOM</th>
-                <th class="head">SR_qty</th>
-                <th class="head">Pend_Qty</th>
-                <th class="head">Issue_Qty</th>
-                <th class="head">Release</th>
-                <th class="head">Avl_Stock</th>
-                <th class="head">Min_Qty</th>
-                <th class="head">Max_Qty</th>
-                <th class="head">Reorder_Qty</th>
-                <th class="head">Dept_Name</th>
-              </tr>
-            </thead>
-            <tbody *ngFor="let material of materialTabel let i =index;">
-              <td class="body" style="width: fit-content;">{{material.Sr_Ref_No}}</td>
-              <td class="body" style="width: fit-content;">{{material.SRDate | date : 'dd-MM-yyyy ' }}</td>
-              <td class="body">{{material.gStrMatDisp}}</td>
-              <td class="body">{{material.SRUom}}</td>
-              <td class="body" style="text-align: right;">{{material.srqty}}</td>
-              <td class="body" style="text-align: right;">{{this.PendingQty}}</td>
-              <td class="body"><input type="number" class="form-control noscroll"  [(ngModel)]="material.IssueQty"
-                  [disabled]="material.IssueQtydis" (input)="ReleaseVaildation(i)"></td>
-              <td class="body"><button mat-raised-button type="button" color="primary" (click)="Release(i)"
-                  [disabled]="material.Releasebtn">Release</button></td>
-              <td class="body" style="text-align: right;" id="Avlstock">{{material.stock}}</td>
-              <td class="body" style="text-align: right;">{{material.min_level }}</td>
-              <td class="body" style="text-align: right;">{{material.max_level}}</td>
-              <td class="body" style="text-align: right;">{{material.reorder_level}}</td>
-              <td class="body">{{material.deptname}}</td>
-            </tbody>
-          </table>
-        </mat-tab>
-        <mat-tab label="Issue Detalis">
-          <table style="width: 100%;">
-            <thead>
-              <tr>
-                <th class="head" style="width: 12%;">Ref_No</th>
-                <th class="head" style="width: 8%;">Date</th>
-                <th class="head">Material</th>
-                <th class="head">UOM</th>
-                <th class="head">SR_qty</th>
-                <th class="head">Issue_Qty</th>
-                <th class="head">GrnRefNo</th>
-                <th class="head">GrnQty</th>
-                <th class="head">Dept.Name</th>
-                <th class="head">Actions</th>
-              </tr>
-            </thead>
-            <tbody *ngFor="let material of IssueDetalisArray; let i =index;">
-              <td class="body" style="width: fit-content;">{{material.Refno}}</td>
-              <td class="body" style="width: fit-content;">{{material.Date | date : 'dd-MM-yyyy ' }}</td>
-              <td class="body">{{material.Material}}</td>
-              <td class="body">{{material.Uom}}</td>
-              <td class="body" style="text-align: right;">{{material.SRQty}}</td>
-              <td class="body" style="text-align: right;">{{material.IssueQty}}</td>
-              <td class="body" style="text-align: right;">{{material.GrnRefno}}</td>
-              <td class="body" style="text-align: right;">{{material.GrnQty }}</td>
-              <td class="body">{{material.Department}}</td>
-              <td><i class="fa-regular fa-trash-can" style="color: #f91f4b;" (click)="Deletematl(i)"></i></td>
-            </tbody>
-          </table>
-        </mat-tab>
-      </mat-tab-group>
-    </mat-card-content>
-    <mat-card-footer align=end *ngIf="ViewMaterial">
-      <button mat-raised-button type="button" color="primary"
-        style="background-color: green;color: white;font-weight: bolder;" (click)="getSave()">Save</button>
-    </mat-card-footer>
-  </mat-card>
-</div>
+      </div>
+      <div class="model-footer float-end mb-3">
+        <!-- <button mat-raised-button type="button" class="mr-4" style="background-color: green;" (click)="GetSave()"
+              disabled>Save</button> -->
+        <button mat-raised-button type="button" class="mr-4" color="warn" (click)="Clear()">Clear</button>
+        <button mat-raised-button type="button" class="mr-4" color="primary" (click)="Add()">Add</button>
+      </div>
+    </form>
+  </mat-card-content>
 
-
-<button style="display: none;" data-bs-toggle="modal" data-bs-target="#ErrorD" #ErrorNative></button>
-<div class="modal" id="ErrorD" data-bs-backdrop='static'>
-  <div class=" modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header" style="font-size: medium;color: rgb(252, 83, 83);font-weight: bold;">Warning!!!</div>
-      <div class="modal-body">
-        <h3>
-          <p style="font-family: 'Times New Roman', Times, serif;font-weight:550;font-size: large;color: rgb(0, 0, 0);">
-            {{Error}}</p><br>
-        </h3>
-        <div class="modal-footer m-0 p-0" style="margin: 0%;">
-          <div *ngIf="Errornum!==1">
-            <button mat-raised-button type="button" class="btn  m-2" color="warn" data-bs-dismiss="modal">OK</button>
-          </div>
-          <div *ngIf="Errornum==1">
-            <button mat-raised-button type="button" class="btn  m-2" color="primary" data-bs-dismiss="modal"
-              (click)="MinmumStckchckY()">Yes</button>
-            <button mat-raised-button type="button" class="btn  m-2" color="warn" data-bs-dismiss="modal"
-              (click)="MinmumStckchckN()">No</button>
-          </div>
-        </div>
+  <mat-tab-group [(selectedIndex)]="TabIndex"  (selectedTabChange)="TabChageEvent($event)">
+    <mat-tab label="Material">
+      <div class="mat-elevation-z8 overflow-auto ">
+        <table mat-table #table [dataSource]="dataSource">
+          <ng-container matColumnDef="Ref_No">
+            <th mat-header-cell *matHeaderCellDef> Ref_No </th>
+            <td mat-cell *matCellDef="let row"> {{row.Sr_Ref_No}} </td>
+          </ng-container>
+          <ng-container matColumnDef="Date">
+            <th mat-header-cell *matHeaderCellDef class="w-12rem"> Date </th>
+            <td mat-cell *matCellDef="let row" class="w-12rem"> {{row.SRDate | date : 'dd-MM-yyyy '}} </td>
+          </ng-container>
+          <ng-container matColumnDef="Material">
+            <th mat-header-cell *matHeaderCellDef> Material </th>
+            <td mat-cell *matCellDef="let row"> {{row.gStrMatDisp}} </td>
+          </ng-container>
+          <ng-container matColumnDef="UOM">
+            <th mat-header-cell *matHeaderCellDef> UOM </th>
+            <td mat-cell *matCellDef="let row"> {{row.SRUom}} </td>
+          </ng-container>
+          <ng-container matColumnDef="SR_qty">
+            <th mat-header-cell *matHeaderCellDef> SR_qty </th>
+            <td mat-cell *matCellDef="let row"> {{row.srqty}} </td>
+          </ng-container>
+          <ng-container matColumnDef="Pend_Qty">
+            <th mat-header-cell *matHeaderCellDef> Pend_Qty </th>
+            <td mat-cell *matCellDef="let row"> {{row.srqty - row.minqty}} </td>
+          </ng-container>
+          <ng-container matColumnDef="Issue_Qty">
+            <th mat-header-cell *matHeaderCellDef> Issue_Qty </th>
+            <td mat-cell *matCellDef="let row"> <input type="number" class="form-control" [(ngModel)]="row.issueQty"
+                [ngClass]="{'stockcolor': row.stockcolor}"> </td>
+          </ng-container>
+          <ng-container matColumnDef="Release">
+            <th mat-header-cell *matHeaderCellDef> Release </th>
+            <td mat-cell *matCellDef="let row;let i=index">
+              <button mat-icon-button color="primary" (click)="onReleaseValidation(row, i)"
+                [disabled]="releaseDisabled[i]">
+                <mat-icon color="accent">archive</mat-icon> </button>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="Avl_Stock">
+            <th mat-header-cell *matHeaderCellDef> Avl_Stock </th>
+            <td mat-cell *matCellDef="let row" [ngClass]="{'stockcheck': row.stockcheck}"> {{row.stock}} </td>
+          </ng-container>
+          <ng-container matColumnDef="Min_Qty">
+            <th mat-header-cell *matHeaderCellDef> Min_Qty </th>
+            <td mat-cell *matCellDef="let row"> {{row.min_level}} </td>
+          </ng-container>
+          <ng-container matColumnDef="Max_Qty">
+            <th mat-header-cell *matHeaderCellDef> Max_Qty </th>
+            <td mat-cell *matCellDef="let row"> {{row.max_level}} </td>
+          </ng-container>
+          <ng-container matColumnDef="Reorder_Qty">
+            <th mat-header-cell *matHeaderCellDef> Reorder_Qty </th>
+            <td mat-cell *matCellDef="let row"> {{row.reorder_level}} </td>
+          </ng-container>
+          <ng-container matColumnDef="Dept_Name">
+            <th mat-header-cell *matHeaderCellDef> Dept_Name </th>
+            <td mat-cell *matCellDef="let row"> {{row.deptname}} </td>
+          </ng-container>
+          <ng-container matColumnDef="Actions">
+            <th mat-header-cell *matHeaderCellDef> Actions </th>
+            <td mat-cell *matCellDef="let row;let i=index"><mat-icon color="warn"
+                (click)="Deletemat(i)">delete</mat-icon></td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="['Ref_No','Date','Material','UOM','SR_qty','Pend_Qty','Issue_Qty','Release','Avl_Stock',
+            'Min_Qty','Max_Qty','Reorder_Qty','Dept_Name','Actions']">
+          </tr>
+          <tr mat-row *matRowDef="let row; columns: ['Ref_No','Date','Material','UOM','SR_qty','Pend_Qty','Issue_Qty','Release',
+            'Avl_Stock','Min_Qty','Max_Qty','Reorder_Qty','Dept_Name','Actions'];">
+          </tr>
+        </table>
       </div>
-    </div>
-  </div>
-</div>
-
-<button style="display: none;" data-bs-toggle="modal" data-bs-target="#Savemenudialog" #SaveVaild></button>
-<div class="modal fade" id="Savemenudialog" data-bs-backdrop='static'>
-  <div class="modal-dialog modal-sm modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header" style="font-size: medium;background-color: rgb(240, 255, 241);">SAVE:</div>
-      <div class="modal-body" style="margin: 0%;">
-        <div>
-          <h4 style="color: rgb(3, 3, 3);font-weight: 550;">Do you yant to Save Data?</h4>
-        </div>
-      </div>
-      <div class="modal-footer" style="background-color: rgb(214, 248, 206);">
-        <button mat-raised-button type="button" style="background-color: #92d87e;" data-bs-dismiss="modal"
-          (click)="Save()">Yes</button>
-        <button mat-raised-button type="button" style="background-color: #f57c7c;" data-bs-dismiss="modal">No</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<button style="display: none;" data-bs-toggle="modal" data-bs-target="#Savedialog" #Savenative></button>
-<div class="modal fade" id="Savedialog" data-bs-backdrop='static'>
-  <div class=" modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">SAVE:</div>
-      <div class="modal-body" style="margin-left: 1%;">
-        <div style="font-size: medium;font-weight: 600;color: rgb(140, 232, 140);" *ngIf="this.Sts == 'Y'">
-          {{Msg}}
-        </div>
-        <div style="font-size: medium;font-weight: 600;color: lightcoral" *ngIf="this.Sts == 'N'">
-          {{Msg}}
-        </div>
-      </div>
-      <div class="modal-footer">
-        <div *ngIf="this.Sts == 'Y'">
-          <button mat-raised-button style="background-color: #92d87e;" type="button" data-bs-dismiss="modal"
-            (click)="finalSave()">OK</button>
-        </div>
-        <div *ngIf="this.Sts == 'N'">
-          <button mat-raised-button class="btn btn-secondary" style="background-color: rgb(247, 107, 75);" type="button"
-            data-bs-dismiss="modal" (click)="savetimeerror()">OK</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+    </mat-tab>
+    <mat-tab label="Issue">
+      <mat-card-content class=" mat-elevation-z8 overflow-auto mt-3"  >
+        <table mat-table #table [dataSource]="IssueDataSource">
+          <ng-container matColumnDef="Ref_No">
+            <th mat-header-cell *matHeaderCellDef> Ref_No </th>
+            <td mat-cell *matCellDef="let row"> {{row.Ref_no}} </td>
+          </ng-container>
+          <ng-container matColumnDef="Date">
+            <th mat-header-cell *matHeaderCellDef> Date </th>
+            <td mat-cell *matCellDef="let row"> {{row.Date | date : 'dd-MM-yyyy '}} </td>
+          </ng-container>
+          <ng-container matColumnDef="Material">
+            <th mat-header-cell *matHeaderCellDef> Material </th>
+            <td mat-cell *matCellDef="let row"> {{row.Rawmaterial}} </td>
+          </ng-container>
+          <ng-container matColumnDef="UOM">
+            <th mat-header-cell *matHeaderCellDef> UOM </th>
+            <td mat-cell *matCellDef="let row"> {{row.UOM}} </td>
+          </ng-container>
+          <ng-container matColumnDef="SR_qty">
+            <th mat-header-cell *matHeaderCellDef> SR_qty </th>
+            <td mat-cell *matCellDef="let row"> {{row.SRQty}} </td>
+          </ng-container>
+          <ng-container matColumnDef="Issue_Qty">
+            <th mat-header-cell *matHeaderCellDef> Issue_Qty </th>
+            <td mat-cell *matCellDef="let row"> {{row.IssueQty}} </td>
+          </ng-container>
+          <ng-container matColumnDef="GrnRefNo">
+            <th mat-header-cell *matHeaderCellDef> GrnRefNo </th>
+            <td mat-cell *matCellDef="let row"> {{row.GRNREFNO}} </td>
+          </ng-container>
+          <ng-container matColumnDef="GrnQty">
+            <th mat-header-cell *matHeaderCellDef> GrnQty </th>
+            <td mat-cell *matCellDef="let row"> {{row.GRNQTY}} </td>
+          </ng-container>
+          <ng-container matColumnDef="Dept_Name">
+            <th mat-header-cell *matHeaderCellDef> Dept_Name </th>
+            <td mat-cell *matCellDef="let row"> {{row.DeptName}} </td>
+          </ng-container>
+          <tr mat-header-row
+            *matHeaderRowDef="['Ref_No','Date','Material','UOM','SR_qty','Issue_Qty','GrnRefNo','GrnQty','Dept_Name']">
+          </tr>
+          <tr mat-row
+            *matRowDef="let row; columns: ['Ref_No','Date','Material','UOM','SR_qty','Issue_Qty','GrnRefNo','GrnQty','Dept_Name'];">
+          </tr>
+        </table>
+      </mat-card-content>
+      <button mat-raised-button type="button" style="background-color: green;" (click)="saveVaild()">Save</button>
+    </mat-tab> 
+  </mat-tab-group>
+</mat-card>

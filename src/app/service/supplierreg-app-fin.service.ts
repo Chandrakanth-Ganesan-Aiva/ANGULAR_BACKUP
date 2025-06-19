@@ -37,6 +37,6 @@ export class SupplierregAppFinService {
     return this.http.post(environment.Api + '/Purchase/Approvals/supregAppFinUp', data)
   }
   unapprove(data: any) {
-    return this.http.post(environment.Api + '/Purchase/Approvals//supregAppFinUpUnapp', data)
+    return this.http.post(environment.Api + '/Purchase/Approvals/supregAppFinUnappr', data)
   }
 }
