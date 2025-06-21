@@ -26,10 +26,5 @@ export class SupplierregAppPurService {
   approve(data: any) {
     return this.http.post(environment.Api + '/Purchase/Approvals/supregAppPurchase', data)
   }
-  unapprove(data: any) {
-    return this.http.post(environment.Api + '/Purchase/Approvals/supregAppPurchaseUnappr', data)
-  }
-  ApproveCheck(partyid: any) {
-    return this.http.get(environment.Api + '/Purchase/Approvals/supregAppPurParty?partyid=' + partyid)
-  }
+
 }

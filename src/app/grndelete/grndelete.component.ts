@@ -35,7 +35,8 @@ export class GrndeleteComponent implements OnInit, AfterViewInit {
     this.dataSource.paginator = this.paginator
   }
   ngOnInit(): void {
-    this.LocationId = JSON.parse(sessionStorage.getItem('location') || '{}')
+    let Location = JSON.parse(sessionStorage.getItem('location') || '{}')
+    this.LocationId = Location[Location.length - 1]
 
     let UserDet = JSON.parse(sessionStorage.getItem('session') || '{}')
     this.Empid = UserDet.empid

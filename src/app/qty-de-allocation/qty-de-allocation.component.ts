@@ -31,7 +31,9 @@ export class QtyDeAllocationComponent implements OnInit, AfterViewInit, OnDestro
       FromDate: [new Date()],
       ToDate: [new Date()]
     })
-    this.loactionId  = JSON.parse(sessionStorage.getItem('location') || '{}');
+    const data = JSON.parse(sessionStorage.getItem('location') || '{}');
+    this.loactionId = data[data.length - 1]
+
     this.datePipe.transform(this.DeAlllocaForm.controls['FromDate'].value, 'yyyy/MM/dd')
     this.datePipe.transform(this.DeAlllocaForm.controls['ToDate'].value, 'yyyy/MM/dd')
   }

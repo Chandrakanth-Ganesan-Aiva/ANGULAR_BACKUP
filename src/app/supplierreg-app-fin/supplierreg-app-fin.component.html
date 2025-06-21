@@ -1,36 +1,38 @@
-<div class="container-fluid p-3">
-    <h1 class="mb-4 text-center">Supplier Registration Approval - Finance</h1>
+<div>
+    <h1>Supplier Registration Approval - Finance</h1>
+
     <div class="card">
         <div class="card-body">
-            <div class="row mb-3">
-                <div class="col-md-4 col-sm-6 col-12">
-                    <label>Approved By</label>
-                    <input type="text" class="form-control form-control-sm" [(ngModel)]="empname" />
+            <div class="row">
+                <div class="col-4">
+                    <label for="">Approved By</label>
+                    <input type="text" class="form-control" [(ngModel)]="empname">
                 </div>
             </div>
 
-            <div class="table-responsive mb-4">
-                <table class="table table-bordered table-hover w-100">
-                    <thead class="table-light">
+            <div class="table-responsive">
+                <table class="table table-bordered table-fixed"
+                    style="width: 100%;table-layout: fixed;border: 1px solid #ddd;">
+                    <thead>
                         <tr>
-                            <th>Approve</th>
-                            <th>Party_Code</th>
-                            <th>Party_Name</th>
-                            <th>Address</th>
-                            <th>City</th>
-                            <th>State</th>
-                            <th>Country</th>
-                            <th>Pin_Code</th>
-                            <th>GST.No</th>
-                            <th>CrDays</th>
+                            <th style="width: 100px;">Approve</th>
+                            <th style="width: 120px;">Party_Code</th>
+                            <th style="width: 200px;">Party_Name</th>
+                            <th style="width: 300px;">Address</th>
+                            <th style="width: 120px;">City</th>
+                            <th style="width: 200px;">State</th>
+                            <th style="width: 100px;">Country</th>
+                            <th style="width: 100px;">Pin_Code</th>
+                            <th style="width: 200px;">GST.No</th>
+                            <th style="width: 100px;">CrDays</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr *ngFor="let table of tableArray">
-                            <td><input type="checkbox" class="form-check-input" (change)="select($event, table)" /></td>
+                            <td><input type="checkbox" class="form-check-input" (change)="select($event,table)" style="border: 1px solid #5161b6;;"></td>
                             <td>{{table.code}}</td>
-                            <td>{{table.name}}</td>
-                            <td>{{table.address}}</td>
+                            <td style="text-align: left;">{{table.name}}</td>
+                            <td style="text-align: left;">{{table.address}}</td>
                             <td>{{table.AreaName}}</td>
                             <td>{{table.StateName}}</td>
                             <td>{{table.CountryName}}</td>
@@ -41,88 +43,72 @@
                     </tbody>
                 </table>
             </div>
-
-            <div class="row mb-3 g-3">
-                <div class="col-md-4 col-sm-6 col-12">
-                    <label>Party Id</label>
-                    <input type="text" class="form-control form-control-sm" [(ngModel)]="partyid" readonly />
+            <div class="row mt-4">
+                <div class="col-4">
+                    <label for="">Party Id</label>
+                    <input type="text" class="form-control" [(ngModel)]="partyid" readonly>
                 </div>
-                <div class="col-md-4 col-sm-6 col-12">
-                    <label>Total Capital Investment</label>
-                    <input type="text" class="form-control form-control-sm" [(ngModel)]="capital" readonly />
-                </div>
-                <div class="col-md-3 col-sm-6 col-12">
-                    <label>Bankers name/ Address</label>
-                    <input type="text" class="form-control form-control-sm" [(ngModel)]="banker" readonly />
-                </div>
-                <div class="col-md-1 col-sm-6 col-12 d-flex align-items-end">
-                    <button mat-raised-button color="primary" (click)="viewBankDetails()">View</button>
+                <div class="col-4 d-flex align-items-center justify-content-center">
+                    <input type="checkbox" class="form-check-input me-2" [(ngModel)]="vendor">
+                    <label for="">Registered Vendor</label>
                 </div>
             </div>
-
-            <div class="row mb-3 g-3">
-                <div class="col-md-4 col-sm-6 col-12">
-                    <label>SSI Reg. No. & Others</label>
-                    <input type="text" class="form-control form-control-sm" [(ngModel)]="ssi" readonly />
+            <div class="row mt-4">
+                <div class="col-4">
+                    <label for="">Total Capital Investment</label>
+                    <input type="text" class="form-control" [(ngModel)]="capital" readonly>
                 </div>
-                <div class="col-md-4 col-sm-6 col-12 d-flex align-items-center">
-                    <input type="checkbox" class="form-check-input me-2" [(ngModel)]="vendor"
-                        (click)="$event.preventDefault()" />
-                    <label class="form-check-label">Registered Vendor</label>
+                <div class="col-4">
+                    <label for="">Bankers name/ Address</label>
+                    <input type="text" class="form-control" [(ngModel)]="banker" readonly>
                 </div>
-                <div class="col-md-3 col-sm-6 col-12">
-                    <label>GST No.</label>
-                    <input type="text" class="form-control form-control-sm" [(ngModel)]="gst" readonly />
-                </div>
-                <div class="col-md-1 col-sm-6 col-12 d-flex align-items-end">
-                    <button mat-raised-button color="primary" (click)="viewgst()">View</button>
-                </div>
-            </div>
-
-            <div class="row mb-3 g-3">
-                <div class="col-md-4 col-sm-6 col-12">
-                    <label>ECC No.</label>
-                    <input type="text" class="form-control form-control-sm" [(ngModel)]="ecc_no" readonly />
-                </div>
-                <div class="col-md-4 col-sm-6 col-12">
-                    <label>Current Type</label>
-                    <input type="text" class="form-control form-control-sm" [(ngModel)]="currency" readonly />
-                </div>
-                <div class="col-md-3 col-sm-6 col-12">
-                    <label>SME No.</label>
-                    <input type="text" class="form-control form-control-sm" [(ngModel)]="smeno" readonly />
-                </div>
-                <div class="col-md-1 col-sm-6 col-12 d-flex align-items-end">
-                    <button mat-raised-button color="primary" (click)="viewsme()">View</button>
-                </div>
-            </div>
-
-            <div class="row mb-4 g-3">
-                <div class="col-md-4 col-sm-6 col-12">
-                    <label>Party Type</label>
-                    <input type="text" class="form-control form-control-sm" [(ngModel)]="partyType" readonly />
-                </div>
-                <div class="col-md-4 col-sm-6 col-12">
-                    <label>Ledger Group</label>
-                    <input type="text" class="form-control form-control-sm" [(ngModel)]="ledgergrp" readonly />
-                </div>
-                <div class="col-md-4 col-sm-6 col-12">
-                    <label>Ledger Name</label>
-                    <input type="text" class="form-control form-control-sm" [(ngModel)]="Ledgername" readonly />
+                <div class="col-4">
+                    <label for="">SSI Reg. No. & Others</label>
+                    <input type="text" class="form-control" [(ngModel)]="ssi" readonly>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-12 d-flex justify-content-end flex-wrap gap-2">
-                    <button mat-raised-button style="background-color: green;color: white;"
+                <div class="col-4">
+                    <label for="">GST No.</label>
+                    <input type="text" class="form-control" [(ngModel)]="gst" readonly>
+                </div>
+                <div class="col-4">
+                    <label for="">ECC No.</label>
+                    <input type="text" class="form-control" [(ngModel)]="ecc_no" readonly>
+                </div>
+                <div class="col-4">
+                    <label for="">Current Type</label>
+                    <input type="text" class="form-control" [(ngModel)]="currency" readonly>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-4">
+                    <label for="">Party Type</label>
+                    <select name="" id="" class="form-select" [(ngModel)]="partyType">
+                        <option *ngFor="let type of partyTypeArray" [value]="type.xxx">{{type.xxx}}</option>
+                    </select>
+
+                </div>
+                <div class="col-4">
+                    <label for="">Ledger Group</label>
+                    <select class="form-select" class="form-select" [(ngModel)]="ledgergrp">
+                        <option [value]="type.xxx" *ngFor="let type of ledgergrpArray">{{type.xxx}}</option>
+                    </select>
+                </div>
+                <div class="col-4">
+                    <label for="">Ledger Name</label>
+                    <input type="text" class="form-control" [(ngModel)]="Ledgername" readonly>
+                </div>
+            </div>
+            <div class="row text-end">
+                <div class="col">
+                    <button mat-raised-button style="background-color: green;color: white;margin-right: 3px;"
                         (click)="approve()">Approve</button>
-                    <button mat-raised-button style="background-color: orange;color: white;"
-                        (click)="unapprove()">Unapprove</button>
                     <button mat-raised-button style="background-color: red;color: white;"
                         (click)="clear()">Clear</button>
                 </div>
             </div>
-
         </div>
     </div>
 </div>

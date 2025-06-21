@@ -30,7 +30,8 @@ export class MaterialReturnFrmDeptComponent implements OnInit,OnDestroy  {
     // this.Currdate = this.date.transform(this.currentDate, 'yyyy-MM-dd');
     // console.log(this.Currdate);
 
-    this.LoactionId = JSON.parse(sessionStorage.getItem('location') || '{}');
+    const data = JSON.parse(sessionStorage.getItem('location') || '{}');
+    this.LoactionId = data[data.length - 1]
     console.log(this.LoactionId);
     const user = JSON.parse(sessionStorage.getItem('session') || '{}');
     this.Empid = user.empid

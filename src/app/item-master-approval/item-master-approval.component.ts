@@ -21,14 +21,15 @@ export class ItemMasterApprovalComponent implements OnInit, AfterViewInit, OnDes
   LoactionId: number = 0
   ViewDet: any[] = new Array()
   dataSource = new MatTableDataSource<any>(this.ViewDet);
-  TabelHeaders: string[] = ['select', 'ItemCode', 'Material', 'Spec', 'Make', 'Category', 'Uom', 'Minqty', 'Maxqty', 'Reorder', 'Uomid', 'Grntypeid', 'Weight',
+  TabelHeaders: string[] = ['select','ItemCode', 'Material', 'Spec', 'Make', 'Category', 'Uom', 'Minqty', 'Maxqty', 'Reorder', 'Uomid', 'Grntypeid', 'Weight',
     'Saleable', 'DrawingNo', 'Grade', 'Gradeid', 'Email', 'Location', 'Qcreq', 'Shelflife', 'Hsncode', 'Department']
   constructor(private service: ItemMasterApprService, private spinner: NgxSpinnerService, private dialog: MatDialog, private fb: FormBuilder) {
     this.ItemMasterForm = this.fb.group({
       Dept: ['', [Validators.required]]
     })
 
-    this.LoactionId = JSON.parse(sessionStorage.getItem('location') || '{}');
+    const Location = JSON.parse(sessionStorage.getItem('location') || '{}');
+    this.LoactionId = Location[Location.length - 1]
     let UserDet = JSON.parse(sessionStorage.getItem('session') || '{}')
     this.empid = UserDet.empid
   }
@@ -68,11 +69,14 @@ export class ItemMasterApprovalComponent implements OnInit, AfterViewInit, OnDes
   onEdit(element: any, key: string, event: Event) {
     const editableElement = event.target as HTMLElement;
     console.log(editableElement);
-    element[key] = editableElement.innerText.trim();     // Update the model with the current text value
-    console.log(element[key]);
+        element[key] = editableElement.innerText.trim();     // Update the model with the current text value
+        console.log(element[key]);
     this.moveCaretToEnd(editableElement);        // Move the caret to the end after input
   }
-
+  // onEdit(element: any, key: string, event: Event) {
+  //   const editableElement = event.target as HTMLElement;
+  //   element[key] = editableElement.innerText.trim(); // Trim to clean spaces
+  // }
   moveCaretToEnd(event: FocusEvent | HTMLElement) {
     let element: HTMLElement;
     if (event instanceof FocusEvent) {             // Handle case where we receive FocusEvent
@@ -80,10 +84,10 @@ export class ItemMasterApprovalComponent implements OnInit, AfterViewInit, OnDes
     } else {                                      // Handle case where we receive HTMLElement directly
       element = event;
     }
-
+  
     const range = document.createRange();
     const selection = window.getSelection();
-
+  
     if (element.childNodes.length > 0) {           // Move caret to the end of the content
       range.selectNodeContents(element);
       range.collapse(false);                       // Set caret position to the end
@@ -91,16 +95,16 @@ export class ItemMasterApprovalComponent implements OnInit, AfterViewInit, OnDes
       selection?.addRange(range);
     }
   }
+  
 
-
-  materialName: any
+  materialName: string = ''
   materialInput(e: any) {
     this.materialName = e.target.value.toLowerCase();
     if (this.materialName) {
       this.dataSource.filter = this.materialName.trim().toLowerCase()
       this.dataSource.data = [... this.dataSource.data];
-    } else {
-      this.materialName = ''
+    }else{
+      this.materialName =''
     }
   }
 
@@ -110,7 +114,7 @@ export class ItemMasterApprovalComponent implements OnInit, AfterViewInit, OnDes
       return this.ItemMasterForm.markAsTouched()
     } else {
       let deptid = this.ItemMasterForm.controls['Dept'].value
-      this.service.View(this.LoactionId, deptid).subscribe({
+      this.service.View(deptid, this.LoactionId).subscribe({
         next: (res: any) => {
           if (res.length > 0) {
             if (res[0].status == 'N') {
@@ -120,39 +124,26 @@ export class ItemMasterApprovalComponent implements OnInit, AfterViewInit, OnDes
             }
             this.ViewDet = res
             this.ItemTabelHidden = false
-            this.ViewDet = this.ViewDet.map((item: any) => ({
-              ...item,
+            let newarr = {
               selected: false,
-            }))
-
-
-            this.ViewDet = this.ViewDet.map((item: any) => {
-              if (item.deptid1 == 0) {
-                item.deptname = 'None';
-              }
-              if (item.gradeid == 0) {
-                item.gradename = '';
-              }
-              item.saleable = item.saleable == 'Y' ? true : false
-              item.ShelfLife = item.ShelfLife == 'Y' ? true : false
-              return item;
+              Grade: '',
+              grntype: '',
+              email: '',
+              Shelflife:''
+            }
+            this.ViewDet.forEach(obj => {
+              Object.assign(obj, newarr);
             });
-
             this.getGrade()
             this.getGrntype()
+            this.getTabelDept()
+            this.getEmail()
             this.getHsncode()
-            this.dataSource.data = [...this.ViewDet]
-            this.dataSource.data = [...this.dataSource.data]
-            console.log(this.dataSource.data);
-
+            this.dataSource.data = [...this.ViewDet];
           }
         }
       })
     }
-  }
-
-  onShelflifeChange(checked: boolean, element: any): void {
-    element.ShelfLife = checked ? 'Y' : 'N';
   }
   Category: any[] = new Array()
   getGrntype() {
@@ -172,41 +163,39 @@ export class ItemMasterApprovalComponent implements OnInit, AfterViewInit, OnDes
       }
     })
   }
-  // getTabelDept() {
-  //   for (let i = 0; i < this.ViewDet.length; i++) {
-  //     const index = i
-  //     this.service.TabelDept(this.ViewDet[i].deptid1).subscribe({
-  //       next: (res: any) => {
-  //         console.log(res);
-  //         if (this.dataSource.data[index].deptid1 > 0) {
-  //           this.dataSource.data[index].deptid1 = res[0].deptname
-  //         } else {
-  //           this.dataSource.data[index].deptid1 = '<None>'
-  //         }
-  //       }
-  //     })
-  //   }
-  // }
+  getTabelDept() {
+    for (let i = 0; i < this.ViewDet.length; i++) {
+      const index = i
+      this.service.TabelDept(this.ViewDet[i].deptid1).subscribe({
+        next: (res: any) => {
+          console.log(res);
+          if (this.dataSource.data[index].deptid1 > 0) {
+            this.dataSource.data[index].deptid1 = res[0].deptname
+          } else {
+            this.dataSource.data[index].deptid1 = '<None>'
+          }
+        }
+      })
+    }
+  }
 
-  // getEmail() {
-  //   for (let i = 0; i < this.ViewDet.length; i++) {
-  //     this.service.email(this.ViewDet[i].loginid).subscribe({
-  //       next: (res: any) => {
-  //         if (res && res.length > 0) {
-  //           this.dataSource.data[i].email = res[0].email
+  getEmail() {
+    for (let i = 0; i < this.ViewDet.length; i++) {
+      this.service.email(this.ViewDet[i].loginid).subscribe({
+        next: (res: any) => {
+          if (res && res.length > 0) {
+            this.dataSource.data[i].email = res[0].email
 
-  //         }
-  //       }
-  //     })
-  //   }
-  // }
-  HsnCode: any[] = new Array()
-  getHsncode() {
-    this.service.hsncode().subscribe({
-      next: (res: any) => {
-        this.HsnCode = res
-      }
-    })
+          }
+        }
+      })
+    }
+  }
+  HsnCode:any[]=new Array()
+  getHsncode(){
+    this.service.hsncode().subscribe({next:(res:any)=>{
+      this.HsnCode=res
+    }})
   }
   selectAll = false;
   RowSelect() {
@@ -214,15 +203,20 @@ export class ItemMasterApprovalComponent implements OnInit, AfterViewInit, OnDes
   }
   Approve() {
     let selectedrecords = this.dataSource.data.filter(item => item.selected)
+    console.log(selectedrecords);
+
     if (selectedrecords.length > 0) {
       this.Error = 'Do You Want to Save ?'
       this.userHeader = 'Save'
       this.opendialog()
       this.dialogRef.afterClosed().subscribe((result) => {
         if (result) {
-          let ItemMasterupdate: any[] = []
-          ItemMasterupdate = []
+          let ItemMasterupdate:any[] = []
+          ItemMasterupdate=[]
           for (let i = 0; i < selectedrecords.length; i++) {
+            if(selectedrecords[i].deptid1 =='<None>'){
+              selectedrecords[i].deptid1=0
+            }
             ItemMasterupdate.push({
               LoginId: this.empid,
               Id: selectedrecords[i].id,
@@ -243,17 +237,25 @@ export class ItemMasterApprovalComponent implements OnInit, AfterViewInit, OnDes
               Hsncode: Number(selectedrecords[i].hsncode),
               Uomvalue: selectedrecords[i].uomid,
               Deptid: selectedrecords[i].deptid1,
-              ShelfLife: selectedrecords[i].ShelfLife,
+              ShelfLife: selectedrecords[i].Shelflife ? selectedrecords[i].Shelflife :"N",
               Saleable: selectedrecords[i].saleable,
               QcReqStatus: selectedrecords[i].qcreq,
               Drgno: selectedrecords[i].drgno,
-
+              InternalPartNo: selectedrecords[i].drgno,
               Gid: selectedrecords[i].gradeid,
-              email: selectedrecords[i].email,
-              Spec: selectedrecords[i].spec,
+              email:selectedrecords[i].email,
+              Spec:selectedrecords[i].spec,
             })
           }
-          console.log(ItemMasterupdate);
+          console.log( ItemMasterupdate);
+
+          // let selectedEmails = this.dataSource.data
+          // .filter(item => item.selected)
+          // .map(item => item.email);
+          // console.log(selectedEmails,'selectedEmails');
+          
+          
+          // return
           this.service.update(ItemMasterupdate).subscribe({
             next: (res: any) => {
               console.log(res);

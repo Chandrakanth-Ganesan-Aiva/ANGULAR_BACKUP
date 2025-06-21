@@ -11,8 +11,8 @@ export class ItemMasterApprService {
   Dept(LocationId:any){
     return this.http.get(environment.Api +'/master/itemMasterAppr-Dept?LocationId='+LocationId);
   }
-  View(locid:any,Deptid:any){
-    return this.http.get(environment.Api +'/master/itemMasterAppr-View?locid='+locid+'&Deptid='+Deptid)
+  View(Deptid:any,Locationid:any){
+    return this.http.get(environment.Api +'/master/itemMasterAppr-View?Deptid='+Deptid+'&Locationid='+Locationid)
   }
   Uom(){
     return this.http.get(environment.Api +'/master/itemMasterAppr-uom')

@@ -84,7 +84,8 @@ export class GRNEntryComponent implements OnInit, AfterViewInit, OnDestroy {
       Billno: ['', Validators.required],
       Billdate: [this.date.transform(new Date(), 'yyyy-MM-dd'), Validators.required]
     })
-    this.LocationId= JSON.parse(sessionStorage.getItem('location') || '{}');
+    const data = JSON.parse(sessionStorage.getItem('location') || '{}');
+    this.LocationId = data[data.length - 1]
   }
   LocationId: number = 0
   filteredOptions: any[] = [];
@@ -223,7 +224,7 @@ export class GRNEntryComponent implements OnInit, AfterViewInit, OnDestroy {
       this.getLinear()
       this.gettaxType()
       this.getPort()
-      // this.getMaterialTabelDet()
+      this.getMaterialTabelDet()
       // this.getWeigtDetalisTabel()
       this.gateEntryNofilter.valueChanges.pipe(map((search) =>
         this.gateEntryNoArr.filter((option: any) =>

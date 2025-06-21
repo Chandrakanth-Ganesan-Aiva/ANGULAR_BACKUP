@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment.development'
 @Injectable({
   providedIn: 'root'
@@ -11,55 +11,65 @@ export class PurchaseRequestService {
 
   }
 
-
-  Department(locationid:any,Empid: any) {
-    return this.http.get(environment.Api + '/Inventory/Department?locationid='+locationid+'&empid=' + Empid)
+  Capex(Empid:any){
+    return this.http.get(environment.Api +'/Inventory/Capexvisibile?Empid='+Empid)
   }
-  Company() {
-    return this.http.get(environment.Api + '/Inventory/company')
+  Department(Empid:any){
+    return this.http.get(environment.Api +'/Inventory/Department?Empid='+Empid)
   }
-  CompName(CompanyId: any) {
-    return this.http.get(environment.Api + '/Inventory/companyname?CompanyId=' + CompanyId)
+  Company(){
+    return this.http.get(environment.Api +'/Inventory/company')
   }
-  Capex(LocationId: any) {
-    return this.http.get(environment.Api + '/Inventory/Capex?LocationId=' + LocationId)
+  CompName(CompanyId:any){
+    return this.http.get(environment.Api +'/Inventory/companyname?CompanyId='+CompanyId)
   }
-  CapexValidationDept(empid: any) {
-    return this.http.get(environment.Api + '/Inventory/CapexDepartment?empid=' + empid)
+  CapexNo(LocationId:any){
+    return this.http.get(environment.Api +'/Inventory/CapexNo?LocationId='+LocationId)
+  }
+  CapexValidationDept(empid:any){
+    return this.http.get(environment.Api +'/Inventory/CapexDepartment?empid='+empid)
   }
   Stockreno(mid: Number, trandate: any, locid: any) {
-    return this.http.get(environment.Api + '/Inventory/StockReqNo?mid=' + mid + '&trandate=' + trandate + '&locid=' + locid)
+    return this.http.get(environment.Api +'/Inventory/StockReqNo?mid=' + mid + '&trandate=' + trandate + '&locid=' + locid)
   }
-  StockReNoValidation(StockReqNo: any) {
-    return this.http.get(environment.Api + '/Inventory/StockReqNochck?StockReqNo=' + StockReqNo)
+  StockReNoValidation(StockReqNo:any){
+    return this.http.get(environment.Api +'/Inventory/StockReqNochck?StockReqNo='+StockReqNo)
   }
   Rawmaterial(locationid: any, Rawmatname: any) {
-    return this.http.get(environment.Api + '/Inventory/Get_RawMaterial?locationid=' + locationid + '&Rawmatname=' + Rawmatname)
-  }
-  
-  IndentDet(LocationId: any, SRDate: any, RawMatId: any, DeptId: any) {
-    return this.http.get(environment.Api + '/Inventory/StoreIndentDetl?LocationId=' + LocationId + '&SRDate=' + SRDate + '&RawMatId=' + RawMatId + '&DeptId=' + DeptId)
-  }
+    return this.http.get(environment.Api +'/Inventory/Get_RawMaterial?locationid=' + locationid +'&Rawmatname='+Rawmatname)
 
-  IssueLocId(empid: any) {
-    return this.http.get(environment.Api + '/Inventory/IssueLocid?empid=' + empid)
   }
-  StockAvl(FrmModule: any, IndentType: any, Issuelocationwise: any, MaterialId: any, LoactionId: any, EmpId: any, Issuelocid: any) {
-    return this.http.get(environment.Api + '/Inventory/StockCheck?FrmModule=' + FrmModule + '&IndentType=' + IndentType + '&Issuelocationwise=' + Issuelocationwise + '&MaterialId=' + MaterialId + '&LoactionId=' + LoactionId + '&EmpId=' + EmpId + '&Issuelocid=' + Issuelocid)
+  IndentDet(LocationId:any,SRDate:any,RawMatId:any,DeptId:any){
+  return  this.http.get(environment.Api +'/Inventory/StoreIndentDetl?LocationId='+LocationId+'&SRDate='+SRDate+'&RawMatId='+RawMatId+'&DeptId='+DeptId)
   }
-  Uom(RawMatId: any) {
-    return this.http.get(environment.Api + '/Inventory/ProductUom?RawMatId=' + RawMatId)
+  IntendPendingView(LocationId:any,RawMatID:any){
+    return this.http.get(environment.Api +'/Inventory/IndentPendingViewDet?LocationId='+LocationId+'&RawMatID='+RawMatID)
   }
-
-  OldPOView(locid: any, Rawmatid: any): Observable<any> {
-    const url = environment.Api + `/Inventory/OldPoView?locid=${locid}&Rawmatid=${Rawmatid}`
-    return this.http.get<any>(url)
+  IssueLocId(empid:any){
+    return this.http.get(environment.Api +'/Inventory/IssueLocid?empid='+empid)
   }
-  oldPo_Tot(Poid: any): Observable<any> {
-    const url = environment.Api + `/Inventory/oldPo-Tot?Poid=${Poid}`
-    return this.http.get<any>(url)
+  StockAvl(FrmModule:any,IndentType:any,Issuelocationwise:any,MaterialId:any,LoactionId:any,EmpId:any,Issuelocid:any){
+    return this.http.get(environment.Api +'/Inventory/StockCheck?FrmModule='+FrmModule+'&IndentType='+IndentType+'&Issuelocationwise='+Issuelocationwise+'&MaterialId='+MaterialId+'&LoactionId='+LoactionId+'&EmpId='+EmpId+'&Issuelocid='+Issuelocid)
   }
-  Save(PurchaseReqSave: any) {
-    return this.http.post(environment.Api + '/Inventory/Post_PurchaseReq', PurchaseReqSave)
+  StoreLoaction(LoactionId:any,Rawmatid:any){
+    return this.http.get(environment.Api +'/Inventory/StoreLoaction?LoactionId='+LoactionId+'&Rawmatid='+Rawmatid)
+  }
+  Uom(RawMatId:any){
+    return this.http.get(environment.Api +'/Inventory/ProductUom?RawMatId='+RawMatId)
+  }
+  Machine(LocationId:any){
+    return this.http.get(environment.Api +'/Inventory/Machinename?LocationId='+LocationId)
+  }
+  Warehouse(LocationId:any){
+    return this.http.get(environment.Api +'/Inventory/Warehouse?LocationId='+LocationId )
+  }
+  MatQtyPending(LocationId:any,Rawmatid:any){
+    return this.http.get(environment.Api +'/Inventory/MatQtypendingsts?LocationId='+LocationId+'&Rawmatid='+Rawmatid)
+  }
+  OldPOView(locid:any,Rawmatid:any){
+    return this.http.get(environment.Api +'/Inventory/OldPoView?locid='+locid+'&Rawmatid='+Rawmatid)
+  }
+  Save(PurchaseReqSave:any){
+    return this.http.post(environment.Api +'/Inventory/Post_PurchaseReq',PurchaseReqSave)
   }
 }

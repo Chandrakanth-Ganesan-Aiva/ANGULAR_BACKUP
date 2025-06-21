@@ -32,19 +32,17 @@ export class PaymentTermsComponent {
       this.loadArray = result
     })
   }
-
-  term(row: any) {
-    if (this.selectedTermId === row.termid) {
-      // Deselect if same item is clicked again
-      this.selectedTermId = null;
-      this.table1Array = [];
-      this.show = false;
-    } else {
+  term(event: any, row: any) {
+    if (event.target.checked) {
       this.selectedTermId = row.termid;
       this.service.table1(this.selectedTermId).subscribe((result: any) => {
         this.table1Array = result;
         this.show = this.table1Array.length > 0;
       });
+    } else {
+      this.selectedTermId = null;
+      this.table1Array = [];
+      this.show = false;
     }
   }
   tableData: any[] = [
@@ -52,14 +50,7 @@ export class PaymentTermsComponent {
   ];
 
   addRow() {
-    if (this.terms) {
-      this.tableData = this.tableData.concat({ terms: '', percentage: '', advance: 'N', detail: '' });
-    }
-    else {
-      this.Error = 'Enter Description'
-      this.userHeader = 'Information'
-      this.opendialog()
-    }
+    this.tableData = this.tableData.concat({ terms: '', percentage: '', advance: 'N', detail: '' });
   }
 
   removeRow(index: number) {
@@ -79,6 +70,8 @@ export class PaymentTermsComponent {
   description(value: string) {
     this.terms = encodeURIComponent(value.trim()); // Trim extra spaces
     this.termArray.push({ terms: this.terms })
+    console.log(this.termArray);
+    console.log(this.termArray.length);
     if (this.terms) {
       this.service.condition(this.terms).subscribe((result: any) => {
         this.count = result.termCount
@@ -88,71 +81,64 @@ export class PaymentTermsComponent {
 
   saveArray: any[] = []
   save() {
-    if (this.terms) {
-      if (this.count === 0) {
-        let missingFields: string[] = [];
-        this.tableData.forEach((row, index) => {
-          for (const key of ['terms', 'percentage', 'advance', 'detail']) {
-            if (!row[key] || row[key].toString().trim() === '') {
-              missingFields.push(`Row ${index + 1}: ${key} is missing`);
-            }
+    if (this.count === 0) {
+      let missingFields: string[] = [];
+      this.tableData.forEach((row, index) => {
+        for (const key of ['terms', 'percentage', 'advance', 'detail']) {
+          if (!row[key] || row[key].toString().trim() === '') {
+            missingFields.push(`Row ${index + 1}: ${key} is missing`);
           }
-          if (row.percentage < 0 || row.percentage > 100) {
-            missingFields.push(`Row ${index + 1}: Percentage should be within 0 to 100`);
-          }
-        });
-        if (missingFields.length > 0) {
-          this.Error = `Please fill in the missing fields:\n${missingFields.map(field => `- ${field}`).join('\n')}`;
-          this.userHeader = 'Information'
-          this.opendialog()
-          return;
         }
-        this.Error = 'Are you sure to Update?'
-        this.userHeader = 'Save'
-        this.opendialog()
-        this.dialogRef.afterClosed().subscribe((result: boolean) => {
-          if (result) {
-            this.termsArray.push({ terms: this.termArray[this.termArray.length - 1].terms });
-            this.service.terms(this.termsArray).subscribe((result: any) => {
-              console.log(this.termsArray);
-              if (result) {
-                this.termiden = result[0]?.id;
-                if (this.termiden) {
-                  this.approveArray = this.tableData.map(row => ({
-                    termid: this.termiden,
-                    term: row.terms,
-                    percentage: row.percentage,
-                    advance: row.advance,
-                    detail: row.detail,
-                  }));
-                  console.log(this.approveArray, 'leng');
-                  this.service.save(this.approveArray).subscribe((result: any) => {
-                    console.log(result, 'res');
-                    this.Error = result.message
-                    this.userHeader = 'Information'
-                    this.opendialog()
-                    this.Clear();
-                  });
-                }
-              }
-            });
-          }
-        })
-      } else if (this.count == null) {
-        this.Error = 'Enter Description'
+        if (row.percentage < 0 || row.percentage > 100) {
+          missingFields.push(`Row ${index + 1}: Percentage should be within 0 to 100`);
+        }
+      });
+      if (missingFields.length > 0) {
+        this.Error = `Please fill in the missing fields:\n${missingFields.map(field => `- ${field}`).join('\n')}`;
         this.userHeader = 'Information'
         this.opendialog()
-      } else {
-        this.Error = 'Already you are having the same spec'
-        this.userHeader = 'Information'
-        this.opendialog()
+        return;
       }
-    } else {
+      this.Error = 'Are you sure to Update?'
+      this.userHeader = 'Save'
+      this.opendialog()
+      this.dialogRef.afterClosed().subscribe((result: boolean) => {
+        if (result) {
+          this.termsArray.push({ terms: this.termArray[this.termArray.length - 1].terms });
+          this.service.terms(this.termsArray).subscribe((result: any) => {
+            console.log(this.termsArray);
+            if (result) {
+              this.termiden = result[0]?.id;
+              if (this.termiden) {
+                this.approveArray = this.tableData.map(row => ({
+                  termid: this.termiden,
+                  term: row.terms,
+                  percentage: row.percentage,
+                  advance: row.advance,
+                  detail: row.detail,
+                }));
+                console.log(this.approveArray, 'leng');
+                this.service.save(this.approveArray).subscribe((result: any) => {
+                  console.log(result, 'res');
+                  this.Error = result.message
+                  this.userHeader = 'Information'
+                  this.opendialog()
+                  this.Clear();
+                });
+              }
+            }
+          });
+        }
+      })
+    } else if (this.count == null) {
       this.Error = 'Enter Description'
       this.userHeader = 'Information'
       this.opendialog()
+    } else {
+      this.Error = 'Already you are having the same spec'
+      this.userHeader = 'Information'
+      this.opendialog()
     }
-
   }
 
   Error: string = ''

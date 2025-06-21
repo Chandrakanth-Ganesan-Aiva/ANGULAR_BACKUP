@@ -31,7 +31,8 @@ export class GateEntryDelayApprComponent implements OnInit, AfterViewInit {
 
   constructor(private service: GateEntryDelayService) { }
   ngOnInit(): void {
-    this.LocationId = JSON.parse(sessionStorage.getItem('location') || '{}')
+    const Location = JSON.parse(sessionStorage.getItem('location') || '{}')
+    this.LocationId = Location[Location.length - 1]
     let empid = JSON.parse(sessionStorage.getItem('session') || '{}')
     this.Empid = empid.empid
     console.log(this.Empid);

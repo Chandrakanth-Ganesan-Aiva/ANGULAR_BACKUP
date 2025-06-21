@@ -21,7 +21,9 @@ export class GrnPrintComponent implements OnDestroy, OnInit, AfterViewInit {
   SupplierFilter = new FormControl('')
   constructor(private date: DatePipe, private fb: FormBuilder, private dialog: MatDialog, private service: GrnprintService) {
 
-    this.LocationId = JSON.parse(sessionStorage.getItem('location') || '{}');
+    const data = JSON.parse(sessionStorage.getItem('location') || '{}');
+    this.LocationId = data[data.length - 1]
+
     const user = JSON.parse(sessionStorage.getItem('session') || '{}');
     this.Empid = user.empid
 

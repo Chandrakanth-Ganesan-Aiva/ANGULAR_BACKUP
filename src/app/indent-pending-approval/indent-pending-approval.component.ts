@@ -29,7 +29,8 @@ export class IndentPendingApprovalComponent {
   rArray: any[] = []
   qty1Array: any[] = []
   ngOnInit() {
-    this.LocationId  = JSON.parse(sessionStorage.getItem('location') || '{}')
+    const locationid = JSON.parse(sessionStorage.getItem('location') || '{}')
+    this.LocationId = locationid[0]
     this.load()
     this.view()
   }

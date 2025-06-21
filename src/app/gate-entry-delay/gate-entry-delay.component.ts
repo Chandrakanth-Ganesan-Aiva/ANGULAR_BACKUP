@@ -36,7 +36,8 @@ export class GateEntryDelayComponent implements OnInit, AfterViewInit {
     this.gateEntryDelayForm = this.fb.group({
       party: new FormControl('', Validators.required)
     })
-    this.LocationId = JSON.parse(sessionStorage.getItem('location') || '{}')
+    const Location = JSON.parse(sessionStorage.getItem('location') || '{}')
+    this.LocationId = Location[Location.length - 1]
     this.partDet()
   }
 

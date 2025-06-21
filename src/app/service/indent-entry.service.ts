@@ -1,6 +1,6 @@
-import { Injectable, ViewChild } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment.development'
 @Injectable({
   providedIn: 'root'
@@ -9,50 +9,50 @@ export class IndentEntryService {
 
   constructor(private http: HttpClient) { }
 
-
-  Stockreno(trandate: any, locid: any) {
-    return this.http.get(environment.Api + '/Inventory/DirectIndentpath?trandate=' + trandate + '&locid=' + locid)
+  Indentpath(LocationId: any) {
+    return this.http.get(environment.Api + '/Purchase/Transactions/IndentEntryPath?LocationId=' + LocationId)
   }
-  Department(locationid: any, Frmdate: any, Todate: any) {
-    return this.http.get(environment.Api + '/Inventory/IndentEntryDept?LocationID=' + locationid + '&Frmdate=' + Frmdate + '&Todate=' + Todate)
+  IndentTrano(IndentPath: any) {
+    return this.http.get(environment.Api + '/Purchase/Transactions/IndentEntryTranno?IndentPath=' + IndentPath)
   }
-  Category(locationid: any, Empid: any) {
-    return this.http.get(environment.Api + '/Inventory/Department?locationid=' + locationid + '&empid=' + Empid)
+  Dept(LocationID: any, Issuedate: any, Frmdate: any, Todate: any) {
+    return this.http.get(environment.Api + '/Purchase/Transactions/IndentEntryDept?LocationID=' + LocationID + '&Frmdate=' + Frmdate +
+      '&Todate=' + Todate)
   }
-  CostCenter() {
-    return this.http.get(environment.Api + '/Inventory/CostCenter')
+  Category(EmpId: any, LoactionId: any) {
+    return this.http.get(environment.Api + '/Purchase/Transactions/Category?EmpId=' + EmpId + '&LoactionId=' + LoactionId)
   }
-  Approvedby(LocationId: any, DeptId: any) {
-    return this.http.get(environment.Api + '/Inventory/Approvedby?LocationId=' + LocationId + '&DeptId=' + DeptId)
+  Approvedby(LoactionId: any, Deptid: any) {
+    return this.http.get(environment.Api + '/Purchase/Transactions/Approved?LoactionId=' + LoactionId + '&Deptid=' + Deptid)
   }
-  Capex(LocationId: any) {
-    return this.http.get(environment.Api + '/Inventory/Capex?LocationId=' + LocationId)
+  Employye(LoactionId: any, CatId: any, Deptid: any) {
+    return this.http.get(environment.Api + '/Purchase/Transactions/emp?LoactionId=' + LoactionId + '&CatId=' + CatId + '&Deptid=' + Deptid)
   }
-  StoreRelaseEmp(locid: any, Deptid: any, Catid: any) {
-    return this.http.get(environment.Api + '/Inventory/IndentEntryStoreReleaseEmp?locid=' + locid + '&Deptid=' + Deptid + '&Catid=' + Catid)
+  Material(LocationId: any, DeptId: any, Sr_Ref_No: any) {
+    return this.http.get(environment.Api + '/Purchase/Transactions/IndentMaterial?LocationId=' + LocationId + '&DeptId=' + DeptId + '&Sr_Ref_No=' + Sr_Ref_No)
   }
-  ResponsableEmp() {
-    return this.http.get(environment.Api + '/Inventory/IndentResponsableEmp')
+  SrRefNo(LocationID: any, Frmdate: any, Todate: any, Deptid: any) {
+    return this.http.get(environment.Api + '/Purchase/Transactions/Sp_IndentEntry_SrRefno?LocationID=' + LocationID + '&Frmdate=' + Frmdate +
+      '&Todate=' + Todate + '&Deptid=' + Deptid)
   }
-  
-  StoreMatl(locid: any, Deptid: any) {
-    return this.http.get(environment.Api + '/Inventory/IndentEntryStoreReleaseRawmaterial?locid=' + locid + '&Deptid=' + Deptid)
+  ViewStoreRelease(LocationID: any, Srnewtype: any, Frmdate: any, Todate: any, Deptid: any, Empid: any, Rawmatid: any, Sr_Ref_No: any) {
+    return this.http.get(environment.Api + '/Purchase/Transactions/ViewStoreRelease?LocationID=' + LocationID + '&Srnewtype=' + Srnewtype + '&Frmdate=' + Frmdate +
+      '&Todate=' + Todate + '&Deptid=' + Deptid + '&Empid=' + Empid + '&Rawmatid=' + Rawmatid + '&Sr_Ref_No=' + Sr_Ref_No)
   }
-
-  View(locid: any, Deptid: any, SrType: any, Empid: any, Rawmatid: any, FrmDate: any, ToDate: any){
-    return this.http.get(environment.Api + '/Inventory/IndentEntryStoreReleaseView?locid=' + locid + '&Deptid=' + Deptid + '&SrType=' + SrType +
-      '&Empid=' + Empid + '&Rawmatid=' + Rawmatid + '&FrmDate=' + FrmDate + '&ToDate=' + ToDate)
+  IndentDet(LocationId: any, SRDate: any, RawMatId: any, DeptId: any) {
+    return this.http.get(environment.Api + '/Purchase/Transactions/StoreIndentDetl?LocationId=' + LocationId + '&SRDate=' + SRDate + '&RawMatId=' + RawMatId +
+      '&DeptId=' + DeptId)
   }
-
-  PoPending(locid: any, Rawmatid: any,Type:any) {
-    return this.http.get(environment.Api + '/Inventory/IndentPoPendingQty?locid=' + locid + '&Rawmatid=' + Rawmatid + '&Type=' + Type)
+  PoPendingQty(LoactionId: any, RawmatId: any) {
+    return this.http.get(environment.Api + '/Purchase/Transactions/PendingPoQty?LoactionId=' + LoactionId + '&RawmatId=' + RawmatId)
   }
-
-  IndentEntry_OldPo(Rawmatid: any, locid: any) {
-    return this.http.get(environment.Api + '/Inventory/IndentEntry_OldPo?Rawamtid=' + Rawmatid + '&locid=' + locid)
+  Prid() {
+    return this.http.get(environment.Api + '/Purchase/Transactions/PridData')
   }
-
-  Save(IndentSave: any) {
-    return this.http.post(environment.Api + '/Inventory/Post_IndentEntry', IndentSave)
+  UpateRecords(SrId: any) {
+    return this.http.get(environment.Api + '/Purchase/Transactions/Updaterecords?SrId=' + SrId)
+  }
+  Update(UpdateIndentEntry: any) {
+    return this.http.post(environment.Api + '/Purchase/Transactions/UpdateIndentEntry', UpdateIndentEntry)
   }
 }

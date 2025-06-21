@@ -53,7 +53,7 @@ form {
   padding: 40px;
   z-index: 1;
   transition: .2s ease-in-out .2s,
-    visibility 0s .1s;
+  visibility 0s .1s;
 }
 
 .container.active .form-box {
@@ -73,7 +73,8 @@ form {
   margin: 30px 0;
 }
 
-.input-box input {
+.input-box input
+ {
   width: 100%;
   padding: 13px 50px 13px 20px;
   background: #eee;
@@ -85,12 +86,10 @@ form {
   font-weight: 500;
 }
 
-.input-box input::placeholder,
-select::placeholder {
+.input-box input::placeholder , select::placeholder {
   color: #888;
   font-weight: 400;
 }
-
 .input-box select {
   width: 100%;
   padding: 13px 50px 13px 20px;
@@ -101,21 +100,17 @@ select::placeholder {
   font-size: 16px;
   color: #333;
   font-weight: 500;
-  --webkit-appearance: none;
-  /* Remove default styling in webkit browsers */
-  background-color: #eee;
-  /* Ensure consistent background */
+  --webkit-appearance: none; /* Remove default styling in webkit browsers */
+  background-color: #eee;   /* Ensure consistent background */
 }
 
 .input-box select option[disabled] {
-  color: #aaa;
-  /* Placeholder text color */
+  color: #aaa; /* Placeholder text color */
   font-style: italic;
 }
 
 .input-box select::-ms-expand {
-  display: none;
-  /* Hide the dropdown arrow in IE */
+  display: none; /* Hide the dropdown arrow in IE */
 }
 
 
@@ -187,10 +182,7 @@ select::placeholder {
 
 }
 
-mat-form-field {
-  width: 100%;
-  padding: .5rem;
-}
+
 
 @media screen and (max-width: 650px) {
   .container {
@@ -253,42 +245,4 @@ mat-form-field {
   .toggle-panel h1 {
     font-size: 30px;
   }
-}
-
-
-@media screen and (min-width: 350px) and (max-width: 575px) {
-  mat-form-field {
-    font-size: small;
-  }
-  mat-label{
-    font-size: small;
-  }
-  button{
-    font-size: small;
-  }
-}
-
-@media screen and (min-width: 576px) and (max-width: 749px) {
-    mat-form-field {
-    font-size: smaller;
-  }
-  mat-label{
-    font-size: smaller;
-  }
-  button{
-    font-size: smaller;
-  }
-}
-
-@media screen and (min-width: 749px) and (max-width: 992px) {
-    mat-form-field {
-    font-size: medium;
-  }
-  mat-label{
-    font-size: medium;
-  }
-  button{
-    font-size: medium;
-  }
-
 }

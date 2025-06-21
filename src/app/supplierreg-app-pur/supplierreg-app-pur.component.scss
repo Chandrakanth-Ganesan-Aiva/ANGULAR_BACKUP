@@ -61,9 +61,10 @@ label {
     color: #555;
 }
 
-.custom-label {
-    color: black;
-}
+// .custom-label {
+//     // font-weight: bold; /* Bold labels */
+//     // font-size: 1px; /* Slightly larger font size for labels */
+// }
 
 // .custom-input {
 //     border: 1px solid #ccc; /* Add a border to inputs */
@@ -80,21 +81,4 @@ th {
 td {
     text-align: center;
     font-size: 16px;
-}
-
-@media (max-width: 576px) {
-    .custom-label {
-        font-size: 13px;
-    }
-
-    .form-control,
-    .form-select {
-        font-size: 13px;
-        padding: 6px 10px;
-    }
-
-    button[mat-raised-button] {
-        font-size: 12px;
-        padding: 5px 10px;
-    }
 }

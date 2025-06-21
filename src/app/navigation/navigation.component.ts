@@ -20,7 +20,8 @@ export class NavigationComponent implements OnInit {
   constructor(private Router: Router, private service: LoginService, private dialog: MatDialog, private router :Router,
     private toastr: ToastrService) { }
   ngOnInit() {
-    this.LoactionId = JSON.parse(sessionStorage.getItem('location') || '{}');
+    const data = JSON.parse(sessionStorage.getItem('location') || '{}');
+    this.LoactionId = data[data.length - 1]
     const user = JSON.parse(sessionStorage.getItem('session') || '{}');
     this.Empid = user.empid
   }

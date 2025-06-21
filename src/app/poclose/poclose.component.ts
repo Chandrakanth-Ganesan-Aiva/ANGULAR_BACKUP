@@ -23,7 +23,8 @@ export class POCloseComponent {
   }
   ngOnInit(): void {
     this.Load()
-    this.LocationId = JSON.parse(sessionStorage.getItem('location') || '{}')
+    const locationid = JSON.parse(sessionStorage.getItem('location') || '{}')
+    this.LocationId = locationid[0]
     console.log(this.todate, 'todate');
     console.log(this.fromdate, 'fromdate');
   }

@@ -1,5 +1,5 @@
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { AfterViewInit, Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { AdminService } from '../service/admin.service';
 
 import { LoginService } from '../service/login.service';
@@ -16,7 +16,6 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { Paginator } from 'primeng/paginator';
-import { StoreIssueService } from '../service/store-issue.service';
 
 
 @Component({
@@ -32,35 +31,30 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
 
   @ViewChild(MatTable) MatTable!: MatTable<any>;
-  @ViewChild(MatTable) table3!: MatTable<any>;
   @ViewChild('paginator', { static: false }) paginator!: MatPaginator;
   @ViewChild('paginator1', { static: false }) paginator1!: MatPaginator;
-  @ViewChild('paginator2', { static: false }) paginator2!: MatPaginator;
-  constructor(private service: AdminService, private dialog: MatDialog, private formBuilder: FormBuilder,
-    private storeservice: StoreIssueService, private toastr: ToastrService) {
+  constructor(private service: AdminService, private dialog: MatDialog,private formBuilder: FormBuilder ) {
   }
 
-  historyData: any = new MatTableDataSource()
+  historyData:any= new MatTableDataSource()
   ngAfterViewInit(): void {
-    if (this.paginator) {
+    if(this.paginator){
       this.dataSource.paginator = this.paginator;
     }
-    if (this.paginator1) {
+    if(this.paginator1){
       this.historyData.paginator = this.paginator1;
     }
-    if (this.paginator2) {
-      this.storeIssueDatasource.paginator = this.paginator2;
-    }
+
   }
   isSticky(buttonToggleGroup: MatButtonToggleGroup, id: string) {
     return (buttonToggleGroup.value || []).indexOf(id) !== -1;
   }
-  Empid: number = 0
+
   ngOnInit(): void {
 
-    this.LoactionId = JSON.parse(sessionStorage.getItem('location') || '{}');
-    let UserDet = JSON.parse(sessionStorage.getItem('session') || '{}')
-    this.Empid = UserDet.empid
+    const data = JSON.parse(sessionStorage.getItem('location') || '{}');
+    this.LoactionId = data[data.length - 1]
+    console.log(this.LoactionId);
     const user = JSON.parse(sessionStorage.getItem('session') || '{}');
     this.Menuform = this.formBuilder.group({
       Loaction: ['', Validators.required],
@@ -283,34 +277,34 @@ export class AdminComponent implements OnInit, AfterViewInit {
     console.log(element.Status);
 
   }
-
+  
   Tab(event: MatTabChangeEvent) {
     console.log('Selected Tab Label:', event.tab.textLabel);
     console.log('Selected Tab Index:', event.index);
-    if (event.tab.textLabel == 'Rights') {
+    if(event.tab.textLabel =='Rights'){
       this.GetRights()
       if (this.dataSource.paginator) {
         this.dataSource.paginator.firstPage();
       }
-    } else {
+    }else{
       let Loctionid = this.Menuform.controls['Loaction'].value
       let Empid = this.Menuform.controls['Emp'].value
       this.service.ViewHistory(Loctionid, Empid).subscribe({
         next: (res: any) => {
-          if (res.length > 0) {
-            if (res[0].staus == 'N') {
-              this.Error = res[0].Msg
-              this.userHeader = 'Error'
+          if(res.length > 0){
+            if(res[0].staus=='N'){
+              this.Error=res[0].Msg
+              this.userHeader='Error'
               this.opendialog()
               return
             }
-            this.historyData.data = res
+            this.historyData.data=res
             this.historyData.paginator = this.paginator1;
-
+            
             if (this.historyData.paginator) {
               this.historyData.paginator.firstPage();
             }
-
+            
           }
         }
       })
@@ -417,59 +411,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
       return this.Menuform.markAllAsTouched()
     }
   }
-  StoresIssue: boolean = false
-  storeIssueDatasource = new MatTableDataSource<any>
-  Store() {
-    let Moduleid = 166
-    let tabeldata: any[] = new Array()
-    this.storeservice.StoreissueloginDet(Moduleid, this.LoactionId, this.Empid).subscribe({
-      next: (res: any) => {
-        if (res.length > 0) {
-          if (res[0].status == 'N') {
-            this.Error = res[0].Msg
-            this.userHeader = 'Error'
-            return this.opendialog()
-          }
-          tabeldata = res
-          tabeldata = tabeldata.map((element: any) => ({
-            ...element,
-            Select: false
-          }))
-          this.storeIssueDatasource.data = [...tabeldata]
-          this.storeIssueDatasource.data = [...this.storeIssueDatasource.data]
-        }else{
-            this.storeIssueDatasource.data=[]
-        }
-      }
-    })
-  }
-  StoreUpdate() {
-    let logoutStoreissue: any[] = new Array()
-    let isSelect = this.storeIssueDatasource.data.filter((item: any) => item.Select)
-    isSelect.forEach((res: any) => {
-      logoutStoreissue.push({
-        locid: this.LoactionId,
-        loginid: res.loginid,
-        modid: res.modid,
-        loginsystem: 'Tab-Entry'
-      })
-    })
-    this.storeservice.UpdateStoreissueLogout(logoutStoreissue).subscribe({
-      next: (res: any) => {
-        console.log(res);
-        
-        if (res.length > 0) {
-          if (res[0].status == 'N') {
-            this.Error = res[0].Msg
-            this.userHeader = 'Error'
-            return this.opendialog()
-          }
-          this.toastr.success(res[0].Msg)
-        }
-        this.Store()
-      }
-    })
-  }
+
   Error: string = ''
   userHeader: string = ''
   dialogRef!: MatDialogRef<DialogCompComponent>;

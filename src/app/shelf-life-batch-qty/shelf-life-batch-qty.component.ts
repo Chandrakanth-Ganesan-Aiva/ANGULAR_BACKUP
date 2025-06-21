@@ -31,7 +31,8 @@ export class ShelfLifeBatchQtyComponent implements OnInit {
       Grnno: ['']
     })
 
-    this.LocationId = JSON.parse(sessionStorage.getItem('location') || '{}');
+    const data = JSON.parse(sessionStorage.getItem('location') || '{}');
+    this.LocationId = data[data.length - 1]
     const user = JSON.parse(sessionStorage.getItem('session') || '{}');
     this.Empid = user.empid
     this.getGrnno()

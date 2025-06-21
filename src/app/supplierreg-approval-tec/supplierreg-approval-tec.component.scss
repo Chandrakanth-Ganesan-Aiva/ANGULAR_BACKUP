@@ -38,21 +38,3 @@ td {
     text-align: center;
 
 }
-
-@media (max-width: 576px) {
-
-    .form-control,
-    .form-select {
-        font-size: 13px;
-        padding: 6px 10px;
-    }
-
-    label {
-        font-size: 13px;
-    }
-
-    button[mat-raised-button] {
-        font-size: 13px;
-        padding: 5px 10px;
-    }
-}

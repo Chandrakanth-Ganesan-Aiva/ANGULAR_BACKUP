@@ -1,12 +1,11 @@
 import { Component, OnDestroy, OnInit, Type, inject } from '@angular/core';
-import { debounceTime, from, map, Subscription, switchMap } from 'rxjs';
+import { from, map, Subscription } from 'rxjs';
 import { ItemmasterService } from '../service/itemmaster.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { DialogCompComponent } from '../dialog-comp/dialog-comp.component';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { data } from 'jquery';
-import { DatePipe } from '@angular/common';
 
 
 @Component({
@@ -19,8 +18,9 @@ export class ItemMasterComponent implements OnInit, OnDestroy {
   LocationId: number = 0
   form!: FormGroup;
   Empid: number = 0
-  constructor(private service: ItemmasterService, private dialog: MatDialog, private fb: FormBuilder, private date: DatePipe) {
-    this.LocationId = JSON.parse(sessionStorage.getItem('location') || '{}');
+  constructor(private service: ItemmasterService, private dialog: MatDialog, private fb: FormBuilder) {
+    const data = JSON.parse(sessionStorage.getItem('location') || '{}');
+    this.LocationId = data[data.length - 1]
     const user = JSON.parse(sessionStorage.getItem('session') || '{}');
     this.Empid = user.empid
     this.form = this.fb.group({
@@ -29,7 +29,7 @@ export class ItemMasterComponent implements OnInit, OnDestroy {
       Dept: ['', Validators.required],
       drgo: [''],
       itemName: ['', Validators.required],
-      Spec: [{ value: '', disabled: true }, [Validators.required]],
+      Spec: [''],
       Uom: ['', Validators.required],
       make: [''],
       weight: [''],
@@ -37,11 +37,10 @@ export class ItemMasterComponent implements OnInit, OnDestroy {
       saleable: [false],
       shelflife: [false],
       qcReq: [false],
-      loc_id: [''],
+      Rawt_loc_id: [''],
       min_level: [''],
       max_level: [''],
-      reorder_level: [''],
-      hsncode: ['']
+      reorder_level: ['']
     })
 
   }
@@ -50,7 +49,6 @@ export class ItemMasterComponent implements OnInit, OnDestroy {
   UomFilterArr = new FormControl('')
   GradeFiterArr = new FormControl('')
   RawMatLocFilterArr = new FormControl('')
-  hsnArrFormcontrol = new FormControl('')
   ngOnInit() {
 
     this.getCat()
@@ -90,21 +88,6 @@ export class ItemMasterComponent implements OnInit, OnDestroy {
       ))
     ).subscribe((filtered: any) => (this.filterRawMatLoc = filtered))
 
-    this.hsnArrFormcontrol.valueChanges.pipe(
-      map((search: any) => {
-        if (search && search.length > 1) {
-          return this.hsnArr.filter((option: any) =>
-            option.hsncode.toLowerCase().includes(search.toLowerCase())
-          );
-        } else {
-          return [];
-        }
-      })
-    ).subscribe((filtered: any) => {
-      this.hsnArrFilter = filtered;
-    });
-
-
   }
 
   categoryArr: any[] = new Array()
@@ -129,18 +112,8 @@ export class ItemMasterComponent implements OnInit, OnDestroy {
   CategoryEvent() {
     if (this.form.controls['category'].value == 104) {
       this.form.controls['saleable'].setValue(true)
-      this.form.controls['drgo'].setValidators(Validators.required)
-      this.form.get('drgo')?.updateValueAndValidity();
-      this.form.controls['saleable'].disable()
-      this.form
     } else {
       this.form.controls['saleable'].setValue(false)
-      this.form.get('drgo')?.setValidators([]);
-      this.form.get('drgo')?.updateValueAndValidity();
-      this.form.controls['saleable'].enable()
-    }
-    if (this.form.controls['category'].value == 1) {
-      this.form.controls['Spec'].enable()
     }
   }
 
@@ -183,7 +156,6 @@ export class ItemMasterComponent implements OnInit, OnDestroy {
   }
 
   hsnArr: any[] = new Array()
-  hsnArrFilter: any[] = new Array()
   gethsn() {
     const sub = this.service.itemHsncode().subscribe({
       next: (res: any) => {
@@ -194,7 +166,6 @@ export class ItemMasterComponent implements OnInit, OnDestroy {
             return this.openDialog()
           }
           this.hsnArr = res
-          this.hsnArrFilter = res
         }
       }
     })
@@ -238,16 +209,6 @@ export class ItemMasterComponent implements OnInit, OnDestroy {
     })
     this.subscriptions.add(sub)
   }
-  Search(e: any) {
-    let searchValue = e.target.value
-    if (searchValue) {
-      this.dataSource.filter = searchValue.trim().toLowerCase()
-      this.dataSource.data = [... this.dataSource.data];
-    } else {
-      searchValue = ''
-    }
-  }
-
   Rawmaterial: any[] = new Array()
   itemMaster: any[] = new Array()
   dataSource = new MatTableDataSource()
@@ -255,6 +216,8 @@ export class ItemMasterComponent implements OnInit, OnDestroy {
   itemEvent() {
     const inputValue: string = this.form.controls['itemName'].value || '';
     const totalLength: number = inputValue.length;
+    console.warn(totalLength);
+
     if (totalLength >= 3) {
       const sub = this.service.itemRawMaterial(this.form.controls['itemName'].value).subscribe({
         next: (res: any) => {
@@ -265,13 +228,7 @@ export class ItemMasterComponent implements OnInit, OnDestroy {
               return this.openDialog()
             }
             this.Rawmaterial = res
-
-
-            this.dataSource.data = [...res]
-            this.dataSource.data = [...this.dataSource.data]
-            console.log(this.dataSource.data);
-          } else {
-            this.dataSource.data = []
+            this.dataSource.data = [...this.Rawmaterial]
           }
         }
       })
@@ -285,17 +242,11 @@ export class ItemMasterComponent implements OnInit, OnDestroy {
             }
             this.itemMaster = res
             this.dataSource1.data = [...this.itemMaster]
-            this.dataSource1.data = [...this.dataSource1.data]
-          } else {
-            this.dataSource.data = []
           }
         }
       })
       this.subscriptions.add(sub);
       this.subscriptions.add(sub1);
-    } else {
-      this.dataSource.data = []
-      this.dataSource1.data = []
     }
   }
   saleable: string = 'N'
@@ -318,13 +269,13 @@ export class ItemMasterComponent implements OnInit, OnDestroy {
     if (this.saleable === 'Y') {
       if (categoryValue === 104) {
         if (this.form.controls['drgo'].value == '') {
-          this.form.controls['drgo'].setValidators(Validators.required)
+          this.form.controls['drgo'].addValidators(Validators.required)
           this.Error = `Please fill the Drawing No.`
           this.userHeader = 'Warining'
           return this.openDialog()
         }
         if (this.form.controls['grade'].value == '') {
-          this.form.controls['grade'].setValidators(Validators.required)
+          this.form.controls['grade'].addValidators(Validators.required)
           this.Error = `Without Grade cannot be saved.`
           this.userHeader = 'Warining'
           return this.openDialog()
@@ -333,92 +284,65 @@ export class ItemMasterComponent implements OnInit, OnDestroy {
     }
     this.service.exisitingItemCheck(this.form.controls['itemName'].value).subscribe({
       next: (res: any) => {
+        if (res[0].status == 'N') {
+          this.Error = res[0].Msg
+          this.userHeader = 'Error'
+          return this.openDialog()
+        }
         if (res.length > 0) {
-          if (res[0].status == 'N') {
-            this.Error = res[0].Msg
-            this.userHeader = 'Error'
-            return this.openDialog()
-          }
-          if (res[0].cc > 0) {
-            this.Error = 'Already Exists in Rawmaterial Master. You cannot create duplicate material'
-            this.userHeader = "Information"
-            return this.openDialog()
-          } else {
-            this.Error = 'Do you Want To Save ? '
-            this.userHeader = 'Save'
-            this.openDialog()
-            this.dialogRef.afterClosed().subscribe((res: any) => {
-              if (res) {
-                this.save()
-              } else {
-                this.Error = 'Save Canclled '
-                this.userHeader = 'Infromation'
-                return this.openDialog()
-              }
-            })
-          }
+          this.Error = 'Already Exists in Rawmaterial Master. You cannot create duplicate material'
+          this.userHeader = "Information"
+          return this.openDialog()
+        } else {
+          this.Error = 'Do you Want To Save ? '
+          this.userHeader = 'Save'
+          this.openDialog()
+          this.dialogRef.afterClosed().subscribe((res: any) => {
+            if (res) {
+              this.save()
+            } else {
+              this.Error = 'Save Canclled '
+              this.userHeader = 'Infromation'
+              return this.openDialog()
+            }
+          })
         }
       }
     })
 
   }
-
+  saleableEvent(e: any) {
+    console.log(e);
+    console.log(e.checked);
+    console.log(this.form.controls['saleable'].value);
+  }
   UomName: string = ''
   save() {
-    this.uomArr.filter((item: any) => {
-      if (this.form.controls['Uom'].value == item.uomid) {
-        this.UomName = item.uomname
-      }
-    })
     const updateData = {
       itemcode: this.form.controls['itemCode'].value,
       itemname: this.form.controls['itemName'].value,
       deptid: this.form.controls['Dept'].value,
-      spec: this.form.controls['Spec'].value,
-      hsncode: this.form.controls['hsncode'].value ? this.form.controls['hsncode'].value : null,
+      // spec: this.form.controls['Spec'].value,
+      hsncode: this.form.controls['hsncode'].value?this.form.controls['hsncode'].value:null,
       make: this.form.controls['make'].value ? this.form.controls['make'].value : '',
       uom: this.UomName,
-      loc_id: this.form.controls['loc_id'].value ? this.form.controls['loc_id'].value : null,
+      Rawt_loc_id: this.form.controls['Rawt_loc_id'].value ? this.form.controls['Rawt_loc_id'].value : null,
       uomid: this.form.controls['Uom'].value,
       grntypeid: this.form.controls['category'].value,
-      min_level: parseFloat(Number(this.form.controls['min_level'].value ? this.form.controls['min_level'].value : 0).toFixed(3)),
-      max_level: parseFloat(Number(this.form.controls['max_level'].value ? this.form.controls['max_level'].value : 0).toFixed(3)),
-      reorder_level: parseFloat(Number(this.form.controls['reorder_level'].value ? this.form.controls['reorder_level'].value : 0).toFixed(3)),
+      min_level: this.form.controls['Spec'].value ? this.form.controls['Spec'].value : 0,
+      max_level: this.form.controls['max_level'].value ? this.form.controls['max_level'].value : 0,
+      reorder_level: this.form.controls['reorder_level'].value ? this.form.controls['reorder_level'].value : 0,
       qcreq: this.qcreq,
       shelflife: this.shelflife,
       saleable: this.saleable,
-      weight: parseFloat(Number(this.form.controls['weight'].value ? this.form.controls['weight'].value : 0).toFixed(3)),
+      weight: (this.form.controls['weight'].value ? this.form.controls['weight'].value : 0).toFixied(3),
       locationid: this.LocationId,
       loginid: this.Empid,
       drgno: this.form.controls['drgo'].value ? this.form.controls['drgo'].value : '',
       gradeid: this.form.controls['grade'].value ? this.form.controls['grade'].value : 0,
-      EntryDate: this.date.transform(new Date, 'yyyy-MM-dd')
     }
-    const sub = this.service.ItemMasSave(updateData).subscribe({
-      next: (res: any) => {
-        if (res[0].status == 'Y') {
-          this.Error = res[0].Msg
-          this.userHeader = 'Information'
-          this.openDialog()
-          this.dialogRef.afterClosed().subscribe((res: any) => {
-            if (res) {
-              this.form.reset()
-              this.form.markAsUntouched()
-              this.getCat()
-              this.getDept()
-              this.getUom()
-              this.gethsn()
-              this.getgrade()
-              this.getRawLoc()
-            }
-          })
-        } else {
-          this.Error = res[0].Msg
-          this.userHeader = 'Error'
-          return this.openDialog()
-        }
-      }
-    })
+    console.log(updateData);
+
   }
   Error: string = ''
   userHeader: string = ''

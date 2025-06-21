@@ -82,12 +82,12 @@
                         <mat-label>Material</mat-label>
                         <mat-select placeholder="---Search---" formControlName="Material"
                             (selectionChange)="RawmaterialChanmgeEvent()">
-                            <mat-option >
+                            <mat-option (input)="MaterialLoad()">
                                 <ngx-mat-select-search [formControl]="materialFilter" placeholderLabel="Search..."
                                     noEntriesFoundLabel="No Results Found">
                                     [clearSearchInput]="true" placeholderLabel="---Search---">
                                 </ngx-mat-select-search></mat-option>
-                            <mat-option *ngFor="let item of rawmaterial"
+                            <mat-option *ngFor="let item of MaterialFilterList"
                                 [value]="item.rawmatid">{{item.rawmatname}}</mat-option>
                         </mat-select>
                         <mat-hint>Type Two letters of Material Name To view Material</mat-hint>

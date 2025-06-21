@@ -39,7 +39,8 @@ export class PDRawmaterialChangeComponent implements OnInit, AfterViewInit {
   loactionId: number = 0
   Empid: number = 0
   ngOnInit(): void {
-    this.loactionId = JSON.parse(sessionStorage.getItem('location') || '{}');
+    const data = JSON.parse(sessionStorage.getItem('location') || '{}');
+    this.loactionId = data[data.length - 1]
     const user = JSON.parse(sessionStorage.getItem('session') || '{}');
     this.Empid = user.empid
     this.Location()

@@ -26,7 +26,10 @@ export class CustomerRejdialogComponent implements OnDestroy,OnInit {
   ngOnInit() {
 
 
-    this.LocationId  = JSON.parse(sessionStorage.getItem('location') || '{}');
+    const data = JSON.parse(sessionStorage.getItem('location') || '{}');
+    this.LocationId = data[data.length - 1]
+
+
     this.GeneralForm = this.fb.group({
       InvoiceId: [''],
       PriceUom: ['', [Validators.required]],

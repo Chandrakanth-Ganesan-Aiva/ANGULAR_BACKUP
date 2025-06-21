@@ -31,8 +31,7 @@
             <mat-select (selectionChange)="EmpChangeEvent()" formControlName="Emp">
               <mat-option *ngFor="let item of Employee" [value]="item.Empid">{{item.Empname}}</mat-option>
             </mat-select>
-            <mat-error *ngIf="Menuform.controls['Emp'].invalid && Menuform.controls['Emp'].markAllAsTouched">Employee
-              Required</mat-error>
+            <mat-error *ngIf="Menuform.controls['Emp'].invalid && Menuform.controls['Emp'].markAllAsTouched">Employee Required</mat-error>
           </mat-form-field>
         </div>
         <div class="col-12 col-xs-12 col-sm-6 col-md-4 col-lg-4">
@@ -41,9 +40,7 @@
             <mat-select (selectionChange)="mainMenuEvent()" formControlName="MainMenu">
               <mat-option *ngFor="let item of MenuNameData" [value]="item.MainMenuId">{{item.MainMenuname}}</mat-option>
             </mat-select>
-            <mat-error
-              *ngIf="Menuform.controls['MainMenu'].invalid && Menuform.controls['MainMenu'].markAllAsTouched">Employee
-              Required</mat-error>
+            <mat-error *ngIf="Menuform.controls['MainMenu'].invalid && Menuform.controls['MainMenu'].markAllAsTouched">Employee Required</mat-error>
           </mat-form-field>
         </div>
         <div class="col-12 col-xs-12 col-sm-6 col-md-4 col-lg-4">
@@ -53,12 +50,10 @@
           </mat-form-field>
         </div>
         <div class="col-12 col-xs-12 col-sm-6 col-md-4 col-lg-4 model-footer">
-          <button value="Approve" mat-raised-button type="button" class="mt-1 text-white" id="Approve"
-            style="background-color: green;" (click)="Approve('Approve')">Approve</button>
-          <button value="UnApprove" mat-raised-button type="button" class="mt-1 text-white ml-3" id="UnApprove"
-            color="warn" (click)="Approve('UnApprove')">UnApprove</button>
-          <button mat-raised-button type="button" class="mt-1 text-white ml-3" color="accent"
-            (click)="Store()">Store</button>
+          <button value="Approve" mat-raised-button type="button" class="mt-1 text-white" id="Approve" style="background-color: green;"
+            (click)="Approve('Approve')">Approve</button>
+            <button value="UnApprove" mat-raised-button type="button" class="mt-1 text-white ml-3" id="UnApprove" color="warn"
+            (click)="Approve('UnApprove')">UnApprove</button>
         </div>
       </div>
     </form>
@@ -70,12 +65,11 @@
             <mat-label>Filter</mat-label>
             <input matInput (keyup)="applyFilter($event)" placeholder="Ex. search" #input>
           </mat-form-field>
-          <table mat-table [dataSource]="dataSource" class="border-right-1">
+          <table mat-table [dataSource]="dataSource"  class="border-right-1">
             <ng-container matColumnDef="Check">
               <th mat-header-cell *matHeaderCellDef> Rights Status </th>
-              <td mat-cell *matCellDef="let element" style="text-align: center;"> <mat-checkbox
-                  [checked]="element.Status ==='Y'" color="primary"
-                  (change)="onCheckboxChange(element, $event)"></mat-checkbox> </td>
+              <td mat-cell *matCellDef="let element" style="text-align: center;"> <mat-checkbox 
+                  [checked]="element.Status ==='Y'" color="primary" (change)="onCheckboxChange(element, $event)"></mat-checkbox> </td>
             </ng-container>
             <ng-container matColumnDef="SubMenuname">
               <th mat-header-cell *matHeaderCellDef> SubMenuname </th>
@@ -93,21 +87,19 @@
             <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
           </table>
           <mat-divider style="background-color: black;"></mat-divider>
-          <mat-paginator #paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons
-            aria-label="Select page of periodic elements">
+          <mat-paginator #paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons aria-label="Select page of periodic elements">
           </mat-paginator>
         </mat-tab>
-        <mat-tab label="History">
+        <mat-tab label="History" >
           <mat-form-field>
             <mat-label>Filter</mat-label>
             <input matInput (keyup)="applyFilter($event)" placeholder="Ex. search" #input>
           </mat-form-field>
-          <table mat-table [dataSource]="historyData" class="border-right-1">
+          <table mat-table [dataSource]="historyData"  class="border-right-1">
             <ng-container matColumnDef="Check">
               <th mat-header-cell *matHeaderCellDef> Rights Status </th>
-              <td mat-cell *matCellDef="let element" style="text-align: center;"> <mat-checkbox
-                  [checked]="element.Status ==='Y'" color="primary" (change)="onCheckboxChange(element, $event)"
-                  disabled></mat-checkbox> </td>
+              <td mat-cell *matCellDef="let element" style="text-align: center;"> <mat-checkbox 
+                  [checked]="element.Status ==='Y'" color="primary" (change)="onCheckboxChange(element, $event)" disabled></mat-checkbox> </td>
             </ng-container>
             <ng-container matColumnDef="Menuname">
               <th mat-header-cell *matHeaderCellDef> Menuname </th>
@@ -123,52 +115,18 @@
             </ng-container>
             <ng-container matColumnDef="UnApprTime">
               <th mat-header-cell *matHeaderCellDef> UnApprTime </th>
-              <td mat-cell *matCellDef="let element"> {{element.RightsUnApprTime | date: 'yyyy-MM-dd hh:mm:ss' :
-                '+0:00'}} </td>
+              <td mat-cell *matCellDef="let element"> {{element.RightsUnApprTime | date: 'yyyy-MM-dd hh:mm:ss'  : '+0:00'}} </td>
             </ng-container>
             <tr mat-header-row *matHeaderRowDef="['Check','Menuname','Empname','UnApprovedBy','UnApprTime']"></tr>
             <tr mat-row *matRowDef="let row; columns: ['Check','Menuname','Empname','UnApprovedBy','UnApprTime'];"></tr>
           </table>
           <mat-divider style="background-color: black;"></mat-divider>
-          <mat-paginator #paginator1 [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons
-            aria-label="Select page of periodic elements">
+          <mat-paginator #paginator1 [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons aria-label="Select page of periodic elements">
           </mat-paginator>
         </mat-tab>
       </mat-tab-group>
 
     </div>
-  </mat-card-content>
-  <mat-card-content [hidden]="StoresIssue">
-    <table mat-table #table3 [dataSource]="storeIssueDatasource" class="border-right-1">
-      <ng-container matColumnDef="Check">
-        <th mat-header-cell *matHeaderCellDef>Action</th>
-        <td mat-cell *matCellDef="let element" style="text-align: center;"> <mat-checkbox
-            [(ngModel)]="element.Select"></mat-checkbox> </td>
-      </ng-container>
-      <ng-container matColumnDef="Empanme">
-        <th mat-header-cell *matHeaderCellDef> Employee </th>
-        <td mat-cell *matCellDef="let element"> {{element.empname}} </td>
-      </ng-container>
-      <ng-container matColumnDef="Loaction">
-        <th mat-header-cell *matHeaderCellDef> ApprovedBy </th>
-        <td mat-cell *matCellDef="let element"> {{element.locid }} </td>
-      </ng-container>
-      <ng-container matColumnDef="logindate">
-        <th mat-header-cell *matHeaderCellDef> Login DateTime </th>
-        <td mat-cell *matCellDef="let element"> {{element.logindate | date: "yyyy-MM-dd" }} </td>
-      </ng-container>
-      <ng-container matColumnDef="loginsystem">
-        <th mat-header-cell *matHeaderCellDef> Login System </th>
-        <td mat-cell *matCellDef="let element"> {{element.loginsystem}} </td>
-      </ng-container>
-      <tr mat-header-row *matHeaderRowDef="['Check','Empanme','Loaction','logindate','loginsystem']"></tr>
-      <tr mat-row *matRowDef="let row; columns: ['Check','Empanme','Loaction','logindate','loginsystem'];"></tr>
-    </table>
-    <mat-divider style="background-color: black;"></mat-divider>
-    <mat-paginator #paginator2 [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons
-      aria-label="Select page of periodic elements">
-    </mat-paginator>
-    <button mat-raised-button type="button" class="float-end" color="primary" (click)="StoreUpdate()">Update</button>
   </mat-card-content>
 </mat-card>
 <!-- ***********************SAVE **********************************-->

@@ -14,7 +14,8 @@ export class ClearingApprovalComponent {
   ngOnInit() {
     const user = JSON.parse(sessionStorage.getItem('session') || '{}');
     this.empid = user.empid
-    this.LocationId = JSON.parse(sessionStorage.getItem('location') || '{}')
+    const locationid = JSON.parse(sessionStorage.getItem('location') || '{}')
+    this.LocationId = locationid[0]
     this.view()
     this.Approver()
     this.table3()

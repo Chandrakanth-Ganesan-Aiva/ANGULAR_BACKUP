@@ -11,28 +11,40 @@ export class DirectIndentService {
   constructor(private http: HttpClient) {
   }
 
-  Stockreno(trandate: any, locid: any) {
-    return this.http.get(environment.Api + '/Inventory/DirectIndentpath?trandate=' + trandate + '&locid=' + locid)
+  PoPath(LoactionId: any, indentdate: any) {
+    return this.http.get(environment.Api + '/Inventory/IndentNo?LoactionId=' + LoactionId + '&indentdate=' + indentdate)
+    
   }
-  Department(locationid: any, Empid: any) {
-    return this.http.get(environment.Api + '/Inventory/Department?locationid=' + locationid + '&empid=' + Empid)
+  IndentPONo(IndentNo: any) {
+    return this.http.get(environment.Api + '/Inventory/IndentPONo?IndentNo=' + IndentNo)
+  }
+  Department( LoactionId:any,Empid: any) {
+    return this.http.get(environment.Api + '/Inventory/DirectDepartment?LoactionId='+LoactionId+'&Empid='+Empid )
   }
   CostCenter() {
     return this.http.get(environment.Api + '/Inventory/CostCenter')
   }
-  Approvedby(LocationId: any, DeptId: any) {
-    return this.http.get(environment.Api + '/Inventory/Approvedby?LocationId=' + LocationId + '&DeptId=' + DeptId)
+  CapexNo(LoctionId: any) {
+    return this.http.get(environment.Api + '/Inventory/CapexNo?LoctionId=' + LoctionId)
   }
-  Capex(LocationId: any) {
-    return this.http.get(environment.Api + '/Inventory/Capex?LocationId=' + LocationId)
+  EmpApr(LocationId: any, DeptId: any, com_selename: any) {
+    return this.http.get(environment.Api + '/Inventory/ApprovalEmployees?LocationId=' + LocationId + '&DeptId=' + DeptId + '&com_selename=' + com_selename)
   }
-  ResponsableEmp() {
-    return this.http.get(environment.Api + '/Inventory/IndentResponsableEmp')
+  EmpCat(Empid: any, LoctionId: any) {
+    return this.http.get(environment.Api + '/Inventory/EmployeeCategory?Empid=' + Empid + '&LoctionId=' + LoctionId)
+  }
+  EmpDet(LoctionId: any, EmpId: any, CategoryId: any) {
+    return this.http.get(environment.Api + '/Inventory/EmpDetalis?LoctionId=' + LoctionId + '&EmpId=' + EmpId + '&CategoryId=' + CategoryId)
   }
   RawMat(Rawmatname: any, Rawmatid: any) {
     return this.http.get(environment.Api + '/Inventory/RawMaterial?Rawmatname=' + Rawmatname + '&Rawmatid=' + Rawmatid)
   }
-
+  IndentDet(LocationId: any, SRDate: any, RawMatId: any, DeptId: any) {
+    return this.http.get(environment.Api + '/Inventory/StoreIndentDetl?LocationId=' + LocationId + '&SRDate=' + SRDate + '&RawMatId=' + RawMatId + '&DeptId=' + DeptId)
+  }
+  Uom(RawMatId: any) {
+    return this.http.get(environment.Api + '/Inventory/ProductUom?RawMatId=' + RawMatId)
+  }
   StockAvl(FrmModule: any, IndentType: any, Issuelocationwise: any, MaterialId: any, LoactionId: any, EmpId: any, Issuelocid: any) {
     return this.http.get(environment.Api + '/Inventory/StockCheck?FrmModule=' + FrmModule + '&IndentType=' + IndentType + '&Issuelocationwise=' + Issuelocationwise + '&MaterialId=' + MaterialId + '&LoactionId=' + LoactionId + '&EmpId=' + EmpId + '&Issuelocid=' + Issuelocid)
   }
@@ -50,10 +62,6 @@ export class DirectIndentService {
   }
   OldPOView(locid: any, Rawmatid: any) {
     return this.http.get(environment.Api + '/Inventory/OldPoView?locid=' + locid + '&Rawmatid=' + Rawmatid)
-  }
-  oldPo_Tot(Poid: any): Observable<any> {
-    const url = environment.Api + `/Inventory/oldPo-Tot?Poid=${Poid}`
-    return this.http.get<any>(url)
   }
   IntendPendingView(LocationId: any, RawMatID: any) {
     return this.http.get(environment.Api + '/Inventory/IndentPendingViewDet?LocationId=' + LocationId + '&RawMatID=' + RawMatID)

@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
 import { LogoutService } from './service/logout.service';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { StoreIssueService } from './service/store-issue.service';
 import { LoginService } from './service/login.service';
@@ -11,9 +11,8 @@ import { DialogCompComponent } from './dialog-comp/dialog-comp.component';
 import { KeyCode } from '@ng-select/ng-select/lib/ng-select.types';
 import { DatePipe } from '@angular/common';
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { Observable, of } from 'rxjs';
-import { switchMap, map, debounceTime, filter, mergeMap } from 'rxjs/operators';
-import { FormControl } from '@angular/forms';
+import { of } from 'rxjs';
+import { switchMap, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -28,9 +27,57 @@ import { FormControl } from '@angular/forms';
   ]
 })
 export class AppComponent implements OnInit, OnDestroy {
+
+  routeMap: Record<number, string> = {
+    203: 'grnEntry',
+    212: 'grnwithoutbillentry',
+    234: 'IndentEntry',
+    374: 'PurchaseReq',
+    242: 'issueReq',
+    143: 'directIndent',
+    473: 'storeissue',
+    396: 'reworkissue',
+    282: 'MatlReceiveFrmDept',
+    471: 'StorageQtyAlloc',
+    440: 'Shelflife',
+    472: 'StoretoStore',
+    201: 'GrnDelete',
+    539: 'WeighRejReq',
+    191: 'GateEntryDelay',
+    538: 'WeighprintDailmr',
+    285: 'minmaxEntry',
+    378: 'QtyDellaco',
+    246: 'itemMasterAppr',
+    380: 'QcReq',
+    441: 'shelflifeRecertificate',
+    322: 'packweight',
+    111: 'customerreturn',
+    192: 'GateEntryDelayAppr',
+    245: 'itemmaster',
+    202: 'GrnDeleteReq',
+    208: 'grnSubmitToAcc',
+    568: 'grnprint',
+    467: 'stockreport',
+    //Purchase
+    349: 'POClose1',
+    358: 'poclose2',
+    350: 'poclose3',
+    76: 'clearingFrechargesApprovals',
+    93: 'creditdaysApprovals',
+    488: 'SupplierRegAppApurchase',
+    487: 'SupplierRegAppFin',
+    489: 'SupplierRegAppTec',
+    333: 'PaymentTerms',
+    155: 'MailNumberUpdate',
+    108: 'customerPackDet',
+    494: 'suppliergst',
+    495: 'supplierreg',
+  };
+
   title = 'Commercial';
   locationId: number = 0;
   empId: number = 0;
+  storeIssueId: number = 460;
   token: string = '';
   sessionTimeoutHandled: boolean = false; // Flag to track if session timeout logic has been executed
   timeoutSubscription: any; // Store the subscription to the idle timeout
@@ -38,80 +85,40 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     private logoutService: LogoutService,
     private loginService: LoginService,
+    private store: Store,
     private router: Router,
     private toastr: ToastrService,
     private storeIssueService: StoreIssueService,
     private dialog: MatDialog,
-    private activatedRoute: ActivatedRoute
-  ) {
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd),
-      map(() => {
-        let route = this.activatedRoute;
-        while (route.firstChild) route = route.firstChild;
-        return route;
-      }),
-      mergeMap(route => route.data)
-    ).subscribe(data => {
-      this.showNavbar = !data['hideNavbar'];
-      console.log(this.showNavbar);
-
-    });
-  }
+    private cdr: ChangeDetectorRef,
+    private date: DatePipe,
+  ) { }
   LocationId: number = 0
   Empid: number = 0
   UserName: string = ''// Change this to any name
-  isLogin: boolean = false
-  showNavbar = true;
+
   ngOnInit() {
-    this.LocationId = JSON.parse(sessionStorage.getItem('location') || '{}')
+
+    const Location = JSON.parse(sessionStorage.getItem('location') || '{}')
+    this.LocationId = Location[Location.length - 1]
     let Data = JSON.parse(sessionStorage.getItem('session') || '{}');
     this.UserName = Data.cusername;
     this.Empid = Data.empid
-    this.isLogin = Boolean(JSON.parse(sessionStorage.getItem('islogIn') || 'false'))
-
     this.getMenu()
+
+    // let Data = JSON.parse(sessionStorage.getItem('session') || '{}');
+    // this.UserName = Data.cusername;
     this.initializeSessionData();
     this.setupIdleTimeout();
-    //  Load all the Menu in Navigation Search Bar
-    this.searchControl.valueChanges
-      .pipe(
-        debounceTime(300),
-        switchMap(value => this.fetchSubMenus(value || ''))
-      )
-      .subscribe((data: any[]) => {
-        this.filteredOptions = data;
-      });
-    // Router
-    this.router.events.pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe(() => {
-        const route = this.getDeepestChild(this.activatedRoute);
-        route.data.subscribe(data => {
-          this.currentMenuId = data['menuId'] ?? null;
-        });
-      });
+    this.updateStoreIssueLogout();
+    this.dispatchTokenToStore();
   }
-  //  Load all the Menu in Navigation Search Bar
-  searchControl = new FormControl('');
-  filteredOptions: any[] = [];
-  fetchSubMenus(value: any): Observable<any> {
-    if (!value || value.trim() === '') {
-      return of(null);
+  ngOnDestroy(): void {
+    if (this.timeoutSubscription) {
+      this.timeoutSubscription.unsubscribe(); // Unsubscribe to avoid subsequent timeouts
     }
-    return this.loginService.SubMenuInput(value).pipe(
-      map((response: any[]) =>
-        response.filter(item =>
-          item.SubMenuName.toLowerCase().includes(value.toLowerCase())
-        )
-      )
-    );
-  }
-  currentMenuId: number = 0
-  getDeepestChild(route: ActivatedRoute): ActivatedRoute {
-    while (route.firstChild) {
-      route = route.firstChild;
-    }
-    return route;
+    this.logoutService.stopTimer();
+    this.dialog.closeAll();
   }
 
   private initializeSessionData(): void {
@@ -127,8 +134,9 @@ export class AppComponent implements OnInit, OnDestroy {
       this.empId = user.empid;
     }
   }
+
   private setupIdleTimeout(): void {
-    const idleTimeoutInSeconds = 300;  // 5 minutes Set to the number of seconds you want for idle timeout
+    const idleTimeoutInSeconds = 500;  // 5 minutes Set to the number of seconds you want for idle timeout
     this.timeoutSubscription = this.logoutService.startWatching(idleTimeoutInSeconds).subscribe({
       next: (isTimeout: boolean) => {
         if (isTimeout && !this.sessionTimeoutHandled) {
@@ -144,6 +152,35 @@ export class AppComponent implements OnInit, OnDestroy {
       },
       error: (err) => console.error('Error in idle timeout:', err),
     });
+  }
+
+  updateStoreIssueLogout(): void {
+    this.storeIssueId = 166;
+    const lockScreenData = {
+      LocationId: this.locationId,
+      EmpId: this.empId,
+      ModuleId: this.storeIssueId,
+      Loginsystem: 'Tab-Entry',
+    };
+
+    this.storeIssueService.Updatelogoutime(lockScreenData).subscribe({
+      next: (res: any) => {
+        res
+      },
+      error: (err) => {
+        this.Error = err.message
+        this.userHeader = 'Error'
+        this.opendialog()
+        return
+      }
+    });
+  }
+
+  private dispatchTokenToStore(): void {
+    const token = sessionStorage.getItem('token');
+    if (token) {
+      this.store.dispatch(setToken({ token }));
+    }
   }
 
   // -------------------------------------------------------DASHBOARD---------------------------------------------------------------------
@@ -178,11 +215,13 @@ export class AppComponent implements OnInit, OnDestroy {
             let Adminaccess = res[0].admin_access
             if (Adminaccess != 'Y') {
               this.menus = this.menus.filter(menu => menu.Name !== 'Admin');
+              console.log(this.menus, 'aseadas');
             }
           }
         }
       })
     }
+
   }
   subTitle: any[] = new Array()
   MainMenuId: number = 0
@@ -218,11 +257,109 @@ export class AppComponent implements OnInit, OnDestroy {
       }
     });
   }
-
-  // -------------------Animation start-----------------------
   getArrowIcon(menu: any): string {
     return this.selectedMainMenuTitle === menu.Name ? 'keyboard_arrow_up' : 'keyboard_arrow_down';
   }
+  SubMenuArr: any[] = new Array()
+  Subtitle: string = ''
+  originalSubMenuArr: any[] = new Array()
+  // navigateToSubContainer(subtitle: any) {
+
+  //   this.Subtitle = subtitle.MainMenuName
+  //   this.MainMenuId = subtitle.MainMenuId
+
+  //   this.cdr.detectChanges();
+  //   const mainContainer = document.getElementById('main-container');
+  //   const subContainer = document.getElementById('sub-container');
+
+  //   if (mainContainer && subContainer) {
+  //     mainContainer.style.animation = 'mainAway 0.3s forwards';
+  //     subContainer.style.display = 'block';
+  //     subContainer.style.animation = 'subBack 0.3s forwards';
+  //     setTimeout(() => {
+  //       if (mainContainer) {
+  //         mainContainer.style.display = 'none';
+  //       }
+  //     }, 300);
+
+  //     this.loginService.RighitsCheck(this.Empid, this.LocationId).subscribe({
+  //       next: (data: any) => {
+  //         if (data.length > 0) {
+  //           if (data[0].status === 'N') {
+  //             this.Error = data[0].Msg;
+  //             this.userHeader = 'Error';
+  //             this.opendialog();
+  //           }
+  //           this.loginService.SubMenuList(this.MainMenuId, this.Mainid).subscribe({
+  //             next: (res: any) => {
+  //               if (res.length > 0) {
+  //                 if (res[0].status === 'N') {
+  //                   this.Error = res[0].Msg;
+  //                   this.userHeader = 'Error';
+  //                   return this.opendialog();
+  //                 }
+  //                 this.SubMenuArr = res
+  //                 this.originalSubMenuArr = res
+  //                 this.MenuRights = data
+  //                 this.SubMenuArr = this.SubMenuArr.filter((item: any) =>
+  //                   this.MenuRights.some((element) => element.Menuid === item.SubMenuId && element.Status === 'Y')
+  //                 );
+  //                 console.log(this.SubMenuArr);
+  //                 this.matchedSubmenu = this.SubMenuArr
+  //                 this.SubMenuArr.forEach((res: any) => {
+  //                   if (this.routeMap[res.SubMenuId]) {
+  //                     res.route = this.routeMap[res.SubMenuId];
+  //                     console.log(res.route);
+
+  //                   }
+  //                 });
+
+  //                 this.SubMenuArr = structuredClone(this.SubMenuArr)
+  //                 this.originalSubMenuArr = structuredClone(this.SubMenuArr)
+  //               }
+  //             }
+  //           })
+  //         } else {
+  //           this.SubMenuArr = []
+  //         }
+  //       }
+  //     })
+  //   }
+  // }
+  navigateToSubContainer(subtitle: any): void {
+    this.Subtitle = subtitle.MainMenuName;
+    this.MainMenuId = subtitle.MainMenuId;
+
+    this.animateTransition();
+
+    this.loginService.RighitsCheck(this.Empid, this.LocationId).pipe(
+      switchMap((rightsData: any[]) => {
+        if (rightsData.length === 0 || rightsData[0].status === 'N') {
+          // this.displayError(rightsData[0]?.Msg || 'Access denied.');
+          return of([]);
+        }
+        this.MenuRights = rightsData;
+        return this.loginService.SubMenuList(this.MainMenuId, this.Mainid);
+      })
+    ).subscribe({
+      next: (subMenuData: any[]) => {
+        if (subMenuData.length === 0 || subMenuData[0].status === 'N') {
+          // this.displayError(subMenuData[0]?.Msg || 'Menu Rights Not Available.');
+          return;
+        }
+        this.SubMenuArr = subMenuData.filter((item: any) =>
+          this.MenuRights.some((right: any) => right.Menuid === item.SubMenuId && right.Status === 'Y')
+        );
+        this.assignRoutesToSubMenus();
+        this.cloneSubMenuArrays();
+      },
+      error: (err) => {
+        this.displayError('An error occurred while fetching submenu data.');
+        console.error(err);
+      }
+    });
+  }
+
   private animateTransition(): void {
     const mainContainer = document.getElementById('main-container');
     const subContainer = document.getElementById('sub-container');
@@ -239,44 +376,26 @@ export class AppComponent implements OnInit, OnDestroy {
       }, 300);
     }
   }
-  navigateToMainContainer() {
-    const mainContainer = document.getElementById('main-container');
-    const subContainer = document.getElementById('sub-container');
-    if (mainContainer && subContainer) {
-      subContainer.style.animation = 'subPush 0.3s forwards';
-      mainContainer.style.display = 'block';
-      mainContainer.style.animation = 'mainBack 0.3s forwards';
-      setTimeout(() => {
-        subContainer.style.display = 'none';
-      });
-    }
-  }
 
-  //-----------------Display the Menu Rigts Record in  SideNavbar------------------
-  Subtitle: string = ''
-  navigateToSubContainer(subtitle: any): void {
-    this.Subtitle = subtitle.MainMenuName;
-    this.MainMenuId = subtitle.MainMenuId;
-    this.animateTransition();
-    this.loginService.RighitsCheck(this.Empid, this.LocationId).pipe(
-      switchMap((rightsData: any[]) => {
-        if (rightsData.length === 0 || rightsData[0].status === 'N') {
-          return of([]);
-        }
-        this.MenuRights = rightsData;
-        return this.loginService.SubMenuList(this.MainMenuId, this.Mainid);
-      })
-    ).subscribe({
-      next: (subMenuData: any[]) => {
-        if (subMenuData.length === 0 || subMenuData[0].status === 'N') {
-          return;
-        }
-        this.MenuRights = subMenuData.filter((item: any) =>
-          this.MenuRights.some((right: any) => right.Menuid === item.SubMenuId && right.Status === 'Y')
-        );
+  private assignRoutesToSubMenus(): void {
+    this.SubMenuArr.forEach((item: any) => {
+      if (this.routeMap[item.SubMenuId]) {
+        item.route = this.routeMap[item.SubMenuId];
       }
     });
   }
+
+  private cloneSubMenuArrays(): void {
+    this.SubMenuArr = structuredClone(this.SubMenuArr);
+    this.originalSubMenuArr = structuredClone(this.SubMenuArr);
+  }
+
+  private displayError(message: string): void {
+    this.Error = message;
+    this.userHeader = 'Error';
+    this.opendialog();
+  }
+
   @Input() isSidenavOpen: boolean = false;
   sidenavClass = 'lg';
   isSmallScreen: boolean = false;
@@ -292,142 +411,139 @@ export class AppComponent implements OnInit, OnDestroy {
             this.opendialog();
           }
           this.MenuRights = data
+          this.SubMenuArr = this.SubMenuArr.filter((item: any) =>
+            this.MenuRights.some((element) => element.Menuid === item.SubMenuId && element.Status === 'Y')
+          );
+          console.log(this.SubMenuArr);
+          this.matchedSubmenu = this.SubMenuArr
+          this.SubMenuArr.forEach((res: any) => {
+            if (this.routeMap[res.SubMenuId]) {
+              res.route = this.routeMap[res.SubMenuId];
+              console.log(res.route);
+
+            }
+          });
+          this.SubMenuArr = structuredClone(this.SubMenuArr)
+          this.originalSubMenuArr = structuredClone(this.SubMenuArr)
         } else {
-          this.MenuRights = []
+          this.SubMenuArr = []
         }
       }
     })
   }
   SearchEvent(event: Event) {
     const searchTerm = (event.target as HTMLInputElement).value.toLowerCase();
-    this.MenuRights = this.MenuRights.filter(subMenu =>
+    this.SubMenuArr = this.originalSubMenuArr.filter(subMenu =>
       subMenu.SubMenuName.toLowerCase().startsWith(searchTerm)
     );
   }
 
-  toogleMenu(subMenu: any) {
-    console.log(subMenu);
-    const path = this.getRouteByMenuId(subMenu.SubMenuId);
-    if (!path) {
-      this.searchControl.setValue('');
-      this.Error = 'Route Path Mismatch Or Undefined';
-      this.userHeader = 'Warning!!';
-      return this.opendialog();
+  navigateToMainContainer() {
+    const mainContainer = document.getElementById('main-container');
+    const subContainer = document.getElementById('sub-container');
+    if (mainContainer && subContainer) {
+      subContainer.style.animation = 'subPush 0.3s forwards';
+      mainContainer.style.display = 'block';
+      mainContainer.style.animation = 'mainBack 0.3s forwards';
+      setTimeout(() => {
+        subContainer.style.display = 'none';
+      });
     }
-    this.router.navigate(['/', path]);
-    this.isSidenavOpen = false;
-    this.searchControl.setValue('');
   }
+
   toggleSidenav() {
     this.isSidenavOpen = this.isSidenavOpen ? false : true
   }
-
-  getRouteByMenuId(menuId: number): string | null {
-    const route = this.router.config.find((r: any) => r.data?.menuId === menuId);
-    return route?.path ?? null;
-  }
-
-  // after Select Option 
-  SubMenuId: number = 0
-  SearchBarOptionSelect(e: any) {
-    const SubMenuId = Number(e.option.value);
-    this.SubMenuId = SubMenuId;
-
+  InputEvent(event: any) {
+    if (event.target.value == 'home') {
+      this.router.navigate(['/Dashboard'], {});
+      this.isSidenavOpen = false
+      event.target.value = ''
+      return
+    }
+    if (event.target.value == 'open') {
+      this.isSidenavOpen = true
+      event.target.value = ''
+      return
+    }
+    if (event.target.value == 'admin') {
+      this.router.navigate(['/admin'], {});
+      this.isSidenavOpen = false
+      event.target.value = ''
+      return
+    }
+    if (event.target.value == 'close') {
+      this.isSidenavOpen = false
+      event.target.value = ''
+      return
+    }
     this.loginService.RighitsCheck(this.Empid, this.LocationId).subscribe({
       next: (data: any) => {
-        if (!this.isAccessAllowed(data)) return;
-
-        if (SubMenuId === 166) {
-          this.handleStoreIssueLogin(SubMenuId);
-        } else {
-          this.navigateToRoute(SubMenuId);
-        }
-      }
-    });
-  }
-
-  private isAccessAllowed(data: any): boolean {
-    if (data.length > 0 && data[0].status === 'N') {
-      this.showDialog('Error', data[0].Msg);
-      return false;
-    }
-
-    this.MenuRights = data;
-    const matchedRight = this.MenuRights.find(
-      (right: any) => right.Menuid === this.SubMenuId && right.Status === 'Y'
-    );
-
-    if (!matchedRight) {
-      this.searchControl.setValue('');
-      this.showDialog('Warning!!', 'Access Denied...');
-      return false;
-    }
-
-    return true;
-  }
-
-  private handleStoreIssueLogin(SubMenuId: number) {
-    this.storeIssueService.StoreissueloginDet(SubMenuId, this.LocationId, this.Empid).subscribe({
-      next: (res: any) => {
-        if (res.length > 0) {
-          if (res[0].status === 'N') {
-            this.showDialog('Error', res[0].Msg);
-            return;
+        if (data.length > 0) {
+          if (data[0].status === 'N') {
+            this.Error = data[0].Msg;
+            this.userHeader = 'Error';
+            this.opendialog();
           }
-          this.searchControl.setValue('');
-          const msg = `Already Logged in By <strong style="color:brown">${res[0].empname}</strong> in <strong style="color:brown">${res[0].loginsystem}</strong>`;
-          this.showDialog('Information', msg);
-          return; // 🔒 Prevent navigation here
         }
+        this.MenuRights = data
+        const menuIds = this.MenuRights
+          .filter(element => element.Status == 'Y')
+          .map(element => element.Menuid);
+        let hasAccess = menuIds.includes(Number(event.target.value));
+        if (event.keyCode == 13) {
+          if (hasAccess) {
+            this.loginService.SubMenuInput().subscribe({
+              next: (res: any) => {
+                if (res.length > 0) {
+                  if (res[0].status === 'N') {
+                    this.Error = res[0].Msg;
+                    this.userHeader = 'Error';
+                    return this.opendialog();
+                  }
+                  this.SubMenuArr = res
+                  this.SubMenuArr = this.SubMenuArr.filter((item: any) =>
+                    this.MenuRights.some((element) => element.Menuid === item.SubMenuId && element.Status === 'Y')
+                  );
+                  console.log(this.SubMenuArr);
+                  let matchedSubMenu = this.SubMenuArr.find(res => res.SubMenuId == Number(event.target.value));
+                  if (matchedSubMenu) {
+                    matchedSubMenu.route = this.routeMap[matchedSubMenu.SubMenuId];
+                    if (!matchedSubMenu.route) {
+                      console.log(this.SubMenuArr)
 
-        this.navigateToRoute(SubMenuId);
-
-        let ModeuleId = 166
-        let logoutStoreissue = {}
-        logoutStoreissue = {
-          modid: ModeuleId,
-          locid: this.LocationId,
-          loginid: this.Empid
-        }
-        this.storeIssueService.InsertScrrenlock(logoutStoreissue).subscribe({
-          next: (res: any) => {
-            if (res.length > 0) {
-              if (res[0].status == 'N') {
-                this.Error = res[0].Msg
-                this.userHeader = 'Error'
-                return this.opendialog()
+                      this.SubMenuArr = this.matchedSubmenu.filter((item: any) =>
+                        this.MenuRights.some((element) => element.Menuid === item.SubMenuId && element.Status === 'Y')
+                      );
+                      event.target.value = ''
+                      this.Error = 'Route Path Mismatch Or Undefined'
+                      this.userHeader = 'Warning!!'
+                      return this.opendialog()
+                    } else {
+                      console.log('Opening Route:', matchedSubMenu.route);
+                      this.router.navigate(['/', matchedSubMenu.route]);
+                      event.target.value = ''
+                      this.isSidenavOpen = false
+                    }
+                  } else {
+                    this.Error = 'Type Match MenuId'
+                    this.userHeader = 'Warning!!'
+                    this.opendialog()
+                  }
+                }
               }
-            }
+            })
+          } else {
+            event.target.value = ''
+            this.Error = 'You Dont have Rights To View '
+            this.userHeader = 'Warning!!'
+            return this.opendialog()
           }
-        })
+        } else {
+          return
+        }
       }
     })
-  }
-
-
-  private navigateToRoute(SubMenuId: number) {
-    const path = this.getRouteByMenuId(SubMenuId);
-    if (!path) {
-      this.searchControl.setValue('');
-      this.showDialog('Warning!!', 'Route Path Mismatch Or Undefined');
-      return;
-    }
-
-    console.log('Opening Route:', path);
-    this.router.navigate(['/', path]);
-    this.isSidenavOpen = false;
-    this.searchControl.setValue('');
-  }
-
-  private showDialog(header: string, message: string) {
-    this.userHeader = header;
-    this.Error = message;
-    this.opendialog();
-  }
-
-
-  barChart() {
-    window.open('http://dataserver/Reports/browse', '_blank');
   }
   Toolbar: boolean = false
   Logout() {
@@ -451,7 +567,7 @@ export class AppComponent implements OnInit, OnDestroy {
           sessionStorage.clear();
           localStorage.clear();
           this.dialog.closeAll();
-          this.router.navigate(['']);
+          this.router.navigate(['/login']);
           // window.location.href = '/login';
         }
       }
@@ -468,32 +584,39 @@ export class AppComponent implements OnInit, OnDestroy {
     });
 
   }
-  ngOnDestroy() {
-    if (this.timeoutSubscription) {
-      this.timeoutSubscription.unsubscribe(); // Unsubscribe to avoid subsequent timeouts
-    }
-    this.logoutService.stopTimer();
-    this.dialog.closeAll();
-    let ModeuleId = 166
-    let logoutStoreissue = {}
-    logoutStoreissue = {
-      locid: this.locationId,
-      loginid: this.Empid,
-      modid: ModeuleId,
-      loginsystem: 'Tab-Entry'
-    }
-    this.storeIssueService.UpdateStoreissueLogout(logoutStoreissue).subscribe({
-      next: (res: any) => {
-        if (res.length > 0) {
-          if (res[0].status == 'N') {
-            this.Error = res[0].Msg
-            this.userHeader = 'Error'
-            return this.opendialog()
-          }
-          this.toastr.success(res[0].Msg)
-        }
-      }
-    })
-    this.Logout()
-  }
+  //  Browser Close  
+  //   @HostListener('window:beforeunload', ['$event'])
+  // unloadHandler(event: Event) {
+  //   let updatelist:any = [];
+  //   updatelist.push({
+  //     EmpId: this.empId,
+  //   });
+  //   this.loginService.UpdateUserDet(updatelist).subscribe({
+  //     next: (data: any) => {
+  //       if (data.length >= 1) {
+  //         if (data[0].status == 'N') {
+  //           this.Error = data[0].Msg;
+  //           this.userHeader = 'Error';
+  //           this.opendialog();
+  //           return;
+  //         }
+  //         this.UserName = ''
+  //         this.Toolbar = true
+  //         this.toastr.warning('Session Timeout Logout');
+  //         sessionStorage.clear();
+  //         localStorage.clear();
+  //         this.dialog.closeAll();
+  //         this.router.navigate(['/login']);
+  //         localStorage.setItem('logoutdata', updatelist);
+  //         // window.location.href = '/login';
+  //       }
+  //     },
+  //   });
+  //   alert(2)
+  //   // Perform any cleanup tasks or API calls here
+  // let date:any= this.date.transform(new Date ,'yyyy-MM-dd hh:mm:ss')
+  //   localStorage.setItem('lastSession', date);
+  // }
 }
+
+

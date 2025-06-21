@@ -46,7 +46,9 @@ export class MinmumMaximumEntryComponent implements OnInit, AfterViewInit, OnDes
   filteredoptions: any[] = []
   pageSizeOptions: number[] = [8, 20, 30];
   ngOnInit() {
-    this.LocationId= JSON.parse(sessionStorage.getItem('location') || '{}');
+    const data = JSON.parse(sessionStorage.getItem('location') || '{}');
+    this.LocationId = data[data.length - 1]
+
     this.filtercontrol.valueChanges.pipe(map((search) =>
       this.ViewCategory.filter((option: any) =>
         option.grntype.toLowerCase().includes(search?.toLowerCase() || '')

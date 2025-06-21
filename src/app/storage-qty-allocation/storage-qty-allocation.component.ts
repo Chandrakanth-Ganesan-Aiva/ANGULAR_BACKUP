@@ -37,7 +37,9 @@ export class StorageQtyAllocationComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator
   filterSubscription: Subscription | undefined;
   ngOnInit() {
-    this.LoactionId = JSON.parse(sessionStorage.getItem('location') || '{}');
+    const data = JSON.parse(sessionStorage.getItem('location') || '{}');
+    this.LoactionId = data[data.length - 1]
+    console.log(this.LoactionId);
     const user = JSON.parse(sessionStorage.getItem('session') || '{}');
     this.Empid = user.empid
     console.log(this.Empid);

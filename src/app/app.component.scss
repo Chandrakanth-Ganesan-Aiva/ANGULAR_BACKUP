@@ -1,5 +1,5 @@
 .sidenav-container {
-  height: 94vh;
+  height: 91vh;
   display: flex;
   flex-direction: column;
   transition: margin-left 0.3s ease;
@@ -7,11 +7,16 @@
 
 }
 
+mat-sidenav {
+  background-color: rgb(255, 255, 255);
+  color: rgb(10, 10, 10);
+}
 
 .sidenavContent {
   display: flex;
   align-items: center;
   padding: 15px 0px 15px 25px;
+  
 }
 
 .mat-sidenav.mat-sidenav-close {
@@ -29,19 +34,37 @@
   /* Light background for content */
   padding: 5px;
   transition: margin-left 0.3s ease;
-
+  
 }
 
-.text-white {
+.mat-sidenav.mat-sidenav-close+.mat-sidenav-content {
+  margin-left: 0;
+}
+
+.text-white{
   font-size: x-large;
 }
 
-.sidenavContent:hover {
-  background-color: #0466c8;
+.sidenavContentHeader {
+  margin-top: 5px;
+  padding: 10px 0px 15px 25px;
+  font-size: 20px;
+  font-weight: bold;
+  
+}
 
-  a {
-    color: white;
+.sidenavContent {
+  display: flex;
+  align-items: center;
+  padding: 15px 0px 15px 25px;
+  cursor:pointer;
+  a{
+    cursor:pointer;
   }
+}
+
+.sidenavContent:hover {
+  background-color: #eaeded;
 }
 
 
@@ -52,6 +75,7 @@
   padding: 0px 25px 0px 25px;
   flex-direction: column;
   // margin-bottom: 10px;
+
 }
 
 .sidenavRow:hover {
@@ -136,6 +160,7 @@ a:active {
 
 
 
+
 #mainMenu:hover {
   background-color: #eaeded;
   cursor: pointer;
@@ -160,7 +185,9 @@ a:active {
 
 #mainMenu mat-icon:hover {
   transform: scale(1.2);
+  /* Slight zoom effect on hover */
   color: #007bff;
+  /* Change to primary blue color on hover */
 }
 
 .sidenavContentHeader {
@@ -258,6 +285,7 @@ ul.main li:hover {
 
 .menu-item:hover {
   background-color: #f0f0f0;
+  /* Light gray background on hover */
 }
 
 .icon-container {
@@ -265,54 +293,87 @@ ul.main li:hover {
   justify-content: center;
   align-items: center;
   width: 40px;
+  /* Fixed width for icon */
   height: 40px;
+  /* Fixed height for icon */
   border-radius: 50%;
   background-color: #e3f2fd;
+  /* Light blue background */
   margin-right: 10px;
 }
 
 .icon-container mat-icon {
   color: #1976d2;
+  /* Blue color for the icon */
   font-size: 24px;
-
+  /* Adjust the size of the icon */
 }
+
+
+
 
 mat-icon {
   color: white;
 }
 
-mat-icon:hover {
-  transform: scale(1.4);
+.example-spacer {
+  flex: 1%;
+}
+
+.navbar {
+  // margin: 10px;
+  height: auto;
+  padding: 7px 5px 5px 8px;
+  background-color: #084eaa;
+  color: rgb(255, 255, 255);
+  position: sticky;
+  z-index: 99999;
 }
 
 
-// --------------------Searc In SiedNavbvar
+
+.mat-toolbar.mat-primary {
+  position: sticky;
+  z-index: 1;
+  // flex-grow: 1px;
+}
+
+
+
+mat-icon:hover {
+  transform: scale(1.4);
+}
 .search-container {
   position: relative;
   display: inline-block;
 }
 
 .form-control {
-  padding-right: 30px;
-  border: #717070 .5px solid;
-  /* Ensure space for the tick */
+  padding-right: 30px; /* Ensure space for the tick */
 }
 
-
-.animate__flip {
+.checkmark {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 18px;
+  color: green;
+  background: white;
+  border-radius: 50%;
+}
+.animate__flip{
   margin-top: -10px;
 }
-
 /* Hide last three icons on small screens */
 @media screen and (max-width: 600px) {
-  .search {
+  .search{
     width: 10rem;
   }
-
-  .animate__flip {
+  .animate__flip{
     margin-top: 0%;
   }
-
   .nav-icons {
     display: none;
   }
@@ -340,125 +401,9 @@ mat-icon:hover {
     font-size: 24px;
     color: black;
   }
-
 }
 
 
 
-// -------------------------------Nav Bar and Search Bar In Top navigation---------------
+// -------------------------------logout
 
-.example-spacer {
-  flex: 1%;
-}
-
-.navbar {
-  height: 3rem;
-  background-color: #084eaa;
-  color: rgb(255, 255, 255);
-  position: sticky;
-  z-index: 99999;
-}
-
-.navbar,
-.nav-icons {
-  overflow: visible;
-  position: relative; // ensure it forms a proper stacking context
-}
-
-.nav-icons {
-  display: flex;
-  align-items: center;
-  gap: 15px; // consistent spacing between icons
-  padding: 5px 15px;
-
-
-}
-
-
-.mat-toolbar.mat-primary {
-  position: sticky;
-  z-index: 1;
-  // flex-grow: 1px;
-}
-
-
-input {
-  // width: 13rem;
-  border-radius: 5px;
-  border: none;
-  padding-left: 10px;
-  font-size: medium;
-}
-
-
-mat-divider {
-  margin: 0 8px;
-  background-color: rgba(0, 0, 0, 0.12);
-}
-
-.option {
-  font-size: medium;
-}
-
-
-mat-toolbar {
-  label {
-    font-size: larger;
-    font-weight: 550;
-    font-family: 'Times New Roman', Times, serif;
-
-  }
-}
-
-
-
-@media screen and (min-width: 350px) and (max-width: 575px) {
-  input {
-    width: 8rem;
-    border-radius: 5px;
-    border: none;
-    padding-left: 10px;
-    font-size: small;
-  }
-
-  .option {
-    font-size: smaller;
-  }
-
-  mat-toolbar {
-    label {
-      font-size: small;
-      color: aqua;
-    }
-  }
-
-  .text-white {
-    font-size: smaller;
-    margin-left: -2rem;
-  }
-}
-
-@media screen and (min-width: 576px) and (max-width: 749px) {
-  input {
-    // width: 13rem;
-    border-radius: 5px;
-    border: none;
-    padding-left: 10px;
-    font-size: smaller;
-  }
-
-  .option {
-    font-size: smaller;
-  }
-
-  mat-toolbar {
-    label {
-      font-size: small;
-      color: aqua;
-    }
-  }
-
-  .text-white {
-    font-size: smaller;
-  }
-}

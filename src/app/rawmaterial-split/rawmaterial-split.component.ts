@@ -23,7 +23,9 @@ export class RawmaterialSplitComponent implements OnInit, AfterViewInit,OnDestro
   displayedColumns: string[] = ['GrnRefNo', 'GrnDate', 'Supplier', 'View', 'Uom', 'GrnQty', 'RejQty', 'Net']
   displayedColumns1: string[] = ['Material', 'Uom', 'Qty']
   constructor(private service: RawmaterialSplitService, private date: DatePipe, private spinner: NgxSpinnerService, private dialog: MatDialog, private fb: FormBuilder) {
-    this.locationid  = JSON.parse(sessionStorage.getItem('location') || '{}');
+    const data = JSON.parse(sessionStorage.getItem('location') || '{}');
+    this.locationid = data[data.length - 1]
+    console.log(this.locationid);
     const user = JSON.parse(sessionStorage.getItem('session') || '{}');
     this.Empid = user.empid
     this.MyForm = fb.group({

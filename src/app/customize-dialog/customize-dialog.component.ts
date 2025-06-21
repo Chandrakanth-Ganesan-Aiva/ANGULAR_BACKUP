@@ -261,7 +261,7 @@ export class CustomizeDialogComponent
     return this.grnDeleteReqTaxDatasource.data
       ? this.MaterialArr.reduce((total, item) => {
         const billedQty = item.BilledQty || 0;
-        const grnBasicPrice = item.GrnBasicPrice || 0;
+        const grnBasicPrice = item.GrnBasicPrice || 0; 
         return total + billedQty * grnBasicPrice;
       }, 0)
       : 0;
@@ -324,7 +324,8 @@ export class CustomizeDialogComponent
   // -------------------------------------------------GRN ENTRY------------------------------------------------------------------
   grnEntryoldGateEntryDet = new MatTableDataSource();
   oldGateEntryDet() {
-    let LocationId = JSON.parse(sessionStorage.getItem('location') || '{}');
+    const data = JSON.parse(sessionStorage.getItem('location') || '{}');
+    let LocationId = data[data.length - 1];
     this.GrnEntryService.gateEntryDelay(LocationId).subscribe({
       next: (res: any) => {
         if (res.length > 0) {
