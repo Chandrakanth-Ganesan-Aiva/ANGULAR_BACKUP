@@ -10,7 +10,6 @@ import { DialogCompComponent } from '../dialog-comp/dialog-comp.component';
 export class SuppliergstComponent implements OnInit {
 
   constructor(private service: SuppliergstService, private dialog: MatDialog) { }
-
   supplierArray: any[] = []
   supplierArray1: any[] = []
   TableArray: any[] = []
@@ -49,9 +48,7 @@ export class SuppliergstComponent implements OnInit {
       this.opendialog()
       return;
     }
-
     this.supplierId = event.supid;
-
     switch (this.supplierType) {
       case 'Supplier':
         this.service.supplier1(this.supplierId).subscribe((result: any) => {
@@ -78,7 +75,6 @@ export class SuppliergstComponent implements OnInit {
         alert('Invalid supplier type!');
     }
   }
-
   resetForm() {
     this.supplierId = null;
     this.gstNo = null;
@@ -88,34 +84,27 @@ export class SuppliergstComponent implements OnInit {
     this.MobileNo = null;
     this.approveArray = [];
   }
-
   type() {
     this.resetForm();
     this.supplierArray = [];
     this.TableArray = [];
-
     console.log('Selected Type:', this.supplierType);
-
     if (this.supplierType === 'Supplier') {
       this.service.supplier().subscribe((result: any) => {
         this.supplierArray = result;
       });
-
       this.service.suppliertable().subscribe((result: any) => {
         this.TableArray = result;
       });
     }
-
     if (this.supplierType === 'Subcontractor') {
       this.service.subcontract().subscribe((result: any) => {
         this.supplierArray = result;
       });
-
       this.service.subcontracttable().subscribe((result: any) => {
         this.TableArray = result;
       });
     }
-
     if (this.supplierType === 'Customer') {
       this.service.customer().subscribe((result: any) => {
         this.supplierArray = result.map((item: any) => ({
@@ -124,7 +113,6 @@ export class SuppliergstComponent implements OnInit {
           gst: item.gstno
         }));
       });
-
       this.service.customertable().subscribe((result: any) => {
         this.TableArray = result.map((item: any) => ({
           supid: item.custid,
@@ -151,8 +139,6 @@ export class SuppliergstComponent implements OnInit {
     this.opendialog()
     this.dialogRef.afterClosed().subscribe((result: boolean) => {
       if (result) {
-
-        // ✅ Rebuild approveArray with current form values
         this.approveArray = [{
           gstno: this.gstNo,
           panno: this.PanNo,

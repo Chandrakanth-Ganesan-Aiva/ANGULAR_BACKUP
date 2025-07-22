@@ -30,10 +30,7 @@ export class QcRequiredComponent implements OnInit, OnDestroy,AfterViewInit {
     this.dataSource.sort = this.sort;
   }
   ngOnInit() {
-    const data = JSON.parse(sessionStorage.getItem('location') || '{}');
-    this.loactionId = data[data.length - 1]
-
-
+    this.loactionId= JSON.parse(sessionStorage.getItem('location') || '{}');
     this.QcRequiredForm = this.fb.group({
       supplier: ['', [Validators.required]]
     })

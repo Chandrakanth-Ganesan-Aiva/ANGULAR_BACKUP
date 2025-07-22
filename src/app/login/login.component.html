@@ -2,26 +2,26 @@
   <div class="container">
     <div class="form-box login">
       <form [formGroup]="loginForm" (ngSubmit)="login()">
-        <h1>Login</h1>
+        <h1 class="typing">Login</h1>
+
         <div class="input-box">
-          <input type="text" placeholder="Username" (keyup)="checkCapsLockUser($event)" formControlName="username" required>
-          <mat-hint style="color: rgb(230, 1, 1);font-weight: 700;" *ngIf="isCapsLockOnUser" class="caps-lock-warning">  Warning: Caps Lock is ON!</mat-hint>
-          <mat-error *ngIf="loginvaildbtn && loginForm.get('username')?.invalid">UserName Required</mat-error>
+          <input type="text" placeholder="Username" (keyup)="checkCapsLockUser($event)" formControlName="username"
+            required>
+          <mat-hint style="color: rgb(230, 1, 1);font-weight: 700;" *ngIf="isCapsLockOnUser" class="caps-lock-warning">
+            Warning: Caps Lock is ON!</mat-hint>
+          <mat-error style="color: #e60101;" *ngIf="loginvaildbtn && loginForm.get('username')?.invalid">UserName Required</mat-error>
         </div>
         <div class="input-box">
-          <input type="password" placeholder="Password" (keyup)="checkCapsLockPass($event)" formControlName="password" required>
-          <mat-hint style="color: rgb(230, 1, 1);font-weight: 700;" *ngIf="isCapsLockOnPass" class="caps-lock-warning">  Warning: Caps Lock is ON!</mat-hint>
-          <mat-error *ngIf="loginvaildbtn && loginForm.get('password')?.invalid">Password Required</mat-error>
+          <input type="password" placeholder="Password" (keyup)="checkCapsLockPass($event)" formControlName="password"
+            required>
+          <mat-hint style="color: #e60101;font-weight: 700;" *ngIf="isCapsLockOnPass" class="caps-lock-warning">
+            Warning: Caps Lock is ON!</mat-hint>
+          <mat-error style="color: #e60101;" *ngIf="loginvaildbtn && loginForm.get('password')?.invalid">Password Required</mat-error>
+          <a  class=" float-end mt-2 mb-2" style="cursor: pointer;" (click)="ForgetPass($event)">Forgot Password?</a>
         </div>
-        <div class="input-box">
-          <select class="form-select" formControlName="location">
-            <option value="" disabled selected hidden>Select Unit</option>
-            <option *ngFor="let item of Loaction" [value]="item.CompanyID">{{item.CompShort}}</option>
-          </select>
-          <mat-error *ngIf="loginvaildbtn && loginForm.get('location')?.invalid">Location Required</mat-error>
-          <!-- <div class="forgot-link">
-                    <a href="#">Forgot Password?</a>
-                </div> -->
+        <div >
+          <!-- <div class="forgot-link"> -->
+          <!-- </div> -->
         </div>
         <button type="submit" class="btn">Login</button>
       </form>
@@ -36,3 +36,99 @@
     </div>
   </div>
 </div>
+
+
+<ng-template #Location>
+  <!-- Dialog Header -->
+  <div
+    style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px;background-color:  #084eaa;">
+    <mat-dialog-title style="color: #ffffff; font-weight: bold; font-size: 1.5rem; margin: 0;">
+      Unit
+    </mat-dialog-title>
+    <mat-icon style="cursor: pointer;color: rgb(255, 255, 255);" (click)="closeDialog()">close</mat-icon>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- Form Content -->
+  <form class="p-4" style="display: flex; flex-direction: column; gap: 24px;">
+    <mat-form-field appearance="fill" style="width: 100%;">
+      <mat-label>Location</mat-label>
+      <mat-select [formControl]="Login">
+        <mat-option *ngFor="let item of Loaction" [value]="item.CompanyID">
+          {{ item.CompShort }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div style="display: flex; justify-content: flex-end;">
+      <button mat-raised-button color="primary" (click)="getUserDetIns()"
+        style="background-color: green; color: white;">
+        Submit
+      </button>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #frgPass>
+  <div
+    style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background-color: #084eaa;">
+    <mat-dialog-title style="color: #ffffff; font-weight: bold; font-size: 1.5rem; margin: 0;">
+      Forgot Password
+    </mat-dialog-title>
+    <mat-icon style="cursor: pointer; color: white;" (click)="frgPasscloseDialog()">close</mat-icon>
+  </div>
+
+  <div mat-dialog-content>
+    <div class="row">
+      <div class="col-12">
+        <mat-form-field>
+          <mat-label>UserName</mat-label>
+          <input matInput placeholder="Username" [formControl]="username">
+        </mat-form-field>
+      </div>
+      <div class="col-12">
+        <mat-form-field appearance="fill">
+          <mat-label>Date of Birth</mat-label>
+          <input matInput [matDatepicker]="picker" placeholder="Choose a date" [formControl]="dob">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </div>
+      <div class="col-12">
+        <button mat-raised-button color="primary" style="margin-left: 10px;" (click)="Verify()">
+          <mat-icon>person_search</mat-icon>
+          Validate User
+        </button>
+        <button mat-raised-button color="accent" style="margin-left:5%;" [disabled]="OTPbtn" (click)="SendOTP()">
+          <mat-icon>send</mat-icon>OTP
+        </button>
+      </div>
+      <div class="col-8">
+        <mat-form-field>
+          <mat-label>OTP</mat-label>
+          <input matInput placeholder="OTP" [formControl]="OTP" required>
+        </mat-form-field>
+      </div>
+      <div class="col-4" style="margin-top: 10px;">
+        <button mat-raised-button matTooltip="VerfiyOTP" color="accent" (click)="VerfiyOTP()" [disabled]="verfiyOtp"
+          aria-label="Verify OTP">
+          <mat-icon color="primary">verified</mat-icon> Verify
+        </button>
+      </div>
+      <div class=" ">
+        <mat-form-field>
+          <mat-label>Enter New Password</mat-label>
+          <input matInput placeholder="Enter New Password" [formControl]="UptPass" required>
+        </mat-form-field>
+      </div>
+      <div style="display: flex; justify-content: center; margin-top: 16px;">
+        <button mat-raised-button color="accent" [disabled]="PaswBtn"   (click)="updatePassword()">
+          <mat-icon>lock_reset</mat-icon>
+          Update Password
+        </button>
+
+      </div>
+    </div>
+  </div>
+</ng-template>

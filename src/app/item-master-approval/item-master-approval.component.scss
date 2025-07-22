@@ -30,35 +30,35 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
 .highlight {
   background-color: #fff3b0;
 }
 
-.table-wrapper {
-  max-height: 500px; // or any desired height
+.table-scroll-container {
+  max-height: 500px; // adjust height as needed
   overflow-y: auto;
-  display: block;
-  position: relative;
+}
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
 
-    th {
-      position: sticky;
-      top: 0;
-      margin: 0%;
-      background-color: #3f51b5;
-      color: white;
-      border: 1px solid silver;
-      text-align: center;
-      z-index: 10;
-    }
+table {
+  th {
+    background-color: #3f51b5;
+    color: white;
+    border: 1px solid silver;
+    text-align: center;
+  }
 
-    td {
+  th.mat-header-cell {
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
 
-      border: 1px solid silver;
-    }
+  td {
+
+    border: 1px solid silver;
   }
 }
 

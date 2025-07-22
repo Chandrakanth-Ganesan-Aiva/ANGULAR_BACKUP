@@ -38,8 +38,7 @@ export class GrndeleterequestComponent implements OnInit, AfterViewInit {
     this.dataSource.paginator = this.paginator
   }
   ngOnInit(): void {
-    let Location = JSON.parse(sessionStorage.getItem('location') || '{}')
-    this.LocationId = Location[Location.length - 1]
+    this.LocationId = JSON.parse(sessionStorage.getItem('location') || '{}')
 
     let UserDet = JSON.parse(sessionStorage.getItem('session') || '{}')
     this.Empid = UserDet.empid

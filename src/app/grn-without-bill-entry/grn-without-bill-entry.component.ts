@@ -2,14 +2,14 @@ import { DatePipe } from '@angular/common';
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
-import { map, startWith } from 'rxjs';
+import { map, startWith, Subscription } from 'rxjs';
 import { GrnWithoutBillEntryService } from '../service/grn-without-bill-entry.service';
 import { DialogCompComponent } from '../dialog-comp/dialog-comp.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { data } from 'jquery';
 import { Router } from '@angular/router';
-import { filter } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, filter, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-grn-without-bill-entry',
@@ -39,25 +39,41 @@ export class GrnWithoutBillEntryComponent implements OnInit {
     })
 
 
-    const data = JSON.parse(sessionStorage.getItem('location') || '{}');
-    this.loactionId = data[data.length - 1]
+    this.loactionId = JSON.parse(sessionStorage.getItem('location') || '{}');
     const user = JSON.parse(sessionStorage.getItem('session') || '{}');
     this.Empid = user.empid
   }
 
-  beforeUnloadHandler = (event: BeforeUnloadEvent) => {
-    console.log('Refresh successful');
-    // Uncomment below lines if you want to show a confirmation prompt
-    // event.preventDefault();
-    // event.returnValue = ''; 
-  };
 
 
-
+  filterSubscription: Subscription | undefined;
   filterControl = new FormControl();
+  filterMatl  = new FormControl();
   ngOnInit() {
     this.getStockReqNo()
     this.getSupplier()
+        this.filterSubscription = this.materialFilter.valueChanges
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        filter((search): search is string => search !== null && search.trim().length >= 2),
+        switchMap((search: string) => this.service.Material(search))
+      )
+      .subscribe({
+        next: (res: any) => {
+          if (res.length > 0) {
+            if (res[0].status == 'N') {
+              this.ErrorMsg = res[0].Msg
+              this.userHeader = 'Error'
+              return this.opendialog()
+            }
+             this.rawmaterial = res;
+             if ((this.materialFilter.value || '').trim().length <= 2) {
+              this.rawmaterial = [];
+            }
+          }
+        }
+      });
   }
   MasterId: number = 8718
   getStockReqNo() {
@@ -228,9 +244,8 @@ export class GrnWithoutBillEntryComponent implements OnInit {
     })
   }
 
-
   MaterialLoad() {
-    if (this.materialFilter.value && this.materialFilter.value.length > 2) {
+    if (this.materialFilter.value && this.materialFilter.value.length > 1) {
       this.getRawmatreial()
       this.materialFilter.valueChanges.pipe(map((search) =>
         this.rawmaterial.filter((option: any) =>

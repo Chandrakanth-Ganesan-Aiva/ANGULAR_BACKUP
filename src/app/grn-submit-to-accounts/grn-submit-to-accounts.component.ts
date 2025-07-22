@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnDestroy, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { GrnSubmitToAccountsService } from '../service/grn-submit-to-accounts.service';
 import { DialogCompComponent } from '../dialog-comp/dialog-comp.component';
@@ -7,6 +7,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { from } from 'rxjs';
 import { MatPaginator } from '@angular/material/paginator';
 import { DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
+import { PrintPageComponent } from '../print-page/print-page.component';
+import { data } from 'jquery';
 
 @Component({
   selector: 'app-grn-submit-to-accounts',
@@ -18,13 +21,12 @@ export class GrnSubmitToAccountsComponent implements OnInit, OnDestroy, AfterVie
   form!: FormGroup;
   CurrDate: any
   Empid: number = 0
-  constructor(private service: GrnSubmitToAccountsService, private dialog: MatDialog, private fb: FormBuilder, private date: DatePipe) {
+  constructor(private service: GrnSubmitToAccountsService, private dialog: MatDialog,
+    private fb: FormBuilder, private date: DatePipe, private router: Router) {
 
     this.CurrDate = this.date.transform(new Date(), 'yyyy-MM-dd')
 
-    const data = JSON.parse(sessionStorage.getItem('location') || '{}');
-    this.LocationId = data[data.length - 1]
-
+    this.LocationId = JSON.parse(sessionStorage.getItem('location') || '{}');
     const user = JSON.parse(sessionStorage.getItem('session') || '{}');
     this.Empid = user.empid
 
@@ -80,15 +82,37 @@ export class GrnSubmitToAccountsComponent implements OnInit, OnDestroy, AfterVie
             this.userHeader = 'Error'
             return this.opendialog()
           }
+            console.log('yes');
           this.ViewGrnDet = res
           this.ViewGrnDet = this.ViewGrnDet.map((element: any) => ({
             ...element,
-            select: false
+            select: false,
+            value: Number(element.value).toFixed(2)
           }));
           this.dataSource.data = [...this.ViewGrnDet]
+          this.dataSource.data = [...this.dataSource.data]
+            console.log('yes');
+        } else {
+          this.dataSource.data = [...res]
+           this.dataSource.data = [... this.dataSource.data]
+           console.log('no');
+           
         }
       }
     })
+  }
+  SelectAll: boolean = false;
+  isIndeterminate: boolean = false;
+  toggleSelectAll(event: any) {
+    this.SelectAll = event.checked;
+    this.dataSource.data.forEach(row => row.select = this.SelectAll);
+    this.isIndeterminate = false;
+  }
+  onCheckboxChange() {
+    const total = this.dataSource.data.length;
+    const selectedCount = this.dataSource.data.filter(row => row.select).length;
+    this.SelectAll = selectedCount === total;
+    this.isIndeterminate = selectedCount > 0 && selectedCount < total;
   }
   Search(e: any) {
     let searchValue = e.target.value
@@ -99,6 +123,7 @@ export class GrnSubmitToAccountsComponent implements OnInit, OnDestroy, AfterVie
       searchValue = ''
     }
   }
+  PrintComDialog!: MatDialogRef<PrintPageComponent>;
   View() {
     let isSelected = this.dataSource.data.filter((item: any) => item.select)
     if (isSelected.length == 0) {
@@ -108,61 +133,30 @@ export class GrnSubmitToAccountsComponent implements OnInit, OnDestroy, AfterVie
     } else {
       this.dataSource1.data = []
       this.dataSource1.data = [...isSelected]
+      this.PrintComDialog = this.dialog.open(PrintPageComponent, {
+        disableClose: true,
+        data: {
+          Comp_Name: "grnSubmitToAcc",
+          dataSource: this.dataSource1.data,
+          PrintId: this.form.controls['id'].value,
+        },
+      });
+      this.PrintComDialog.afterClosed().subscribe((result: any) => {
+        console.log(result);
+        if (result) {
+          this.getView()
+        }
+      });
     }
-
   }
   dataSource1 = new MatTableDataSource<any>()
-  Print() {
-    this.Error = 'Do You Want To Print/Save ?'
-    this.userHeader = 'Save'
-    this.opendialog()
-    this.dialogRef.afterClosed().subscribe((res: any) => {
-      if (res) {
-        let updateData: any[] = []
-        for (let data of this.dataSource1.data) {
-          updateData.push({
-            PrintId: this.form.controls['id'].value,
-            Printedby: this.Empid,
-            grn_ref_no: data.Grn_Ref_no
-          })
-        }
-        console.log(updateData);
-
-        // this.service.update(updateData).subscribe({
-        //   next: (res: any) => {
-        //     if (res.length > 0) {
-        //       if (res[0].status == 'N') {
-        //         this.Error = res[0].Msg
-        //         this.userHeader = 'Error'
-        //         return this.opendialog()
-        //       } else {
-        //         let printContents = document.getElementById('printableDiv')?.innerHTML;
-        //         let originalContents = document.body.innerHTML;
-        //         if (printContents) {
-        //           document.body.innerHTML = printContents;
-        //           window.print();
-        //         }
-        //         this.Error = res[0].Msg
-        //         this.userHeader = 'Information'
-        //         this.opendialog()
-        //         this.dialogRef.afterClosed().subscribe((res: any) => {
-        //           if (res) {
-        //             document.body.innerHTML = originalContents;
-        //             location.reload(); // Optional: reload to restore Angular bindings
-        //           }
-        //         });
-        //       }
-        //     }
-        //   }
-        // })
-      } else {
-        this.Error = 'Print/Save  Cancelled?'
-        this.userHeader = 'Information'
-        return this.opendialog()
-      }
-    })
-
-
+  clear() {
+    this.ViewGrnDet = this.ViewGrnDet.map((element: any) => ({
+      ...element,
+      select: false,
+      value: Number(element.value).toFixed(2)
+    }));
+    this.dataSource.data = [...this.ViewGrnDet]
   }
 
   ngOnDestroy() {

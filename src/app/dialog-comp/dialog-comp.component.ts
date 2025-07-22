@@ -27,8 +27,35 @@ export class DialogCompComponent {
     this.Status = false
     this.dialogRef.close(this.Status)
   }
-
   closeDialog(value: string): void {
     this.dialogRef.close(value);
   }
+  isSelectingText: any
+  checkTextSelectionStart(event: MouseEvent) {
+    const selection = window.getSelection();
+    if (selection && selection.toString().length === 0) {
+      this.isSelectingText = true;
+    }
+  }
+  checkTextSelectionEnd(event: MouseEvent) {
+    setTimeout(() => {
+      const selection = window.getSelection();
+      this.isSelectingText = selection && selection.toString().length > 0;
+      // Reset drag-disabled after short delay
+      setTimeout(() => this.isSelectingText = false, 200);
+    }, 0);
+  }
+
+  //
+  reason: string = '';
+  approve() {
+    this.Status = true;
+    this.dialogRef.close('Approved');
+  }
+   saveReason() {     
+    if (this.reason.trim()) {
+      this.dialogRef.close({ approved: true, reason: this.reason.trim() });
+    }
+  }
+
 }

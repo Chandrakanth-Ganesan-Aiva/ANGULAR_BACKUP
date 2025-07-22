@@ -26,5 +26,40 @@ export class SupplierregAppPurService {
   approve(data: any) {
     return this.http.post(environment.Api + '/Purchase/Approvals/supregAppPurchase', data)
   }
+  unapprove(data: any) {
+    return this.http.post(environment.Api + '/Purchase/Approvals/supregAppPurchaseUnappr', data)
+  }
+  unapproveCheck(partyid: any) {
+    return this.http.get(environment.Api + '/Purchase/Approvals/supregAppPurParty?partyid=' + partyid)
+  }
+  ApproveCheck(partyid: any) {
 
+    return this.http.get(environment.Api + '/Purchase/Approvals/supregAppPurParty?partyid=' + partyid)
+  }
+  insertType(data: any) {
+    return this.http.post(environment.Api + '/Purchase/Approvals/SupregPurInsertType', data)
+  }
+  email(data: any) {
+    const empid = data[0]?.empid;
+    return this.http.post(
+      `${environment.Api}/Purchase/Approvals/supregPurchaseemail?empid=${empid}`,
+      data
+    );
+  }
+  country() {
+    return this.http.get(environment.Api + '/Purchase/Approvals/SupregAppPurCountry')
+  }
+  stateid(countryid: any) {
+    return this.http.get(environment.Api + '/Purchase/Approvals/supregAppPurState?countryid=' + countryid)
+  }
+  area(stateid: any) {
+    return this.http.get(environment.Api + '/Purchase/Approvals/supregAppPurArea?stateid=' + stateid)
+  }
+  edit(data: any) {
+    console.log(data);
+    return this.http.post(environment.Api + '/Purchase/Approvals/SupregAppPurEdit', data)
+  }
+  backup(data: any) {
+    return this.http.post(environment.Api + "/Purchase/Approvals/supregAppPurbackup", data)
+  }
 }

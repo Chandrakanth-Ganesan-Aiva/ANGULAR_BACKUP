@@ -135,39 +135,39 @@ export class StoreissuelogoutComponent implements OnInit {
         ModuleId:this.StoreIssueId,
         Loginsystem:'Tab-Entry'
       }
-      this.storeissueservice.Updatelogoutime(this.Updatelockscreen).subscribe({
-        next: (res: any) => {
-          const updatelockscrrentime = res
-          console.log(updatelockscrrentime, 'updatelockscrrentime');
-          if (updatelockscrrentime.length > 0) {
-            if (updatelockscrrentime[0].status === 'Y') {
-              this.ErrorMsg = ''
-              this.ErrorMsg = "You Logout " + this.Empid + ""
-              console.log(this.ErrorMsg);
-              const view = document.getElementById('logout') as HTMLInputElement
-              view.click()
-            } else {
-              this.ErrorMsg = ''
-              this.ErrorMsg = "Failed  (OR) No Records For this Employee..Click View Btn and Check For this Empoyee will Open the Store Issue Or NOT ..."
-              console.log(this.ErrorMsg);
-              const view = document.getElementById('logout') as HTMLInputElement
-              view.click()
-            }
-          } else {
-            this.ErrorMsg = ''
-            this.ErrorMsg = "No Records To Logout For this Employee"
-            console.log(this.ErrorMsg);
-            const view = document.getElementById('logout') as HTMLInputElement
-            view.click()
-          }
-        },
-        error: (error: any) => {
-          this.apiErrorMsg = error;
-          const Error = document.getElementById('apierror') as HTMLInputElement
-          Error.click()
-          return
-        }
-      })
+      // this.storeissueservice.Updatelogoutime(this.Updatelockscreen).subscribe({
+      //   next: (res: any) => {
+      //     const updatelockscrrentime = res
+      //     console.log(updatelockscrrentime, 'updatelockscrrentime');
+      //     if (updatelockscrrentime.length > 0) {
+      //       if (updatelockscrrentime[0].status === 'Y') {
+      //         this.ErrorMsg = ''
+      //         this.ErrorMsg = "You Logout " + this.Empid + ""
+      //         console.log(this.ErrorMsg);
+      //         const view = document.getElementById('logout') as HTMLInputElement
+      //         view.click()
+      //       } else {
+      //         this.ErrorMsg = ''
+      //         this.ErrorMsg = "Failed  (OR) No Records For this Employee..Click View Btn and Check For this Empoyee will Open the Store Issue Or NOT ..."
+      //         console.log(this.ErrorMsg);
+      //         const view = document.getElementById('logout') as HTMLInputElement
+      //         view.click()
+      //       }
+      //     } else {
+      //       this.ErrorMsg = ''
+      //       this.ErrorMsg = "No Records To Logout For this Employee"
+      //       console.log(this.ErrorMsg);
+      //       const view = document.getElementById('logout') as HTMLInputElement
+      //       view.click()
+      //     }
+      //   },
+      //   error: (error: any) => {
+      //     this.apiErrorMsg = error;
+      //     const Error = document.getElementById('apierror') as HTMLInputElement
+      //     Error.click()
+      //     return
+      //   }
+      // })
     }
   }
 }
